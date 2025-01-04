@@ -20,7 +20,6 @@ class LoginRegisterController extends Controller
     // Menyimpan data form registrasi
     public function store(Request $request)
     {    
-        
         $request->validate([
             'username' => 'required|string|max:50|unique:users',
             'full_name' => 'required|string|max:100',
@@ -31,9 +30,9 @@ class LoginRegisterController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
  
-        // Membuat pengguna baru
+        // Membuat pengguna baru dengan accepted default false
         User::create([
-            'username' => $request->username, // Pastikan ini ada
+            'username' => $request->username,
             'full_name' => $request->full_name,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -41,6 +40,7 @@ class LoginRegisterController extends Controller
             'address' => $request->address,
             'password' => Hash::make($request->password),
             'role' => 'pengajar',
+            'accepted' => false, // Set accepted ke false secara default
         ]);     
  
         // Redirect ke halaman login setelah registrasi berhasil
@@ -56,7 +56,6 @@ class LoginRegisterController extends Controller
     // Mengautentikasi credential pengguna yang login
     public function authenticate(Request $request)
     {
-        
         // Validasi input
         $request->validate([
             'email' => 'required|email',
@@ -65,8 +64,17 @@ class LoginRegisterController extends Controller
 
         // Coba untuk mengautentikasi pengguna
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            // Redirect berdasarkan role
             $user = Auth::user();
+
+            // Periksa apakah pengguna diterima
+            if (!$user->accepted) {
+                Auth::logout(); // Logout pengguna jika tidak diterima
+                throw ValidationException::withMessages([
+                    'email' => 'Your registration is not yet accepted by the admin.',
+                ]);
+            }
+
+            // Redirect berdasarkan role
             if ($user->role === 'admin') {
                 return redirect()->route('dashboard-admin');
             } else {
@@ -79,7 +87,6 @@ class LoginRegisterController extends Controller
             'email' => 'The provided credentials do not match our records.',
         ]);
     }
-
 
     // Menampilkan layar dashboard kepada pengguna yang telah terautentikasi
     public function dashboard()
