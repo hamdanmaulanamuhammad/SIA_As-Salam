@@ -18,48 +18,26 @@
                 <a class="ml-6 text-lg font-bold text-gray-800" href="#">SIA As-Salam</a>
                 <ul class="mt-6">
                     <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->routeIs('dashboard-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('dashboard-admin') }}">
-                            <img src="{{ asset(request()->routeIs('dashboard-admin') ? 'assets/images/icons/house-active.svg' : 'assets/images/icons/house.svg') }}" alt="Dashboard Icon" class="w-5 h-5" />
+                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->routeIs('dashboard-pengajar') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('dashboard-pengajar') }}">
+                            <img src="{{ asset(request()->routeIs('dashboard-pengajar') ? 'assets/images/icons/house-active.svg' : 'assets/images/icons/house.svg') }}" alt="Dashboard Icon" class="w-5 h-5" />
                             <span class="ml-4">Dashboard</span>
-                        </a>
-                    </li>                    
-                    <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->is('events-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('events-admin') }}">
-                            <img src="{{ asset(request()->is('events-admin') ? 'assets/images/icons/event-active.svg' : 'assets/images/icons/event.svg') }}" alt="Events Icon" class="w-5 h-5" />
-                            <span class="ml-4">Acara</span>
                         </a>
                     </li>
                     <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->is('data-recap-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ url('/data-recap-admin') }}">
-                            <img src="{{ asset(request()->is('data-recap-admin') ? 'assets/images/icons/recap-active.svg' : 'assets/images/icons/recap.svg') }}" alt="Rekap Data Icon" class="w-5 h-5" />
+                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->is('data-recap-pengajar') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ url('/data-recap-pengajar') }}">
+                            <img src="{{ asset(request()->is('data-recap-pengajar') ? 'assets/images/icons/recap-active.svg' : 'assets/images/icons/recap.svg') }}" alt="Rekap Data Icon" class="w-5 h-5" />
                             <span class="ml-4">Rekap Data</span>
                         </a>
                     </li>
                     <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold 
-                            {{ request()->is('attendance-admin') || request()->is('manual-attendance-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} 
-                            transition-colors duration-150 hover:text-gray-800" 
-                            href="{{ url('/attendance-admin') }}">
-                            <img src="{{ asset(request()->is('attendance-admin') || request()->is('manual-attendance-admin') ? 'assets/images/icons/attendance-active.svg' : 'assets/images/icons/attendance.svg') }}" alt="Attendance Icon" class="w-5 h-5" />
+                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->is('attendance-pengajar') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ url('/attendance-pengajar') }}">
+                            <img src="{{ asset(request()->is('attendance-pengajar') ? 'assets/images/icons/attendance-active.svg' : 'assets/images/icons/attendance.svg') }}" alt="Attendance Icon" class="w-5 h-5" />
                             <span class="ml-4">Kehadiran</span>
-                        </a>
-                    </li>
-                    <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->is('teacher-details-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ url('/teacher-details-admin') }}">
-                            <img src="{{ asset(request()->is('teacher-details-admin') ? 'assets/images/icons/teachers-active.svg' : 'assets/images/icons/teachers.svg') }}" alt="Teacher Details Icon" class="w-5 h-5" />
-                            <span class="ml-4">Data Pengajar</span>
-                        </a>
-                    </li>
-                    <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->is('registration-request-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ url('/registration-request-admin') }}">
-                            <img src="{{ asset(request()->is('registration-request-admin') ? 'assets/images/icons/request-active.svg' : 'assets/images/icons/request.svg') }}" alt="Permintaan Pendaftaran Icon" class="w-5 h-5" />
-                            <span class="ml-4">Data Registrasi</span>
                         </a>
                     </li>
                 </ul>
             </div>
         </aside>
-
 
         <div class="flex flex-col flex-1 w-full md:ml-64">
             <header class="z-10 py-2 bg-white shadow-md">
@@ -75,16 +53,10 @@
                             <button id="profile-button" class="align-middle rounded-full focus:outline-none" aria-label="Account" aria-haspopup="true">
                                 <img class="object-cover w-8 h-8 rounded-full" src="https://placehold.co/200x200" alt="" aria-hidden="true" />
                             </button>
-                            <span class="ml-2 text-sm font-medium text-gray-700">
-                            @auth
-                                {{ Auth::user()->username }}
-                            @else
-                                Guest
-                            @endauth
-                            </span>
+                            <span class="ml-2 text-sm font-medium text-gray-700">Pengajar</span>
                             <div id="dropdown" class="absolute right-0 z-20 hidden mt-2 w-48 bg-white rounded-md shadow-lg">
                                 <div class="py-1">
-                                    <a class="flex px-4 py-2 hover:bg-gray-100" href="{{ route('profile-admin') }}">
+                                    <a class="flex px-4 py-2 hover:bg-gray-100" href="{{ route('profile-pengajar') }}">
                                         <img src="{{ asset('assets/images/icons/profile.svg') }}" alt="Profile" class="w-3 h-3 mr-3">
                                         <span class="block text-sm text-gray-800">Profile</span>
                                     </a>

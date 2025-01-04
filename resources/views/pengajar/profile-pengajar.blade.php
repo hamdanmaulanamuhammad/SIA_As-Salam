@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.pengajar')
 
 @section('title', 'Profile')
 
@@ -23,28 +23,24 @@
 
             <div class="mt-8">
                 <div class="mb-4">
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                    <input type="text" id="name" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="{{ $user->full_name }}" readonly />
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
+                    <input type="text" id="name" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="John Doe" readonly />
                 </div>
                 <div class="mb-4">
                     <label for="nip" class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
-                    <input type="text" id="nip" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="{{ $user->id }}" readonly />
+                    <input type="text" id="nip" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="123456789" readonly />
                 </div>
                 <div class="mb-4">
                     <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                    <input type="text" id="username" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="{{ $user->username }}" readonly />
+                    <input type="text" id="username" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="johndoe" readonly />
                 </div>
                 <div class="mb-4">
                     <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">No HP</label>
-                    <input type="text" id="phone" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="{{ $user->phone }}" readonly />
+                    <input type="text" id="phone" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="08123456789" readonly />
                 </div>
                 <div class="mb-4">
                     <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" id="email" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="{{ $user->email }}" readonly />
-                </div>
-                <div class="mb-4">
-                    <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                    <input type="text" id="role" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="{{ $user->role }}" readonly />
+                    <input type="email" id="email" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="johndoe@example.com" readonly />
                 </div>
                 <div class="flex justify-end">
                     <button type="button" id="edit-button" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Edit</button>
@@ -61,19 +57,19 @@
             <form id="edit-profile-form" class="mt-4">
                 <div class="mb-4">
                     <label for="edit-name-input" class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
-                    <input type="text" id="edit-name-input" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="{{ $user->full_name }}" required />
+                    <input type="text" id="edit-name-input" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="John Doe" required />
                 </div>
                 <div class="mb-4">
                     <label for="edit-username-input" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                    <input type="text" id="edit-username-input" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="{{ $user->username }}" required />
+                    <input type="text" id="edit-username-input" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="johndoe" required />
                 </div>
                 <div class="mb-4">
                     <label for="edit-phone-input" class="block text-sm font-medium text-gray-700 mb-1">No HP</label>
-                    <input type="text" id="edit-phone-input" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="{{ $user->phone }}" required />
+                    <input type="text" id="edit-phone-input" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="08123456789" required />
                 </div>
                 <div class="mb-4">
                     <label for="edit-email-input" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" id="edit-email-input" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="{{ $user->email }}" required />
+                    <input type="email" id="edit-email-input" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="johndoe@example.com" required />
                 </div>
                 <div class="flex justify-end">
                     <button type="button" id="cancel-edit-button" class="px-4 py-2 mr-2 text-sm text-white bg-gray-400 rounded-md hover:bg-gray-500">Batal</button>

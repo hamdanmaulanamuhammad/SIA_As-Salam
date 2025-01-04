@@ -1,16 +1,19 @@
 <?php
 
+use App\Http\Controllers\LoginRegisterController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 // Login
-Route::get('/', function () {
-    return view('auth.login'); 
-})-> name('login');
+Route::get('/', [LoginRegisterController::class, 'login'])->name('login');
+Route::post('/login', [LoginRegisterController::class, 'authenticate'])->name('login.authenticate');
 
 // Register
-Route::get('/register', function () {
-    return view('auth.register'); 
-})->name('register');
+Route::get('/register', [LoginRegisterController::class, 'register'])->name('register');
+Route::post('/register', [LoginRegisterController::class, 'store'])->name('register.store');
+
+// Logout
+Route::post('/logout', [LoginRegisterController::class, 'logout'])->name('logout');
 
 // Admin Route
     // Dashboard
@@ -49,9 +52,26 @@ Route::get('/register', function () {
     })->name('registration-request-admin');
 
     // Profile
-    Route::get('/profile-admin', function () {
-        return view('admin.profile-admin'); 
-    })->name('profile-admin');
+    Route::get('/profile-admin', [ProfileController::class, 
+    'showAdminProfile'])->name('profile-admin');
 
     
+// Pengajar Route
+    // Dashboard
+    Route::get('/dashboard-pengajar', function () {
+        return view('pengajar.dashboard-pengajar'); 
+    })->name('dashboard-pengajar');
 
+    // Data Recap
+    Route::get('/data-recap-pengajar', function () {
+        return view('pengajar.data-recap-pengajar'); 
+    })->name('data-recap-pengajar');
+
+    // Kehadiran
+    Route::get('/attendance-pengajar', function () {
+        return view('pengajar.attendance-pengajar'); 
+    })->name('attendance-pengajar');
+
+    // Profile
+    Route::get('/profile-pengajar', [ProfileController::class, 
+    'showPengajarProfile'])->name('profile-pengajar');

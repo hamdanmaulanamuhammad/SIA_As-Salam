@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register - SIA As-Salam</title>
-    @vite('resources/css/app.css') <!-- Menggunakan Vite untuk mengimpor CSS -->
+    @vite('resources/css/app.css')
 </head>
 <body>
     <div class="flex items-center min-h-screen p-6 bg-gray-50">
@@ -16,41 +16,50 @@
                 <div class="flex items-center justify-center p-6 sm:p-12 md:w-1/2">
                     <div class="w-full">
                         <h1 class="mb-6 text-2xl font-semibold text-gray-700">Register - SIA As-Salam</h1>
-                        <form action="{{ route('register') }}" method="POST"> <!-- Ganti dengan rute register yang sesuai -->
+                        <form action="{{ route('register.store') }}" method="post">
                             @csrf
-                            <label class="block text-base">
+                            @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+                            <label class="block text-base" for="username">
                                 <span class="text-gray-700">Username</span>
-                                <input class="block w-full p-2 mt-1 text-sm md:text-lg border-gray-300 rounded-md focus:border-blue-600 focus:outline-none focus:shadow-outline-blue form-input dark:bg-gray-100 dark:border-gray-600" name="username" placeholder="Username" required />
+                                <input id="username" class="block w-full p-2 mt-1 text-sm md:text-lg border-gray-300 rounded-md" name="username" placeholder="Username" required />
                             </label>
-                            <label class="block text-base">
+                            <label class="block mt-4 text-base" for="full_name">
                                 <span class="text-gray-700">Nama Lengkap</span>
-                                <input class="block w-full p-2 mt-1 text-sm md:text-lg border-gray-300 rounded-md focus:border-blue-600 focus:outline-none focus:shadow-outline-blue form-input dark:bg-gray-100 dark:border-gray-600" name="full_name" placeholder="Nama Lengkap" required />
+                                <input id="full_name" class="block w-full p-2 mt-1 text-sm md:text-lg border-gray-300 rounded-md" name="full_name" placeholder="Nama Lengkap" required />
                             </label>
-                            <label class="block mt-4 text-base">
+                            <label class="block mt-4 text-base" for="email">
                                 <span class="text-gray-700">Email</span>
-                                <input class="block w-full p-2 mt-1 text-sm md:text-lg border-gray-300 rounded-md focus:border-blue-600 focus:outline-none focus:shadow-outline-blue form-input dark:bg-gray-100 dark:border-gray-600" name="email" placeholder="Email" required />
+                                <input id="email" class="block w-full p-2 mt-1 text-sm md:text-lg border-gray-300 rounded-md" name="email" placeholder="Email" required />
                             </label>
-                            <label class="block mt-4 text-base">
+                            <label class="block mt-4 text-base" for="phone">
                                 <span class="text-gray-700">No Telp</span>
-                                <input class="block w-full p-2 mt-1 text-sm md:text-lg border-gray-300 rounded-md focus:border-blue-600 focus:outline-none focus:shadow-outline-blue form-input dark:bg-gray-100 dark:border-gray-600" name="phone" placeholder="No. Telp" required />
+                                <input id="phone" class="block w-full p-2 mt-1 text-sm md:text-lg border-gray-300 rounded-md" name="phone" placeholder="No. Telp" required />
                             </label>
-                            <label class="block mt-4 text-base">
+                            <label class="block mt-4 text-base" for="university">
                                 <span class="text-gray-700">Universitas</span>
-                                <input class="block w-full p-2 mt-1 text-sm md:text-lg border-gray-300 rounded-md focus:border-blue-600 focus:outline-none focus:shadow-outline-blue form-input dark:bg-gray-100 dark:border-gray-600" name="university" placeholder="Nama Universitas" required />
+                                <input id="university" class="block w-full p-2 mt-1 text-sm md:text-lg border-gray-300 rounded-md" name="university" placeholder="Nama Universitas" required />
                             </label>
-                            <label class="block mt-4 text-base">
+                            <label class="block mt-4 text-base" for="address">
                                 <span class="text-gray-700">Alamat</span>
-                                <input class="block w-full p-2 mt-1 text-sm md:text-lg border-gray-300 rounded-md focus:border-blue-600 focus:outline-none focus:shadow-outline-blue form-input dark:bg-gray-100 dark:border-gray-600" name="address" placeholder="Alamat" required />
+                                <input id="address" class="block w-full p-2 mt-1 text-sm md:text-lg border-gray-300 rounded-md" name="address" placeholder="Alamat" required />
                             </label>
-                            <label class="block mt-4 text-base">
+                            <label class="block mt-4 text-base" for="password">
                                 <span class="text-gray-700">Password</span>
-                                <input class="block w-full p-2 mt-1 text-sm md:text-lg border-gray-300 rounded-md focus:border-blue-600 focus:outline-none focus:shadow-outline-blue form-input dark:bg-gray-100 dark:border-gray-600" name="password" placeholder="***************" type="password" required />
+                                <input id="password" class="block w-full p-2 mt-1 text-sm md:text-lg border-gray-300 rounded-md" name="password" type="password" placeholder="***************" required />
                             </label>
-                            <label class="block mt-4 text-base mb-10">
+                            <label class="block mt-4 text-base mb-10" for="password_confirmation">
                                 <span class="text-gray-700">Konfirmasi Password</span>
-                                <input class="block w-full p-2 mt-1 text-sm md:text-lg border-gray-300 rounded-md focus:border-blue-600 focus:outline-none focus:shadow-outline-blue form-input dark:bg-gray-100 dark:border-gray-600" name="password_confirmation" placeholder="***************" type="password" required />
+                                <input id="password_confirmation" class="block w-full p-2 mt-1 text-sm md:text-lg border-gray-300 rounded-md" name="password_confirmation" type="password" placeholder="***************" required />
                             </label>
-                            <button type="submit" class="block w-full px-4 py-3 mt-4 text-sm md:text-lg font-medium leading-5 text-center text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">Register</button>
+                            <button type="submit" class="block w-full px-4 py-3 mt-4 text-sm md:text-lg font-medium leading-5 text-center text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg">Register</button>
                         </form>
                         <hr class="my-8" />
                         <p class="mt-1">
@@ -63,3 +72,4 @@
     </div>
 </body>
 </html>
+ 

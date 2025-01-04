@@ -108,48 +108,23 @@
         </div>
     </div>
 
-    <!-- Modal Konfirmasi Terima Pendaftaran -->
-    <div id="accept-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
-        <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md">
-            <span id="close-accept-modal" class="float-right cursor-pointer text-gray-500">&times;</span>
-            <h3 class="text-lg font-semibold">Konfirmasi Terima Pendaftaran</h3>
-            <p class="mt-2">Masukkan NIP untuk pengajar <span id="accept-teacher-name"></span>:</p>
-            <input type="text" id="nip-input" class="mt-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" placeholder="NIP" required />
-            <div class="flex justify-end mt-4">
-                <button id="cancel-accept" class="px-4 py-2 mr-2 text-sm text-white bg-gray-400 rounded-md hover:bg-gray-500">Batal</button>
-                <button id="confirm-accept" class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700">Terima</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         // Fungsi untuk mengonfirmasi penerimaan pendaftaran
         function confirmAccept(name) {
-            // Menampilkan modal konfirmasi
-            document.getElementById('accept-teacher-name').textContent = name;
-            document.getElementById('accept-modal').classList.remove('hidden');
-
-            // Menangani tombol batal
-            document.getElementById('cancel-accept').onclick = () => {
-                document.getElementById('accept-modal').classList.add('hidden');
-            };
-
-            // Menangani tombol terima
-            document.getElementById('confirm-accept').onclick = () => {
-                const nip = document.getElementById('nip-input').value;
-                if (nip) {
+            // Menampilkan SweetAlert konfirmasi
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: `Apakah Anda yakin ingin menerima pendaftaran pengajar ${name}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, terima',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
                     // Logika untuk menerima pendaftaran
-                    Swal.fire('Sukses!', `Pendaftaran pengajar ${name} dengan NIP ${nip} telah diterima.`, 'success');
-                    document.getElementById('accept-modal').classList.add('hidden');
-                } else {
-                    Swal.fire('Error!', 'NIP tidak boleh kosong!', 'error');
+                    Swal.fire('Sukses!', `Pendaftaran pengajar ${name} telah diterima.`, 'success');
                 }
-            };
-
-            // Menangani tombol close
-            document.getElementById('close-accept-modal').onclick = () => {
-                document.getElementById('accept-modal').classList.add('hidden');
-            };
+            });
         }
 
         // Fungsi untuk mengonfirmasi penolakan pendaftaran
