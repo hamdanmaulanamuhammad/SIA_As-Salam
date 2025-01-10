@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LoginRegisterController;
+use App\Http\Controllers\PengajarController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckRole;
@@ -46,26 +47,29 @@ Route::middleware(['auth'])->group(function () {
         })->name('manual-attendance-admin');
 
         // Detail Pengajar
-        Route::get('/teacher-details-admin', function () {
-            return view('admin.teacher-details-admin'); 
-        })->name('teacher-details-admin');
+        Route::get('/teacher-details-admin', [PengajarController::class, 'showTeacherDetails'])->name('teacher-details-admin');
+        // Rute untuk menghapus pengajar
+        Route::delete('/teachers/{id}', [PengajarController::class, 'deleteTeacher'])->name('teachers.delete');
 
         // Permintaan Pendaftaran
-        Route::get('/registration-request-admin', function () {
-            return view('admin.registration-request-admin'); 
-        })->name('registration-request-admin');
+        // Rute untuk menampilkan permintaan registrasi
+        Route::get('/registration-request-admin', [PengajarController::class, 'showRegistrationRequests'])->name('registration-request-admin');
+
+        // Rute untuk menerima dan menolak pendaftaran
+        Route::post('/registration/accept/{id}', [PengajarController::class, 'acceptRegistration'])->name('registration.accept');
+        Route::post('/registration/reject/{id}', [PengajarController::class, 'rejectRegistration'])->name('registration.reject');
 
         // Profile
         Route::get('/profile-admin', [ProfileController::class, 'showAdminProfile'])->name('profile-admin');
 
         // Rute untuk mengupdate profil admin
-        Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
+        Route::post('/profile-admin/update', [ProfileController::class, 'updateProfile'])->name('profile.admin.update');
 
         // Rute untuk mengupload foto profil admin
-        Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.uploadPhoto');
+        Route::post('/profile-admin/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.admin.uploadPhoto');
 
         // Rute untuk menghapus foto profil admin
-        Route::post('/profile/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.deletePhoto');
+        Route::delete('/profile-admin/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.admin.deletePhoto');
     });
 
     // Pengajar Route
@@ -89,12 +93,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/profile-pengajar', [ProfileController::class, 'showPengajarProfile'])->name('profile-pengajar');
 
         // Rute untuk mengupdate profil pengajar
-        Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
+        Route::post('/profile-pengajar/update', [ProfileController::class, 'updateProfile'])->name('profile.pengajar.update');
 
         // Rute untuk mengupload foto profil pengajar
-        Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.uploadPhoto');
+        Route::post('/profile-pengajar/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.pengajar.uploadPhoto');
 
         // Rute untuk menghapus foto profil pengajar
-        Route::post('/profile/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.deletePhoto');
+        Route::post('/profile-pengajar/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.pengajar.deletePhoto');
     });
 });

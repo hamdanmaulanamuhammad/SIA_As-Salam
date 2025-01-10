@@ -33,7 +33,8 @@ class ProfileController extends Controller
         $user->email = $request->email;
         $user->save();
 
-        return response()->json(['success' => true, 'user' => $user]);
+        // Menyimpan pesan sukses ke session
+        return redirect()->route('profile-admin')->with('success', 'Profil berhasil diperbarui.');
     }
 
     // Mengupload foto profil
@@ -56,22 +57,25 @@ class ProfileController extends Controller
         $user->photo = $path;
         $user->save();
 
-        return response()->json(['success' => true, 'photoUrl' => Storage::url($path)]);
+        // Menyimpan pesan sukses ke session
+        return redirect()->route('profile-admin')->with('success', 'Foto profil berhasil diunggah.');
     }
-
 
     // Menghapus foto profil
     public function deletePhoto(Request $request)
     {
         $user = Auth::user();
 
-        // Hapus foto dari storage
-        if ($user->photo) {
-            Storage::delete($user->photo);
-            $user->photo = null; // Set foto ke null
-            $user->save();
-        }
-
-        return response()->json(['success' => true]);
+    // Hapus foto dari storage
+    if ($user->photo) {
+        Storage::delete($user->photo);
+        $user->photo = null; // Set foto ke null
+        $user->save();
     }
+
+    // Menyimpan pesan sukses ke session
+    return redirect()->route('profile-admin')->with('success', 'Foto profil berhasil dihapus.');
+    }
+
+    
 }

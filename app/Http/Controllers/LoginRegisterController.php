@@ -103,4 +103,5 @@ class LoginRegisterController extends Controller
 
         return redirect()->route('login')->with('success','You have logged out successfully!');
     }
-}
+        
+    }

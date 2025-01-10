@@ -72,9 +72,9 @@
                     <h2 class="my-2 text-xl font-semibold text-gray-700">@yield('title')</h2>
                     <div class="flex items-center">
                         <div class="relative">
-                            <button id="profile-button" class="align-middle rounded-full focus:outline-none" aria-label="Account" aria-haspopup="true">
-                                <img class="object-cover w-8 h-8 rounded-full" src="https://placehold.co/200x200" alt="" aria-hidden="true" />
-                            </button>
+                        <button id="profile-button" class="align-middle rounded-full focus:outline-none" aria-label="Account" aria-haspopup="true">
+                            <img class="object-cover w-8 h-8 rounded-full" src="{{ Auth::user()->photo ? Storage::url(Auth::user()->photo) : 'https://placehold.co/100x100' }}" alt="Profile Picture" aria-hidden="true" />
+                        </button>
                             <span class="ml-2 text-sm font-medium text-gray-700">
                             @auth
                                 {{ Auth::user()->username }}

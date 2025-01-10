@@ -5,6 +5,13 @@
 @section('content')
     <div class="container mx-auto p-6">
         <h2 class="text-2xl font-semibold text-gray-700 mt-6 mb-6">Data Permintaan Registrasi</h2>
+
+        @if(session('success'))
+            <div class="bg-green-500 text-white p-4 rounded-md mb-4">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <!-- Filter dan Entries -->
         <div class="md:flex md:justify-between">
             <div class="flex space-x-4 mb-6">
@@ -41,6 +48,7 @@
                 <span class="ml-2 text-sm text-gray-600">entries</span>
             </div>
         </div>
+
         <!-- Tabel Permintaan Pendaftaran -->
         <div class="overflow-x-auto">
             <table class="w-full bg-white rounded-lg shadow">
@@ -58,91 +66,119 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y">
+                    @foreach($users as $user)
                     <tr class="text-gray-700">
-                        <td class="px-4 py-3">1</td>
-                        <td class="px-4 py-3">NULL</td>
-                        <td class="px-4 py-3">John Doe</td>
-                        <td class="px-4 py-3">john.doe@example.com</td>
-                        <td class="px-4 py-3">08123456789</td>
-                        <td class="px-4 py-3">01/01/2024</td>
-                        <td class="px-4 py-3">Universitas A</td>
-                        <td class="px-4 py-3">Jl. Contoh No. 1</td>
+                        <td class="px-4 py-3">{{ $loop->iteration }}</td>
+                        <td class="px-4 py-3">{{ $user->id }}</td> <!-- Menggunakan ID sebagai NIP -->
+                        <td class="px-4 py-3">{{ $user->full_name }}</td>
+                        <td class="px-4 py-3">{{ $user->email }}</td>
+                        <td class="px-4 py-3">{{ $user->phone }}</td>
+                        <td class="px-4 py-3">{{ $user->created_at->format('d/m/Y') }}</td>
+                        <td class="px-4 py-3">{{ $user->university }}</td>
+                        <td class="px-4 py-3">{{ $user->address }}</td>
                         <td class="px-4 py-3">
-                            <button class="px-2 py-1 w-8 text-white bg-green-600 rounded-md" onclick="confirmAccept('John Doe')">
-                                <i class="fas fa-check"></i>
-                            </button>
-                            <button class="px-2 py-1 w-8 text-white bg-red-600 rounded-md" onclick="confirmReject('John Doe')">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </td>                                                                     
-                    </tr>
-                    <tr class="text-gray-700">
-                        <td class="px-4 py-3">2</td>
-                        <td class="px-4 py-3">NULL</td>
-                        <td class="px-4 py-3">Jane Smith</td>
-                        <td class="px-4 py-3">jane.smith@example.com</td>
-                        <td class="px-4 py-3">08234567890</td>
-                        <td class="px-4 py-3">02/02/2024</td>
-                        <td class="px-4 py-3">Universitas B</td>
-                        <td class="px-4 py-3">Jl. Contoh No. 2</td>
-                        <td class="px-4 py-3">
-                            <button class="px-2 py-1 w-8 text-white bg-green-600 rounded-md" onclick="confirmAccept('Jane Smith')">
-                                <i class="fas fa-check"></i>
-                            </button>
-                            <button class="px-2 py-1 w-8 text-white bg-red-600 rounded-md" onclick="confirmReject('Jane Smith')">
-                                <i class="fas fa-times"></i>
-                            </button>
+                            <!-- Form untuk menerima pendaftaran -->
+                            <form action="{{ route('registration.accept', $user->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                <button type="button" class="px-2 py-1 w-8 text-white bg-green-600 rounded-md" onclick="confirmAccept('{{ $user->full_name }}', {{ $user->id }})">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </form>
+                            <!-- Form untuk menolak pendaftaran -->
+                            <form action="{{ route('registration.reject', $user->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                <button type="button" class="px-2 py-1 w-8 text-white bg-red-600 rounded-md" onclick="confirmReject('{{ $user->full_name }}', {{ $user->id }})">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
-                    <!-- Tambahkan lebih banyak baris sesuai kebutuhan -->
+                    @endforeach
                 </tbody>
             </table>
             <!-- Pagination -->
             <div class="flex items-center justify-between mt-4 mb-10">
-                <span class="text-sm text-gray-700">Showing 1-3 of 10 entries</span>
+                <span class="text-sm text-gray-700">Showing {{ $users->count() }} of {{ $users->total() }} entries</span>
                 <div>
-                    <button class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700">Previous</button>
-                    <button class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700">Next</button>
+                    {{ $users->links() }} <!-- Pagination links -->
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Fungsi untuk mengonfirmasi penerimaan pendaftaran
-        function confirmAccept(name) {
-            // Menampilkan SweetAlert konfirmasi
-            Swal.fire({
-                title: 'Konfirmasi',
-                text: `Apakah Anda yakin ingin menerima pendaftaran pengajar ${name}?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, terima',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Logika untuk menerima pendaftaran
-                    Swal.fire('Sukses!', `Pendaftaran pengajar ${name} telah diterima.`, 'success');
-                }
-            });
-        }
+     // Fungsi untuk mengonfirmasi penerimaan pendaftaran
+    function confirmAccept(name, id) {
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: `Apakah Anda yakin ingin menerima pendaftaran pengajar ${name}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, terima',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Kirim permintaan untuk menerima pendaftaran
+                fetch(`/registration/accept/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Sukses!', `Pendaftaran pengajar ${name} telah diterima.`, 'success')
+                            .then(() => {
+                                location.reload(); // Reload halaman untuk memperbarui tampilan
+                            });
+                    } else {
+                        Swal.fire('Error!', data.message || 'Terjadi kesalahan saat menerima pendaftaran.', 'error');
+                    }
+                })
+                .catch(error => {
+                    Swal.fire('Error!', 'Terjadi kesalahan saat menerima pendaftaran.', 'error');
+                });
+            }
+        });
+    }
 
-        // Fungsi untuk mengonfirmasi penolakan pendaftaran
-        function confirmReject(name) {
-            Swal.fire({
-                title: 'Konfirmasi Tolak Pendaftaran',
-                text: `Apakah Anda yakin ingin menolak pendaftaran pengajar ${name}?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Tolak',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Logika untuk menolak pendaftaran
-                    Swal.fire('Sukses!', `Pendaftaran pengajar ${name} telah ditolak.`, 'success');
-                    // Tambahkan logika untuk memperbarui tabel jika diperlukan
-                }
-            });
-        }
-    </script>
+    // Fungsi untuk mengonfirmasi penolakan pendaftaran
+    function confirmReject(name, id) {
+        Swal.fire({
+            title: 'Konfirmasi Tolak Pendaftaran',
+            text: `Apakah Anda yakin ingin menolak pendaftaran pengajar ${name}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Tolak',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Kirim permintaan untuk menolak pendaftaran
+                fetch(`/registration/reject/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Sukses!', `Pendaftaran pengajar ${name} telah ditolak.`, 'success')
+                            .then(() => {
+                                location.reload(); // Reload halaman untuk memperbarui tampilan
+                            });
+                    } else {
+                        Swal.fire('Error!', data.message || 'Terjadi kesalahan saat menolak pendaftaran.', 'error');
+                    }
+                })
+                .catch(error => {
+                    Swal.fire('Error!', 'Terjadi kesalahan saat menolak pendaftaran.', 'error');
+                });
+            }
+        });
+    }
+</script>
 @endsection

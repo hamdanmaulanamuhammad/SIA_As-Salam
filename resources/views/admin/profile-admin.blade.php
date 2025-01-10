@@ -14,10 +14,13 @@
                         class="py-3.5 px-7 text-base font-medium text-white focus:outline-none bg-blue-600 rounded-lg border border-blue-200 hover:bg-blue-700 focus:z-10 focus:ring-4 focus:ring-blue-200 ">
                         Ganti Foto
                     </button>
-                    <button type="button" id="delete-photo-button"
-                        class="py-3.5 px-7 text-base font-medium text-red-600 focus:outline-none bg-white rounded-lg border border-red-200 hover:bg-red-100 focus:z-10 focus:ring-4 focus:ring-red-200 ">
-                        Hapus Foto
-                    </button>
+                    <form action="{{ route('profile.admin.deletePhoto') }}" method="POST" class="inline-block">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" id="delete-photo-button" class="py-3.5 px-7 text-base font-medium text-red-600 focus:outline-none bg-white rounded-lg border border-red-200 hover:bg-red-100 focus:z-10 focus:ring-4 focus:ring-red-200">
+                            Hapus Foto
+                        </button>
+                    </form>
                 </div>
             </div>
 
@@ -58,7 +61,7 @@
         <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md">
             <span id="close-edit-modal" class="float-right cursor-pointer text-gray-500">&times;</span>
             <h2 class="text-lg font-semibold">Edit Profile</h2>
-            <form action="{{ route('profile.update') }}" method="POST" class="mt-4">
+            <form action="{{ route('profile.admin.update') }}" method="POST" class="mt-4">
                 @csrf
                 <div class="mb-4">
                     <label for="edit-name-input" class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
@@ -89,7 +92,7 @@
         <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md">
             <span id="close-change-photo-modal" class="float-right cursor-pointer text-gray-500">&times;</span>
             <h2 class="text-lg font-semibold">Ganti Foto Profil</h2>
-            <form action="{{ route('profile.uploadPhoto') }}" method="POST" enctype="multipart/form-data" id="change-photo-form">
+            <form action="{{ route('profile.admin.uploadPhoto') }}" method="POST" enctype="multipart/form-data" id="change-photo-form">
                 @csrf
                 <input type="file" name="photo" accept="image/*" required class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 mt-4" />
                 <div class="flex justify-end mt-4">
@@ -126,6 +129,50 @@
 
         document.getElementById('cancel-change-photo').addEventListener('click', () => {
             document.getElementById('change-photo-modal').classList.add('hidden');
+        });
+        // Menangani penghapusan foto dengan SweetAlert
+        document.getElementById('delete-photo-button').addEventListener('click', () => {
+            Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: "Apakah Anda yakin ingin menghapus foto profil ini?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Jika pengguna mengkonfirmasi, kirim permintaan untuk menghapus foto
+                    fetch('{{ route("profile.admin.deletePhoto") }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire(
+                                'Dihapus!',
+                                'Foto profil Anda telah dihapus.',
+                                'success'
+                            ).then(() => {
+                                location.reload(); // Reload halaman untuk memperbarui tampilan
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            'Error!',
+                            'Terjadi kesalahan saat menghapus foto.',
+                            'error'
+                        );
+                    });
+                }
+            });
         });
 
         // Menangani SweetAlert untuk pesan sukses

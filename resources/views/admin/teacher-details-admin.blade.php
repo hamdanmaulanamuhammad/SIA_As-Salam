@@ -43,7 +43,7 @@
         </div>
         <!-- Tabel Detail Pengajar -->
         <div class="overflow-x-auto">
-            <table class="w-full bg-white rounded-lg shadow">
+        <table class="w-full bg-white rounded-lg shadow">
                 <thead>
                     <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
                         <th class="px-4 py-3">No</th>
@@ -58,37 +58,23 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y">
+                    @foreach($teachers as $index => $teacher)
                     <tr class="text-gray-700">
-                        <td class="px-4 py-3">1</td>
-                        <td class="px-4 py-3">123456</td>
-                        <td class="px-4 py-3">John Doe</td>
-                        <td class="px-4 py-3">john.doe@example.com</td>
-                        <td class="px-4 py-3">08123456789</td>
-                        <td class="px-4 py-3">01/01/2020</td>
-                        <td class="px-4 py-3">Universitas A</td>
-                        <td class="px-4 py-3">Jl. Contoh No. 1</td>
+                        <td class="px-4 py-3">{{ $index + 1 }}</td>
+                        <td class="px-4 py-3">{{ $teacher->id }}</td>
+                        <td class="px-4 py-3">{{ $teacher->full_name }}</td>
+                        <td class="px-4 py-3">{{ $teacher->email }}</td>
+                        <td class="px-4 py-3">{{ $teacher->phone }}</td>
+                        <td class="px-4 py-3">{{ $teacher->created_at->format('d/m/Y') }}</td>
+                        <td class="px-4 py-3">{{ $teacher->university }}</td>
+                        <td class="px-4 py-3">{{ $teacher->address }}</td>
                         <td class="px-4 py-3">
-                            <button class="text-red-600" onclick="confirmDelete('123456', 'John Doe')">
+                            <button class="text-red-600" onclick="confirmDelete('{{ $teacher->id }}', '{{ $teacher->full_name }}')">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </td>
                     </tr>
-                    <tr class="text-gray-700">
-                        <td class="px-4 py-3">2</td>
-                        <td class="px-4 py-3">654321</td>
-                        <td class="px-4 py-3">Jane Smith</td>
-                        <td class="px-4 py-3">jane.smith@example.com</td>
-                        <td class="px-4 py-3">08234567890</td>
-                        <td class="px-4 py-3">02/02/2020</td>
-                        <td class="px-4 py-3">Universitas B</td>
-                        <td class="px-4 py-3">Jl. Contoh No. 2</td>
-                        <td class="px-4 py-3">
-                            <button class="text-red-600" onclick="confirmDelete('654321', 'Jane Smith')">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <!-- Tambahkan lebih banyak baris sesuai kebutuhan -->
+                    @endforeach
                 </tbody>
             </table>
 
@@ -107,7 +93,7 @@
 @section('scripts')
     <script>
         // Fungsi untuk mengonfirmasi penghapusan pengajar
-        function confirmDelete(nip, name) {
+        function confirmDelete(id, name) {
             Swal.fire({
                 title: 'Konfirmasi Hapus',
                 text: `Apakah Anda yakin ingin menghapus pengajar ${name}?`,
@@ -117,16 +103,30 @@
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Logika untuk menghapus pengajar
-                    Swal.fire('Dihapus!', `Pengajar ${name} telah dihapus.`, 'success');
-                    // Tambahkan logika untuk memperbarui tabel jika diperlukan
+                    // Kirim permintaan untuk menghapus pengajar
+                    fetch(`/teachers/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Dihapus!', `Pengajar ${name} telah dihapus.`, 'success')
+                                .then(() => {
+                                    location.reload(); // Reload halaman untuk memperbarui tampilan
+                                });
+                        } else {
+                            Swal.fire('Error!', 'Terjadi kesalahan saat menghapus pengajar.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error!', 'Terjadi kesalahan saat menghapus pengajar.', 'error');
+                    });
                 }
             });
         }
-
-        // Inisialisasi SweetAlert jika diperlukan
-        document.addEventListener('DOMContentLoaded', function() {
-            // Kode inisialisasi lainnya jika diperlukan
-        });
     </script>
 @endsection
