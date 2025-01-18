@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\LoginRegisterController;
 use App\Http\Controllers\PengajarController;
 use App\Http\Controllers\ProfileController;
@@ -26,11 +27,13 @@ Route::middleware(['auth'])->group(function () {
             return view('admin.dashboard-admin'); 
         })->name('dashboard-admin');
 
-        // Events
-        Route::get('/events-admin', function () {
-            return view('admin.events-admin'); 
-        })->name('events-admin');
-
+        // Events  
+        Route::get('/events-admin', [EventController::class, 'index'])->name('events-admin');  
+        Route::get('/events-admin/create', [EventController::class, 'create'])->name('events.create');  
+        Route::post('/events-admin', [EventController::class, 'store'])->name('events.store');  
+        Route::get('/events-admin/{event}/edit', [EventController::class, 'edit'])->name('events.edit');  
+        Route::put('/events-admin/{event}', [EventController::class, 'update'])->name('events.update');  
+        Route::delete('/events-admin/{event}', [EventController::class, 'destroy'])->name('events.destroy');  
         // Data Recap
         Route::get('/data-recap-admin', function () {
             return view('admin.data-recap-admin'); 
