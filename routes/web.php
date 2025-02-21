@@ -1,9 +1,9 @@
 <?php
-
-use App\Http\Controllers\EventController;
 use App\Http\Controllers\LoginRegisterController;
 use App\Http\Controllers\PengajarController;
+use App\Http\Controllers\PresenceController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RecapController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckRole;
 
@@ -27,22 +27,35 @@ Route::middleware(['auth'])->group(function () {
             return view('admin.dashboard-admin'); 
         })->name('dashboard-admin');
 
-        // Events  
-        Route::get('/events-admin', [EventController::class, 'index'])->name('events-admin');  
-        Route::get('/events-admin/create', [EventController::class, 'create'])->name('events.create');  
-        Route::post('/events-admin', [EventController::class, 'store'])->name('events.store');  
-        Route::get('/events-admin/{event}/edit', [EventController::class, 'edit'])->name('events.edit');  
-        Route::put('/events-admin/{event}', [EventController::class, 'update'])->name('events.update');  
-        Route::delete('/events-admin/{event}', [EventController::class, 'destroy'])->name('events.destroy');  
-        // Data Recap
-        Route::get('/data-recap-admin', function () {
-            return view('admin.data-recap-admin'); 
-        })->name('data-recap-admin');
+        // Presence
+        Route::get('/presence-admin', [PresenceController::class, 'index'])->name('presence-admin');
+        Route::post('/presence-admin', [PresenceController::class, 'store'])->name('presence.store');
+        Route::get('/presence-admin/edit/{id}', [PresenceController::class, 'edit'])->name('presence.edit');
+        Route::put('/presence-admin/{id}', [PresenceController::class, 'update'])->name('presence.update');
+        Route::delete('/presence-admin/{id}', [PresenceController::class, 'destroy'])->name('presence.destroy');
 
-        // Kehadiran
-        Route::get('/attendance-admin', function () {
-            return view('admin.attendance-admin'); 
-        })->name('attendance-admin');
+        // Data Recap
+        Route::get('/data-recap-admin', [RecapController::class, 'index'])->name('data-recap-admin');
+        Route::post('/data-recap-admin', [RecapController::class, 'store'])->name('recap.store');
+        Route::get('/data-recap-admin/create', [RecapController::class, 'create'])->name('recap.create');
+        Route::get('/data-recap-admin/{id}', [RecapController::class, 'show'])->name('recap.show');
+        Route::get('/data-recap-admin/{id}/edit', [RecapController::class, 'edit'])->name('recap.edit');
+        Route::put('/data-recap-admin/{id}', [RecapController::class, 'update'])->name('recap.update');
+        Route::delete('/data-recap-admin/{id}', [RecapController::class, 'destroy'])->name('recap.destroy');
+
+        Route::get('/details-recap-admin', function () {
+            return view('admin.details-recap-admin'); 
+        })->name('details-recap-admin');
+        
+        // Santri
+        Route::get('/santri-admin', function () {
+            return view('admin.santri-admin'); 
+        })->name('santri-admin');
+
+        Route::get('/santri-admin/data-santri', function () {
+            return view('admin.data-santri-admin');
+        })->name('data-santri');
+
 
         // Presensi Manual
         Route::get('/manual-attendance-admin', function () {
@@ -63,16 +76,16 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/registration/reject/{id}', [PengajarController::class, 'rejectRegistration'])->name('registration.reject');
 
         // Profile
-        Route::get('/profile-admin', [ProfileController::class, 'showAdminProfile'])->name('profile-admin');
+        Route::get('/profile-admin', [ProfileController::class, 'showProfile'])->name('view-admin-profile');
 
         // Rute untuk mengupdate profil admin
-        Route::post('/profile-admin/update', [ProfileController::class, 'updateProfile'])->name('profile.admin.update');
+        Route::post('/profile-admin/update', [ProfileController::class, 'updateProfile'])->name('profile.adminupdate');
 
         // Rute untuk mengupload foto profil admin
-        Route::post('/profile-admin/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.admin.uploadPhoto');
+        Route::post('/profile-admin/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.adminuploadPhoto');
 
         // Rute untuk menghapus foto profil admin
-        Route::delete('/profile-admin/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.admin.deletePhoto');
+        Route::delete('/profile-admin/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.admindeletePhoto');
     });
 
     // Pengajar Route
@@ -93,15 +106,15 @@ Route::middleware(['auth'])->group(function () {
         })->name('attendance-pengajar');
 
         // Profile
-        Route::get('/profile-pengajar', [ProfileController::class, 'showPengajarProfile'])->name('profile-pengajar');
+        Route::get('/profile-pengajar', [ProfileController::class, 'showProfile'])->name('view-pengajar-profile');
 
         // Rute untuk mengupdate profil pengajar
-        Route::post('/profile-pengajar/update', [ProfileController::class, 'updateProfile'])->name('profile.pengajar.update');
+        Route::post('/profile-pengajar/update', [ProfileController::class, 'updateProfile'])->name('profile.pengajar-update');
 
         // Rute untuk mengupload foto profil pengajar
-        Route::post('/profile-pengajar/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.pengajar.uploadPhoto');
+        Route::post('/profile-pengajar/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.pengajar-uploadPhoto');
 
         // Rute untuk menghapus foto profil pengajar
-        Route::post('/profile-pengajar/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.pengajar.deletePhoto');
+        Route::post('/profile-pengajar/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.pengajar-deletePhoto');
     });
 });

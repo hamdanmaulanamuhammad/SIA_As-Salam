@@ -1,6 +1,6 @@
 @extends('layouts.pengajar')
 
-@section('title', 'Dashboard Pengajar')
+@section('title', 'Dashboard')
 
 @section('content')
     <div class="container px-6 mx-auto grid">
@@ -41,29 +41,11 @@
             </div>
         </div>
 
-        <!-- Card Acara yang Sedang Berlangsung -->
+        <!-- Card Presensi -->
         <div id="event-info" class="mb-6">
-            <div class="bg-white rounded-lg shadow p-4 flex justify-between border border-gray-200">
+            <div class="bg-white rounded-lg shadow py-8 px-6 flex justify-between border border-gray-200">
                 <div class="mb-2">
-                    <div class="flex items-center mb-2">
-                        <h3 class="text-lg font-semibold text-gray-800" id="event-name-display">Nama Acara</h3>
-                        <p class="text-lg font-semibold text-gray-800 ml-1">Sedang Berlangsung</p>
-                    </div>
-                    
-                    <div class="space-y-2">
-                        <div>
-                            <p class="text-sm text-gray-800 mb-2">Terlambat dalam</p>
-                            <span class="border bg-yellow-500 text-white text-sm font-bold rounded-md p-2" id="event-late-timer">
-                                00:09:54
-                            </span>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-800 mb-2">Presensi berakhir dalam</p>
-                            <span class="border bg-red-600 text-white text-sm font-bold rounded-md p-2" id="event-presence-timer">
-                                00:09:54
-                            </span>
-                        </div>
-                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800">Presensi</h3>
                 </div>
 
                 <button id="attendance-button" class="my-auto w-8 h-8 text-white bg-green-600 rounded-md" onclick="openModal()">
@@ -71,131 +53,253 @@
                 </button>
             </div>
         </div>
-        
-        <!-- Tabel Riwayat Acara -->
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Riwayat Acara</h3>
-        <!-- Filter dan Entries -->
-        <div class="md:flex md:justify-between mb-6">
-            <div class="flex space-x-4 mb-6">
-                <select id="year-filter" class="border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 text-sm">
-                    <option value="">Tahun</option>
-                    <option value="2024">2024</option>
-                    <option value="2023">2023</option>
-                    <option value="2022">2022</option>
-                </select>
-                <select id="month-filter" class="border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 text-sm">
-                    <option value="">Bulan</option>
-                    <option value="1">Januari</option>
-                    <option value="2">Februari</option>
-                    <option value="3">Maret</option>
-                    <option value="4">April</option>
-                    <option value="5">Mei</option>
-                    <option value="6">Juni</option>
-                    <option value="7">Juli</option>
-                    <option value="8">Agustus</option>
-                    <option value="9">September</option>
-                    <option value="10">Oktober</option>
-                    <option value="11">November</option>
-                    <option value="12">Desember</option>
-                </select>
-                <button id="filter-button" class="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 text-sm">Terapkan Filter</button>
-            </div>
-            <div class="flex items-center">
-                <label for="entries" class="text-sm font-medium text-gray-700">Show</label>
-                <select id="entries" class="ml-2 border border-gray-300 rounded-md">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                </select>
-                <span class="ml-2 text-sm text-gray-600">entries</span>
-            </div>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="w-full bg-white rounded-lg shadow">
-                <thead>
-                    <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
-                        <th class="px-4 py-3">No</th>
-                        <th class="px-4 py-3">Nama Acara</th>
-                        <th class="px-4 py-3">Waktu Pelaksanaan</th>
-                        <th class="px-4 py-3">Status Kehadiran</th>
-                        <th class="px-4 py-3">Waktu Presensi</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y">
-                    <!-- Data Acara Dummy -->
-                    <tr class="text-gray-700">
-                        <td class="px-4 py-3">1</td>
-                        <td class="px-4 py-3">Acara 1</td>
-                        <td class="px-4 py-3">10:00 AM, 01/01/2024</td>
-                        <td class="px-4 py-3">Hadir</td>
-                        <td class="px-4 py-3">10:00 AM, 01/01/2024</td>
-                    </tr>
-                    <tr class="text-gray-700">
-                        <td class="px-4 py-3">2</td>
-                        <td class="px-4 py-3">Acara 2</td>
-                        <td class="px-4 py-3">11:00 AM, 15/01/2024</td>
-                        <td class="px-4 py-3">Izin</td>
-                        <td class="px-4 py-3">-</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
 
-        <!-- Pagination -->
-        <div class="flex items-center justify-between mt-4 mb-10">
-            <span class="text-sm text-gray-700">Showing 1-2 of 2 entries</span>
-            <div>
-                <button class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700">Previous</button>
-                <button class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700">Next</button>
-            </div>
-        </div>
+    <!-- Tabel Riwayat Presensi Hari ini -->
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">Tabel Kehadiran Hari Ini</h3>
+
+    <div class="overflow-x-auto">
+        <table class="w-full bg-white rounded-lg shadow">
+            <thead>
+                <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
+                    <th class="px-4 py-3">No</th>
+                    <th class="px-4 py-3">Timestamp</th>
+                    <th class="px-4 py-3">Nama</th>
+                    <th class="px-4 py-3">Waktu Kedatangan</th>
+                    <th class="px-4 py-3">Hari Mengajar</th>
+                    <th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y">
+                <!-- Data Acara Dummy -->
+                <tr class="text-gray-700">
+                    <td class="px-4 py-3">1</td>
+                    <td class="px-4 py-3">10:00 AM, 01/01/2024</td>
+                    <td class="px-4 py-3">John Doe</td>
+                    <td class="px-4 py-3">04:22:00</td>
+                    <td class="px-4 py-3">2025-02-11</td>
+                    <td class="px-4 py-3">Hadir</td>
+                    <td class="px-4 py-3 min-w-24">
+                        <button class="text-blue-500 hover:text-blue-700 mr-2">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button class="text-red-500 hover:text-red-700">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <!-- Modal Presensi -->
-    <div id="attendance-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
+    <!-- Modal untuk Presensi/Izin -->
+    <div id="presence-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
         <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md">
-            <span id="close-modal" class="float-right cursor-pointer text-gray-500" onclick="closeModal()">&times;</span>
-            <h2 class="text-lg font-semibold">Informasi Presensi</h2>
-            <div class="mt-4">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">NIP</label>
-                    <input type="text" id="nip-display" class="mt-1 block w-full border border-gray-300 rounded-md p-2" value="123456789" readonly />
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Nama</label>
-                    <input type="text" id="name-display" class="mt-1 block w-full border border-gray-300 rounded-md p-2" value="Nama Pengajar" readonly />
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Waktu Kehadiran</label>
-                    <input type="text" id="timestamp-display" class="mt-1 block w-full border border-gray-300 rounded-md p-2" value="2024-01-01 10:00 AM" readonly />
-                </div>
-            </div>
-            <div class="flex justify-end mt-4">
-                <button class="mr-2 text-gray-600 border border-gray-300 rounded-md px-4 py-2" onclick="closeModal()">Batal</button>
-                <button class="bg-blue-600 text-white rounded-md px-4 py-2" onclick="confirmAttendance()">Presensi</button>
+            <span id="close-presence-modal" class="float-right cursor-pointer text-gray-500">&times;</span>
+            <h2 class="text-lg font-semibold">Pilih Jenis Presensi</h2>
+            <div class="flex justify-center mt-4">
+                <button id="presence-option" class="px-4 py-2 mr-2 text-sm text-white bg-green-600 rounded-md hover:bg-green-700">Presensi</button>
+                <button id="leave-option" class="px-4 py-2 text-sm text-white bg-red-600 rounded-md hover:bg-red-700">Izin</button>
             </div>
         </div>
     </div>
 
-    <script>
-        function openModal() {
-            document.getElementById('attendance-modal').classList.remove('hidden');
-        }
+    <!-- Modal untuk Form Presensi -->
+    <div id="presence-form-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
+            <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md max-h-screen overflow-y-auto">
+                <span id="close-presence-form-modal" class="float-right cursor-pointer text-gray-500">&times;</span>
+                <h2 class="text-lg font-semibold">Form Presensi</h2>
+                <form id="presence-form" action="{{ route('presence.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" id="presence-id" name="id">
+                    <input type="hidden" name="_method" id="presence-method" value="POST">
+                    <div class="mb-4">
+                        <label for="user_id" class="block text-sm font-medium text-gray-700">Nama Pengajar</label>
+                        <input type="text" id="user_id" name="user_id" value="{{ auth()->user()->full_name }}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" readonly />
+                    </div>
+                    <input type="hidden" name="type" value="presence">
+                    <div class="mb-4">
+                        <label for="teaching-day" class="block text-sm font-medium text-gray-700">Hari Mengajar</label>
+                        <input type="date" id="teaching-day" name="date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required value="{{ now()->format('Y-m-d') }}" />
+                    </div>
+                    <div class="mb-4">
+                        <label for="arrival-time" class="block text-sm font-medium text-gray-700">Waktu Kedatangan</label>
+                        <input type="time" id="arrival-time" name="arrival_time" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required />
+                    </div>
+                    <div class="mb-4">
+                        <label for="end-time" class="block text-sm font-medium text-gray-700">Waktu Selesai</label>
+                        <input type="time" id="end-time" name="end_time" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required />
+                    </div>
+                    <div class="mb-4">
+                        <label for="class" class="block text-sm font-medium text-gray-700">Kelas yang Diajar</label>
+                        <select id="class" name="class" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
+                            <option value="Mustawa 1">Mustawa 1</option>
+                            <option value="Mustawa 2">Mustawa 2</option>
+                            <option value="Mustawa 3">Mustawa 3</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="material" class="block text-sm font-medium text-gray-700">Materi yang Diajarkan</label>
+                        <textarea id="material" name="material" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="presence-proof" class="block text-sm font-medium text-gray-700">Bukti Mengajar</label>
+                        <input type="file" id="presence-proof" name="proof" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" accept="image/*" required/>
+                        <input type="hidden" id="presence-proof-existing" name="proof_existing">
+                        <img id="presence-proof-preview" class="mt-2 w-full rounded-md shadow-md hidden" alt="Bukti Izin Sebelumnya">
+                    </div>
+                    <div class="mb-4">
+                        <label for="issues" class="block text-sm font-medium text-gray-700">Kendala (Opsional)</label>
+                        <textarea id="issues" name="issues" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1"></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button type="button" id="cancel-presence-form-button" class="px-4 py-2 mr-2 text-sm text-white bg-gray-400 rounded-md hover:bg-gray-500">Batal</button>
+                        <button type="submit" class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-        function closeModal() {
-            document.getElementById('attendance-modal').classList.add('hidden');
-        }
+        <!-- Modal untuk Form Izin -->
+        <div id="leave-form-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
+            <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md max-h-screen overflow-y-auto">
+                <span id="close-leave-form-modal" class="float-right cursor-pointer text-gray-500">&times;</span>
+                <h2 class="text-lg font-semibold" id="leave-form-title">Form Izin</h2>
+                <form id="leave-form" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="_method" id="leave-form-method" value="POST"> <!-- Untuk Edit -->
+                    <input type="hidden" name="type" value="leave">
+                    <div class="mb-4">
+                        <label for="user_id" class="block text-sm font-medium text-gray-700">Nama Pengajar</label>
+                        <input type="text" id="user_id" name="user_id" value="{{ auth()->user()->full_name }}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" readonly />
+                    </div>
+                    <div class="mb-4">
+                        <label for="teaching-day" class="block text-sm font-medium text-gray-700">Hari Mengajar</label>
+                        <input type="date" id="teaching-day" name="date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required value="{{ now()->format('Y-m-d') }}" />
+                    </div>
+                    <div class="mb-4">
+                        <label for="leave-subject" class="block text-sm font-medium text-gray-700">Subjek Izin</label>
+                        <input type="text" id="leave-subject" name="leave_reason" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required />
+                    </div>
 
-        function confirmAttendance() {
-            // Menutup modal presensi
-            closeModal();
-            // Menampilkan modal sukses menggunakan SweetAlert
-            Swal.fire({
-                icon: 'success',
-                title: 'Sukses!',
-                text: 'Anda telah berhasil melakukan presensi.',
-                confirmButtonText: 'Tutup'
-            });
-        }
-    </script>
+                    <div class="mb-4">
+                        <label for="leave-proof" class="block text-sm font-medium text-gray-700">Bukti Izin</label>
+                        <input type="file" id="leave-proof" name="proof" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" accept="image/*" required />
+                        <input type="hidden" id="leave-proof-existing" name="proof_existing">
+                        <img id="leave-proof-preview" class="mt-2 w-full rounded-md shadow-md hidden" alt="Bukti Izin Sebelumnya">
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button type="button" id="cancel-leave-form-button" class="px-4 py-2 mr-2 text-sm text-white bg-gray-400 rounded-md hover:bg-gray-500">Batal</button>
+                        <button type="submit" id="leave-form-submit" class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
 @endsection
+
+@section('scripts')
+<script>
+    // Fungsi untuk membuka modal opsi
+    function openModal() {
+        document.getElementById('presence-modal').classList.remove('hidden');
+    }
+
+    // Fungsi untuk menutup semua modal
+    function closeModal() {
+        document.getElementById('presence-modal').classList.add('hidden');
+        document.getElementById('presence-form-modal').classList.add('hidden');
+        document.getElementById('leave-form-modal').classList.add('hidden');
+    }
+
+    // Menambahkan event listener untuk tombol-tombol penutup modal
+    document.getElementById('close-presence-modal').addEventListener('click', closeModal);
+    document.getElementById('close-presence-form-modal').addEventListener('click', closeModal);
+    document.getElementById('close-leave-form-modal').addEventListener('click', closeModal);
+
+    // Menambahkan event listener untuk tombol batal pada form
+    document.getElementById('cancel-presence-form-button').addEventListener('click', closeModal);
+    document.getElementById('cancel-leave-form-button').addEventListener('click', closeModal);
+
+    // Menambahkan event listener untuk pilihan presensi
+    document.getElementById('presence-option').addEventListener('click', function() {
+        closeModal();
+        document.getElementById('presence-form-modal').classList.remove('hidden');
+    });
+
+    // Menambahkan event listener untuk pilihan izin
+    document.getElementById('leave-option').addEventListener('click', function() {
+        closeModal();
+        document.getElementById('leave-form-modal').classList.remove('hidden');
+    });
+
+    // Menambahkan event listener untuk preview gambar pada form presensi
+    document.getElementById('presence-proof').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('presence-proof-preview').src = e.target.result;
+                document.getElementById('presence-proof-preview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        } else {
+            document.getElementById('presence-proof-preview').classList.add('hidden');
+        }
+    });
+
+    // Menambahkan event listener untuk preview gambar pada form izin
+    document.getElementById('leave-proof').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('leave-proof-preview').src = e.target.result;
+                document.getElementById('leave-proof-preview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        } else {
+            document.getElementById('leave-proof-preview').classList.add('hidden');
+        }
+    });
+
+    // Menambahkan event listener untuk form presensi
+    document.getElementById('presence-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        // Simpan data ke server atau lakukan proses lainnya
+        // Setelah berhasil, tampilkan pesan sukses menggunakan SweetAlert
+        Swal.fire({
+            title: 'Berhasil!',
+            text: 'Presensi berhasil disimpan.',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                closeModal();
+                // Lakukan tindakan lain setelah menutup modal jika diperlukan
+            }
+        });
+    });
+
+    // Menambahkan event listener untuk form izin
+    document.getElementById('leave-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        // Simpan data ke server atau lakukan proses lainnya
+        // Setelah berhasil, tampilkan pesan sukses menggunakan SweetAlert
+        Swal.fire({
+            title: 'Berhasil!',
+            text: 'Izin berhasil disimpan.',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                closeModal();
+                // Lakukan tindakan lain setelah menutup modal jika diperlukan
+            }
+        });
+    });
+</script>
+@endsection
+

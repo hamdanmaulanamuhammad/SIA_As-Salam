@@ -24,9 +24,9 @@
                         </a>
                     </li>                    
                     <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->is('events-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('events-admin') }}">
-                            <img src="{{ asset(request()->is('events-admin') ? 'assets/images/icons/event-active.svg' : 'assets/images/icons/event.svg') }}" alt="Events Icon" class="w-5 h-5" />
-                            <span class="ml-4">Acara</span>
+                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->is('presence-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('presence-admin') }}">
+                            <img src="{{ asset(request()->is('presence-admin') ? 'assets/images/icons/presence-active.svg' : 'assets/images/icons/presence.svg') }}" alt="Events Icon" class="w-5 h-5" />
+                            <span class="ml-4">Kehadiran Pengajar</span>
                         </a>
                     </li>
                     <li class="relative px-6 py-3">
@@ -37,11 +37,11 @@
                     </li>
                     <li class="relative px-6 py-3">
                         <a class="inline-flex items-center w-full text-sm font-semibold 
-                            {{ request()->is('attendance-admin') || request()->is('manual-attendance-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} 
+                            {{ request()->is('santri-admin') || request()->is('manual-santri-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} 
                             transition-colors duration-150 hover:text-gray-800" 
-                            href="{{ url('/attendance-admin') }}">
-                            <img src="{{ asset(request()->is('attendance-admin') || request()->is('manual-attendance-admin') ? 'assets/images/icons/attendance-active.svg' : 'assets/images/icons/attendance.svg') }}" alt="Attendance Icon" class="w-5 h-5" />
-                            <span class="ml-4">Kehadiran</span>
+                            href="{{ url('/santri-admin') }}">
+                            <img src="{{ asset(request()->is('santri-admin') || request()->is('manual-attendance-admin') ? 'assets/images/icons/attendance-active.svg' : 'assets/images/icons/attendance.svg') }}" alt="Attendance Icon" class="w-5 h-5" />
+                            <span class="ml-4">Santri</span>
                         </a>
                     </li>
                     <li class="relative px-6 py-3">
@@ -84,7 +84,7 @@
                             </span>
                             <div id="dropdown" class="absolute right-0 z-20 hidden mt-2 w-48 bg-white rounded-md shadow-lg">
                                 <div class="py-1">
-                                    <a class="flex px-4 py-2 hover:bg-gray-100" href="{{ route('profile-admin') }}">
+                                    <a class="flex px-4 py-2 hover:bg-gray-100" href="{{ route('view-admin-profile') }}">
                                         <img src="{{ asset('assets/images/icons/profile.svg') }}" alt="Profile" class="w-3 h-3 mr-3">
                                         <span class="block text-sm text-gray-800">Profile</span>
                                     </a>

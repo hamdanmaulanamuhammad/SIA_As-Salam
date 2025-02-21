@@ -50,13 +50,19 @@
                     <h2 class="my-2 text-xl font-semibold text-gray-700">@yield('title')</h2>
                     <div class="flex items-center">
                         <div class="relative">
-                            <button id="profile-button" class="align-middle rounded-full focus:outline-none" aria-label="Account" aria-haspopup="true">
-                                <img class="object-cover w-8 h-8 rounded-full" src="https://placehold.co/200x200" alt="" aria-hidden="true" />
-                            </button>
-                            <span class="ml-2 text-sm font-medium text-gray-700">Pengajar</span>
+                        <button id="profile-button" class="align-middle rounded-full focus:outline-none" aria-label="Account" aria-haspopup="true">
+                            <img class="object-cover w-8 h-8 rounded-full" src="{{ Auth::user()->photo ? Storage::url(Auth::user()->photo) : 'https://placehold.co/100x100' }}" alt="Profile Picture" aria-hidden="true" />
+                        </button>
+                            <span class="ml-2 text-sm font-medium text-gray-700">
+                                @auth
+                                    {{ Auth::user()->username }}
+                                @else
+                                    Guest
+                                @endauth
+                            </span>
                             <div id="dropdown" class="absolute right-0 z-20 hidden mt-2 w-48 bg-white rounded-md shadow-lg">
                                 <div class="py-1">
-                                    <a class="flex px-4 py-2 hover:bg-gray-100" href="{{ route('profile-pengajar') }}">
+                                    <a class="flex px-4 py-2 hover:bg-gray-100" href="{{ route('view-pengajar-profile') }}">
                                         <img src="{{ asset('assets/images/icons/profile.svg') }}" alt="Profile" class="w-3 h-3 mr-3">
                                         <span class="block text-sm text-gray-800">Profile</span>
                                     </a>

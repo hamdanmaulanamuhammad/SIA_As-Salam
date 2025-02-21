@@ -10,10 +10,14 @@ use App\Models\User;
 class ProfileController extends Controller
 {
     // Menampilkan profil admin
-    public function showAdminProfile()
+    public function showProfile()
     {
         $user = Auth::user();
-        return view('admin.profile-admin', compact('user'));
+        if ($user->role === 'admin') {
+            return view('admin.profile-admin', compact('user'));
+        } elseif ($user->role === 'pengajar') {
+            return view('pengajar.profile-pengajar', compact('user'));
+        }
     }
 
     // Mengupdate data profil
@@ -33,8 +37,18 @@ class ProfileController extends Controller
         $user->email = $request->email;
         $user->save();
 
-        // Menyimpan pesan sukses ke session
-        return redirect()->route('profile-admin')->with('success', 'Profil berhasil diperbarui.');
+        // Menentukan route berdasarkan role user
+        if ($user->role === 'admin') {
+            return redirect() -> back() -> with('success','berhasil memperbarui profile');
+        } elseif ($user->role === 'pengajar') {
+            return redirect() -> back() -> with('success','berhasil memperbarui profile');
+        }
+    
+        // Jika role tidak dikenali, kirim error
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan dalam memperbarui profil.'
+        ], 400);
     }
 
     // Mengupload foto profil
@@ -58,7 +72,11 @@ class ProfileController extends Controller
         $user->save();
 
         // Menyimpan pesan sukses ke session
-        return redirect()->route('profile-admin')->with('success', 'Foto profil berhasil diunggah.');
+        if ($user->role === 'admin') {
+            return redirect()->route('view-admin-profile', ['user' => 'admin'])->with('success', 'Foto profil berhasil diunggah.');
+        } elseif ($user->role === 'pengajar') {
+            return redirect()->route('view-pengajar-profile', ['user' => 'pengajar'])->with('success', 'Foto profil berhasil diunggah.');
+        }
     }
 
     // Menghapus foto profil
@@ -74,7 +92,19 @@ class ProfileController extends Controller
     }
 
     // Menyimpan pesan sukses ke session
-    return redirect()->route('profile-admin')->with('success', 'Foto profil berhasil dihapus.');
+    if ($user->role === 'admin') {
+        return response()->json([
+            'success' => true,
+            'message' => 'Foto profil berhasil dihapus.',
+            'redirect' => route('view-admin-profile', ['user' => 'admin']) // Route admin
+        ]);
+    } elseif ($user->role === 'pengajar') {
+        return response()->json([
+            'success' => true,
+            'message' => 'Foto profil berhasil dihapus.',
+            'redirect' => route('view-pengajar-profile', ['user' => 'pengajar']) // Route pengajar
+        ]);
+    }
     }
 
     
