@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@yield('title') - SIA As-Salam</title>
     @vite('resources/css/app.css')
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 </head>
 <body>
     <div id="app" class="flex h-screen bg-gray-50">
@@ -22,25 +24,22 @@
                             <img src="{{ asset(request()->routeIs('dashboard-admin') ? 'assets/images/icons/house-active.svg' : 'assets/images/icons/house.svg') }}" alt="Dashboard Icon" class="w-5 h-5" />
                             <span class="ml-4">Dashboard</span>
                         </a>
-                    </li>                    
+                    </li>
                     <li class="relative px-6 py-3">
                         <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->is('presence-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('presence-admin') }}">
                             <img src="{{ asset(request()->is('presence-admin') ? 'assets/images/icons/presence-active.svg' : 'assets/images/icons/presence.svg') }}" alt="Events Icon" class="w-5 h-5" />
                             <span class="ml-4">Kehadiran Pengajar</span>
                         </a>
                     </li>
-                    <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->is('data-recap-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ url('/data-recap-admin') }}">
-                            <img src="{{ asset(request()->is('data-recap-admin') ? 'assets/images/icons/recap-active.svg' : 'assets/images/icons/recap.svg') }}" alt="Rekap Data Icon" class="w-5 h-5" />
+                   <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold {{ Route::is('recaps.index') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('recaps.index') }}">
+                            <img src="{{ asset(Route::is('recaps.index') ? 'assets/images/icons/recap-active.svg' : 'assets/images/icons/recap.svg') }}" alt="Rekap Data Icon" class="w-5 h-5" />
                             <span class="ml-4">Rekap Data</span>
                         </a>
                     </li>
                     <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold 
-                            {{ request()->is('santri-admin') || request()->is('manual-santri-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} 
-                            transition-colors duration-150 hover:text-gray-800" 
-                            href="{{ url('/santri-admin') }}">
-                            <img src="{{ asset(request()->is('santri-admin') || request()->is('manual-attendance-admin') ? 'assets/images/icons/attendance-active.svg' : 'assets/images/icons/attendance.svg') }}" alt="Attendance Icon" class="w-5 h-5" />
+                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->routeIs('santri-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ url('/data-santri') }}">
+                            <img src="{{ asset(request()->routeIs('santri-admin') || request()->is('manual-attendance-admin') ? 'assets/images/icons/attendance-active.svg' : 'assets/images/icons/attendance.svg') }}" alt="Attendance Icon" class="w-5 h-5" />
                             <span class="ml-4">Santri</span>
                         </a>
                     </li>
@@ -123,7 +122,7 @@
             toggleSideMenu() {
                 this.isSideMenuOpen = !this.isSideMenuOpen;
                 document.getElementById('sidebar').classList.toggle('hidden', !this.isSideMenuOpen);
-                document.body.classList.toggle('overflow-hidden', this.isSideMenuOpen); 
+                document.body.classList.toggle('overflow-hidden', this.isSideMenuOpen);
             },
             closeSideMenu() {
                 this.isSideMenuOpen = false;

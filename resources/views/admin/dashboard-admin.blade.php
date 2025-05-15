@@ -52,33 +52,6 @@
             </div>
         </div>
 
-         <!-- Card Acara yang Sedang Berlangsung -->
-         <div class="mb-6">
-            <div class="bg-white rounded-lg shadow p-4">
-                <div class="mb-2">
-                    <div class="flex items-center mb-2">
-                        <h3 class="text-lg font-semibold text-gray-800">TPA Senin</h3>
-                        <p class="text-lg font-semibold text-gray-800 ml-1">Sedang Berlangsung</p>
-                    </div>
-                    
-                    <div class="space-y-2">
-                        <div>
-                            <p class="text-sm text-gray-800 mb-2">Terlambat dalam</p>
-                            <span class="border bg-yellow-500 text-white text-sm font-bold rounded-md p-2">
-                                00:09:54
-                            </span>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-800 mb-2">Presensi berakhir dalam</p>
-                            <span class="border bg-red-600 text-white text-sm font-bold rounded-md p-2">
-                                00:09:54
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
         <!-- Tabel Data Event Terakhir -->
         <h3 class="text-lg font-semibold text-gray-800 mb-4">Riwayat Acara</h3>
         <!-- Filter dan Entries -->

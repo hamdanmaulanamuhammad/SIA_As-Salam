@@ -5,42 +5,7 @@
 @section('content')
     <div class="container mx-auto p-6">
         <h2 class="text-2xl font-semibold text-gray-700 mt-6 mb-4">Detail Pengajar</h2>
-        <!-- Filter dan Entries -->
-        <div class="md:flex md:justify-between">
-            <div class="flex space-x-4 mb-6">
-                <select id="year-filter" class="border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 text-sm">
-                    <option value="">Tahun</option>
-                    <option value="2024">2024</option>
-                    <option value="2023">2023</option>
-                    <option value="2022">2022</option>
-                </select>
-                <select id="month-filter" class="border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 text-sm">
-                    <option value="">Bulan</option>
-                    <option value="1">Januari</option>
-                    <option value="2">Februari</option>
-                    <option value="3">Maret</option>
-                    <option value="4">April</option>
-                    <option value="5">Mei</option>
-                    <option value="6">Juni</option>
-                    <option value="7">Juli</option>
-                    <option value="8">Agustus</option>
-                    <option value="9">September</option>
-                    <option value="10">Oktober</option>
-                    <option value="11">November</option>
-                    <option value="12">Desember</option>
-                </select>
-                <button id="filter-button" class="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 text-sm">Terapkan Filter</button>
-            </div>
-            <div class="flex items-center">
-                <label for="entries" class="text-sm font-medium text-gray-700">Show</label>
-                <select id="entries" class="ml-2 border border-gray-300 rounded-md">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                </select>
-                <span class="ml-2 text-sm text-gray-600">entries</span>
-            </div>
-        </div>
+
         <!-- Tabel Detail Pengajar -->
         <div class="overflow-x-auto">
         <table class="w-full bg-white rounded-lg shadow">
@@ -50,10 +15,7 @@
                         <th class="px-4 py-3">NIP</th>
                         <th class="px-4 py-3">Nama</th>
                         <th class="px-4 py-3">Email</th>
-                        <th class="px-4 py-3">No HP</th>
-                        <th class="px-4 py-3">Waktu Bergabung</th>
-                        <th class="px-4 py-3">Tempat Kuliah</th>
-                        <th class="px-4 py-3">Alamat</th>
+                        <th class="px-4 py-3">No Telp</th>
                         <th class="px-4 py-3">Aksi</th>
                     </tr>
                 </thead>
@@ -65,10 +27,7 @@
                         <td class="px-4 py-3">{{ $teacher->full_name }}</td>
                         <td class="px-4 py-3">{{ $teacher->email }}</td>
                         <td class="px-4 py-3">{{ $teacher->phone }}</td>
-                        <td class="px-4 py-3">{{ $teacher->created_at->format('d/m/Y') }}</td>
-                        <td class="px-4 py-3">{{ $teacher->university }}</td>
-                        <td class="px-4 py-3">{{ $teacher->address }}</td>
-                        <td class="px-4 py-3">
+                        <td class="px-4 py-3 text-sm flex gap-2">
                             <button class="text-red-600" onclick="confirmDelete('{{ $teacher->id }}', '{{ $teacher->full_name }}')">
                                 <i class="fas fa-trash-alt"></i>
                             </button>

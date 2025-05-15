@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Presence;
 use App\Models\User;
+use Auth;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
 use Maestroerror\HeicToJpg;
@@ -20,39 +21,49 @@ class PresenceController extends Controller
         $users = User::where('role', 'pengajar')->get();
         return view('admin.presence-admin', compact('presences', 'users'));
     }
+    public function indexPengajar()
+    {
+        $user_id = Auth::id();
+
+        $presences = Presence::where('user_id', $user_id)
+                            ->whereDate('date', date('Y-m-d'))
+                            ->get();
+
+        $recentPresences = Presence::where('user_id', $user_id)
+                                ->orderBy('created_at', 'desc')
+                                ->take(5)
+                                ->get();
+
+        return view('pengajar.dashboard-pengajar', compact('presences', 'recentPresences'));
+    }
+
 
     // Menyimpan data presensi baru
-// Menyimpan data presensi baru
     public function store(Request $request)
     {
         // Log untuk debugging
         Log::info('Data diterima:', $request->all());
 
-        // Validasi umum
-        $rules = [
-            'user_id' => 'required|exists:users,id',
-            'type' => 'required|in:presence,leave',
-            'date' => 'required|date',
-        ];
+        // Cek route untuk menentukan apakah request dari admin atau pengajar
+        $route = $request->route()->getName();
+        $isFromPengajar = strpos($route, 'pengajar') !== false;
 
-        if ($request->type === 'presence') {
-            $rules = array_merge($rules, [
-                'arrival_time' => 'required|date_format:H:i',
-                'end_time' => 'required|date_format:H:i',
-                'class' => 'nullable|string',
-                'material' => 'nullable|string',
-                'issues' => 'nullable|string',
-            ]);
-        } elseif ($request->type === 'leave') {
-            $rules = array_merge($rules, [
-                'leave_reason' => 'required|string',
-                'proof' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            ]);
+        if ($isFromPengajar) {
+            $request->merge(['user_id' => Auth::id()]);
         }
 
         // Validasi request
         try {
-            $validatedData = $request->validate($rules);
+            $validatedData = $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'date' => 'required|date',
+                'arrival_time' => 'required|date_format:H:i',
+                'end_time' => 'required|date_format:H:i',
+                'class' => 'required|string',
+                'material' => 'required|string',
+                'proof' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'issues' => 'nullable|string',
+            ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -61,7 +72,7 @@ class PresenceController extends Controller
             ], 422);
         }
 
-        // **Cek apakah user sudah melakukan presensi pada hari yang sama**
+        // Cek apakah user sudah melakukan presensi pada hari yang sama
         $existingPresence = Presence::where('user_id', $request->user_id)
             ->whereDate('date', $request->date)
             ->first();
@@ -73,7 +84,7 @@ class PresenceController extends Controller
             ], 422);
         }
 
-        // Simpan bukti izin jika ada
+        // Simpan bukti presensi jika ada
         $proofPath = null;
         if ($request->hasFile('proof')) {
             $file = $request->file('proof');
@@ -84,27 +95,28 @@ class PresenceController extends Controller
             );
         }
 
+        // Tentukan hari berdasarkan tanggal
+        $day = date('l', strtotime($request->date));
+
         // Simpan data ke database
-        $presence = Presence::create([
-            'user_id' => $request->user_id,
-            'date' => $request->date,
-            'arrival_time' => $request->type === 'presence' ? $request->arrival_time : null,
-            'end_time' => $request->type === 'presence' ? $request->end_time : null,
-            'class' => $request->type === 'presence' ? $request->class : null,
-            'material' => $request->type === 'presence' ? $request->material : null,
-            'proof' => $proofPath,
-            'leave_reason' => $request->type === 'leave' ? $request->leave_reason : null,
-            'issues' => $request->type === 'presence' ? $request->issues : null,
-            'type' => $request->type,
-        ]);
+        $presence = new Presence();
+        $presence->user_id = $request->user_id;
+        $presence->date = $request->date;
+        $presence->day = $day;
+        $presence->arrival_time = $request->arrival_time;
+        $presence->end_time = $request->end_time;
+        $presence->class = $request->class;
+        $presence->material = $request->material;
+        $presence->proof = $proofPath;
+        $presence->issues = $request->issues;
+        $presence->save();
 
         return response()->json([
             'success' => true,
-            'message' => ucfirst($request->type) . ' berhasil disimpan.',
+            'message' => 'Presensi berhasil disimpan.',
             'data' => $presence
         ]);
     }
-
 
     // Metode untuk mengedit data presensi
     public function edit($id)
@@ -119,16 +131,14 @@ class PresenceController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'date' => 'required|date',
-            'arrival_time' => 'nullable|date_format:H:i',
-            'end_time' => 'nullable|date_format:H:i',
-            'class' => 'nullable|string',
-            'material' => 'nullable|string',
+            'arrival_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i',
+            'class' => 'required|string',
+            'material' => 'required|string',
             'proof' => 'nullable|image|mimes:jpeg,png,jpg,gif,heic|max:2048',
-            'leave_reason' => 'nullable|string',
             'issues' => 'nullable|string',
-            'type' => 'required|in:presence,leave',
         ]);
-        
+
         $presence = Presence::findOrFail($id);
 
         // Simpan bukti baru jika ada
@@ -147,18 +157,19 @@ class PresenceController extends Controller
             }
         }
 
+        // Tentukan hari berdasarkan tanggal
+        $day = date('l', strtotime($request->date));
+
         // Update data presensi
-        $presence->update([
-            'user_id' => $request->user_id,
-            'date' => $request->date,
-            'arrival_time' => $request->arrival_time,
-            'end_time' => $request->end_time,
-            'class' => $request->class,
-            'material' => $request->material,
-            'leave_reason' => $request->leave_reason,
-            'issues' => $request->issues,
-            'type' => $request->type,
-        ]);
+        $presence->user_id = $request->user_id;
+        $presence->date = $request->date;
+        $presence->day = $day;
+        $presence->arrival_time = $request->arrival_time;
+        $presence->end_time = $request->end_time;
+        $presence->class = $request->class;
+        $presence->material = $request->material;
+        $presence->issues = $request->issues;
+        $presence->save();
 
         return response()->json([
             'success' => true,
@@ -178,5 +189,4 @@ class PresenceController extends Controller
 
         return redirect()->back()->with('success', 'Presensi berhasil dihapus.');
     }
-
 }

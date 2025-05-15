@@ -4,31 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Recap extends Model
 {
     use HasFactory;
 
-    /**
-     * Kolom yang dapat diisi secara massal.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'nama_rekap',
-        'periode',
-        'batas_keterlambatan',
-        'mukafaah',
-        'bonus',
-    ];
+    protected $fillable = ['periode', 'batas_keterlambatan', 'mukafaah', 'bonus', 'dates'];
 
-    /**
-     * Konversi periode ke format bulan dan tahun.
-     *
-     * @return string
-     */
     public function getPeriodeAttribute($value)
     {
-        return \Carbon\Carbon::parse($value)->format('F Y');
+        try {
+            return Carbon::createFromFormat('Y-m', $value, 'Asia/Jakarta')
+                ->locale('id')
+                ->translatedFormat('F Y');
+        } catch (\Exception $e) {
+            \Log::error('Failed to parse periode: ' . $e->getMessage(), ['periode' => $value]);
+            return $value; // Kembalikan nilai mentah jika gagal
+        }
     }
 }

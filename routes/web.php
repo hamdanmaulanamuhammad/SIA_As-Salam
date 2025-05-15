@@ -1,9 +1,11 @@
 <?php
+use App\Http\Controllers\SantriController;
 use App\Http\Controllers\LoginRegisterController;
 use App\Http\Controllers\PengajarController;
 use App\Http\Controllers\PresenceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RecapController;
+use App\Models\Santri;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckRole;
 
@@ -24,7 +26,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware([CheckRole::class . ':admin'])->group(function () {
         // Dashboard
         Route::get('/dashboard-admin', function () {
-            return view('admin.dashboard-admin'); 
+            return view('admin.dashboard-admin');
         })->name('dashboard-admin');
 
         // Presence
@@ -35,31 +37,29 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/presence-admin/{id}', [PresenceController::class, 'destroy'])->name('presence.destroy');
 
         // Data Recap
-        Route::get('/data-recap-admin', [RecapController::class, 'index'])->name('data-recap-admin');
-        Route::post('/data-recap-admin', [RecapController::class, 'store'])->name('recap.store');
-        Route::get('/data-recap-admin/create', [RecapController::class, 'create'])->name('recap.create');
-        Route::get('/data-recap-admin/{id}', [RecapController::class, 'show'])->name('recap.show');
-        Route::get('/data-recap-admin/{id}/edit', [RecapController::class, 'edit'])->name('recap.edit');
-        Route::put('/data-recap-admin/{id}', [RecapController::class, 'update'])->name('recap.update');
-        Route::delete('/data-recap-admin/{id}', [RecapController::class, 'destroy'])->name('recap.destroy');
+        Route::get('/recaps', [RecapController::class, 'index'])->name('recaps.index');
+        Route::post('/recaps', [RecapController::class, 'store'])->name('recaps.store');
+        Route::get('/recaps/{id}', [RecapController::class, 'show'])->name('recaps.show');
+        Route::get('/recaps/{id}/edit', [RecapController::class, 'edit'])->name('recaps.edit');
+        Route::put('/recaps/{id}', [RecapController::class, 'update'])->name('recaps.update');
+        Route::delete('/recaps/{id}', [RecapController::class, 'destroy'])->name('recaps.destroy');
 
-        Route::get('/details-recap-admin', function () {
-            return view('admin.details-recap-admin'); 
-        })->name('details-recap-admin');
-        
-        // Santri
-        Route::get('/santri-admin', function () {
-            return view('admin.santri-admin'); 
-        })->name('santri-admin');
+        // Data Santri
+        Route::get('/data-santri', [SantriController::class, 'index'])->name('santri-admin');
+        Route::post('/santri', [SantriController::class, 'store'])->name('santri.store');
+        Route::get('/santri/{id}', [SantriController::class, 'show'])->name('santri.show');
+        Route::get('/santri/{id}/edit', [SantriController::class, 'edit'])->name('santri.edit');
+        Route::put('/santri/{id}', [SantriController::class, 'update'])->name('santri.update');
+        Route::delete('/santri/{id}', [SantriController::class, 'destroy'])->name('santri.destroy');
 
-        Route::get('/santri-admin/data-santri', function () {
-            return view('admin.data-santri-admin');
-        })->name('data-santri');
+        //Detail Santri
+        Route::get('/santri/{id}', [SantriController::class, 'show'])->name('santri.show');
+        Route::get('/santri/{id}/download-akta', [SantriController::class, 'downloadAkta'])->name('download.akta');
 
 
         // Presensi Manual
         Route::get('/manual-attendance-admin', function () {
-            return view('admin.manual-attendance-admin'); 
+            return view('admin.manual-attendance-admin');
         })->name('manual-attendance-admin');
 
         // Detail Pengajar
@@ -91,18 +91,23 @@ Route::middleware(['auth'])->group(function () {
     // Pengajar Route
     Route::middleware([CheckRole::class . ':pengajar'])->group(function () {
         // Dashboard
-        Route::get('/dashboard-pengajar', function () {
-            return view('pengajar.dashboard-pengajar'); 
-        })->name('dashboard-pengajar');
+        Route::get('/dashboard-pengajar', [PresenceController::class, 'indexPengajar'])->name('dashboard-pengajar');
 
         // Data Recap
         Route::get('/data-recap-pengajar', function () {
-            return view('pengajar.data-recap-pengajar'); 
+            return view('pengajar.data-recap-pengajar');
         })->name('data-recap-pengajar');
+
+        //Presensi
+        Route::get('/presence', [PresenceController::class, 'index'])->name('presence.index');
+        Route::post('/presence', [PresenceController::class, 'store'])->name('pengajar.presence.store');
+        Route::get('/presence-pengajar/edit/{id}', [PresenceController::class, 'edit'])->name('pengajar.presence.edit');
+        Route::put('/presence/{id}', [PresenceController::class, 'update'])->name('pengajar.presence.update');
+        Route::delete('/presence/{id}', [PresenceController::class, 'destroy'])->name('pengajar.presence.destroy');
 
         // Kehadiran
         Route::get('/attendance-pengajar', function () {
-            return view('pengajar.attendance-pengajar'); 
+            return view('pengajar.attendance-pengajar');
         })->name('attendance-pengajar');
 
         // Profile
