@@ -62,11 +62,14 @@ Route::middleware(['auth'])->group(function () {
             return view('admin.manual-attendance-admin');
         })->name('manual-attendance-admin');
 
-        // Detail Pengajar
-        Route::get('/teacher-details-admin', [PengajarController::class, 'showTeacherDetails'])->name('teacher-details-admin');
-        // Rute untuk menghapus pengajar
+        // Data Pengajar
+        Route::get('/data-pengajar', [PengajarController::class, 'showTeacherList'])->name('pengajar.show');
+        Route::get('/teachers/{id}', [PengajarController::class, 'showTeacherDetail'])->name('teachers.detail');
+        Route::put('/teachers/{id}', [PengajarController::class, 'update'])->name('teachers.update');
         Route::delete('/teachers/{id}', [PengajarController::class, 'deleteTeacher'])->name('teachers.delete');
-
+        Route::post('/teachers/{id}/contracts', [PengajarController::class, 'storeContract'])->name('contracts.store');
+        Route::put('/teachers/{id}/contracts/{contract_id}', [PengajarController::class, 'updateContract'])->name('contracts.update');
+        Route::delete('/teachers/{id}/contracts/{contract_id}', [PengajarController::class, 'deleteContract'])->name('contracts.destroy');
         // Permintaan Pendaftaran
         // Rute untuk menampilkan permintaan registrasi
         Route::get('/registration-request-admin', [PengajarController::class, 'showRegistrationRequests'])->name('registration-request-admin');

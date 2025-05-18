@@ -3,50 +3,112 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Presence;
+use App\Models\Contract;
+use Illuminate\Support\Facades\Storage;
 
 class PengajarController extends Controller
 {
-    // Menampilkan permintaan registrasi pengajar
-    public function showRegistrationRequests()
+    public function showTeacherList()
     {
-        $users = User::where('accepted', false)->paginate(10);
-        return view('admin.registration-request-admin', compact('users'));
+        $teachers = User::where('role', 'pengajar')->get();
+        return view('admin.data-pengajar-admin', compact('teachers'));
     }
 
-    // Menerima pendaftaran pengajar
-    public function acceptRegistration($id)
+    public function showTeacherDetail($id)
+    {
+        $teacher = User::findOrFail($id);
+        $presences = Presence::where('user_id', $id)->orderBy('date', 'desc')->paginate(12); // Limit to 12 per page
+        $contracts = $teacher->role === 'pengajar' ? Contract::where('user_id', $id)->orderBy('start_date', 'desc')->paginate(2) : collect([]); // Limit to 2 per page
+        $isPengajar = $teacher->role === 'pengajar';
+
+        return view('admin.detail-pengajar-admin', compact('teacher', 'presences', 'contracts', 'isPengajar'));
+    }
+
+    public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        $user->accepted = true;
-        $user->save();
 
-        return response()->json(['success' => true, 'message' => 'Pendaftaran diterima.']);
+        $request->validate([
+            'full_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $id,
+            'phone' => 'required|string|max:15',
+            'university' => 'required|string|max:255',
+            'address' => 'required|string',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $data = $request->only(['full_name', 'email', 'phone', 'university', 'address']);
+
+        if ($request->hasFile('photo')) {
+            // Delete old photo if exists
+            if ($user->photo) {
+                Storage::delete('public/' . $user->photo);
+            }
+            $path = $request->file('photo')->store('photos', 'public');
+            $data['photo'] = $path;
+        }
+
+        $user->update($data);
+
+        return response()->json(['success' => true, 'message' => 'Profil telah diperbarui.']);
     }
 
-    // Menolak pendaftaran pengajar
-    public function rejectRegistration($id)
+    public function storeContract(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        $user->delete();
+        if ($user->role !== 'pengajar') {
+            return response()->json(['success' => false, 'message' => 'Kontrak hanya berlaku untuk pengajar.'], 403);
+        }
 
-        return response()->json(['success' => true, 'message' => 'Pendaftaran ditolak.']);
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after:start_date',
+            'status' => 'required|string|in:active,expired,terminated',
+            'document' => 'nullable|string',
+        ]);
+
+        Contract::create([
+            'user_id' => $id,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'status' => $request->status,
+            'document' => $request->document,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Kontrak ditambahkan.']);
     }
 
-    // Menampilkan daftar pengajar
-    public function showTeacherDetails()
-    {
-        // Ambil data pengajar yang diterima
-        $teachers = User::where('role', 'pengajar')->where('accepted', true)->get();
-        return view('admin.teacher-details-admin', compact('teachers'));
-    }
-
-
-    // Menghapus pengajar
-    public function deleteTeacher($id)
+    public function updateContract(Request $request, $id, $contract_id)
     {
         $user = User::findOrFail($id);
-        $user->delete();
+        if ($user->role !== 'pengajar') {
+            return response()->json(['success' => false, 'message' => 'Kontrak hanya berlaku untuk pengajar.'], 403);
+        }
 
-        return response()->json(['success' => true, 'message' => 'Pengajar berhasil dihapus.']);
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after:start_date',
+            'status' => 'required|string|in:active,expired,terminated',
+            'document' => 'nullable|string',
+        ]);
+
+        $contract = Contract::findOrFail($contract_id);
+        $contract->update($request->only(['start_date', 'end_date', 'status', 'document']));
+
+        return response()->json(['success' => true, 'message' => 'Kontrak diperbarui.']);
+    }
+
+    public function deleteContract($id, $contract_id)
+    {
+        $user = User::findOrFail($id);
+        if ($user->role !== 'pengajar') {
+            return response()->json(['success' => false, 'message' => 'Kontrak hanya berlaku untuk pengajar.'], 403);
+        }
+
+        $contract = Contract::findOrFail($contract_id);
+        $contract->delete();
+
+        return response()->json(['success' => true, 'message' => 'Kontrak dihapus.']);
     }
 }

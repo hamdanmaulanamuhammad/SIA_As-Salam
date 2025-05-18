@@ -7,7 +7,6 @@ use App\Models\User;
 use Auth;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
-use Maestroerror\HeicToJpg;
 use Illuminate\Support\Facades\Storage;
 use Log;
 
