@@ -1,10 +1,16 @@
 <?php
+use App\Http\Controllers\AkademikController;
+use App\Http\Controllers\KelasController;
+use App\Http\Controllers\KelasMapelSemesterController;
+use App\Http\Controllers\KelasSemesterController;
+use App\Http\Controllers\MapelController;
 use App\Http\Controllers\SantriController;
 use App\Http\Controllers\LoginRegisterController;
 use App\Http\Controllers\PengajarController;
 use App\Http\Controllers\PresenceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RecapController;
+use App\Http\Controllers\SemesterController;
 use App\Models\Santri;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckRole;
@@ -89,6 +95,52 @@ Route::middleware(['auth'])->group(function () {
 
         // Rute untuk menghapus foto profil admin
         Route::delete('/profile-admin/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.admindeletePhoto');
+
+        Route::prefix('akademik')->group(function () {
+            Route::get('/', [AkademikController::class, 'index'])->name('akademik.index');
+
+            // Kelas routes
+            Route::get('kelas', [KelasController::class, 'index'])->name('akademik.kelas.index');
+            Route::get('kelas/create', [KelasController::class, 'create'])->name('akademik.kelas.create');
+            Route::post('kelas', [KelasController::class, 'store'])->name('akademik.kelas.store');
+            Route::get('kelas/{id}', [KelasController::class, 'show'])->name('akademik.kelas.show');
+            Route::get('kelas/{id}/edit', [KelasController::class, 'edit'])->name('akademik.kelas.edit');
+            Route::put('kelas/{id}', [KelasController::class, 'update'])->name('akademik.kelas.update');
+            Route::delete('kelas/{id}', [KelasController::class, 'destroy'])->name('akademik.kelas.destroy');
+
+            // Mapel routes
+            Route::resource('mapel', MapelController::class)->names([
+                'index' => 'akademik.mapel.index',
+                'create' => 'akademik.mapel.create',
+                'store' => 'akademik.mapel.store',
+                'show' => 'akademik.mapel.show',
+                'edit' => 'akademik.mapel.edit',
+                'update' => 'akademik.mapel.update',
+                'destroy' => 'akademik.mapel.destroy',
+            ]);
+
+            // Semester routes
+            Route::resource('semester', SemesterController::class)->names([
+                'index' => 'akademik.semester.index',
+                'create' => 'akademik.semester.create',
+                'store' => 'akademik.semester.store',
+                'show' => 'akademik.semester.show',
+                'edit' => 'akademik.semester.edit',
+                'update' => 'akademik.semester.update',
+                'destroy' => 'akademik.semester.destroy',
+            ]);
+
+            // Route untuk mapel kelas-semester (diletakkan di atas untuk prioritas)
+            Route::post('kelas-semester/mapel', [KelasMapelSemesterController::class, 'store'])->name('akademik.kelas-semester.mapel.store');
+            Route::delete('kelas-semester/mapel/{id}', [KelasMapelSemesterController::class, 'destroy'])->name('akademik.kelas-semester.mapel.destroy');
+
+            // Route untuk kelas-semester (ubah untuk menghindari konflik)
+            Route::get('semester/{semester}/kelas-semester', [KelasSemesterController::class, 'index'])->name('akademik.kelas-semester');
+            Route::post('semester/{semester}/kelas-semester/store', [KelasSemesterController::class, 'store'])->name('akademik.kelas-semester.store');
+            Route::get('kelas-semester/{id}/edit', [KelasSemesterController::class, 'edit'])->name('akademik.kelas-semester.edit');
+            Route::put('kelas-semester/{id}', [KelasSemesterController::class, 'update'])->name('akademik.kelas-semester.update');
+            Route::delete('kelas-semester/{id}', [KelasSemesterController::class, 'destroy'])->name('akademik.kelas-semester.destroy');
+        });
     });
 
     // Pengajar Route

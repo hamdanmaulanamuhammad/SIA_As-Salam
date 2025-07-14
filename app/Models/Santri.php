@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Santri extends Model
@@ -30,6 +30,8 @@ class Santri extends Model
         'kelas',
         'jilid_juz',
         'status',
+        'kelas_awal_id',
+        'kelas_id',
 
         // Orang Tua/Wali
         'nama_ayah',
@@ -51,70 +53,88 @@ class Santri extends Model
         'tanggal_lahir' => 'date',
     ];
 
-    // Scope untuk filtering
-    public function scopeFilter($query, array $filters)
+    // ========================
+    //        RELATIONS
+    // ========================
+
+    // Kelas aktif saat ini
+    public function kelas()
     {
-        $query->when($filters['search'] ?? false, function($query, $search) {
-            return $query->where('nama_lengkap', 'like', '%'.$search.'%')
-                        ->orWhere('nis', 'like', '%'.$search.'%');
-        });
-
-        $query->when($filters['kelas'] ?? false, function($query, $kelas) {
-            return $query->where('kelas', $kelas);
-        });
-
-        $query->when($filters['status'] ?? false, function($query, $status) {
-            return $query->where('status', $status);
-        });
+        return $this->belongsTo(Kelas::class, 'kelas_id');
     }
 
-    // Accessor untuk URL foto
+    // Kelas saat pertama masuk
+    public function kelasAwal()
+    {
+        return $this->belongsTo(Kelas::class, 'kelas_awal_id');
+    }
+
+    // Semua riwayat semester (pivot)
+    public function kelasSemester()
+    {
+        return $this->hasMany(SantriKelasSemester::class);
+    }
+
+    // ========================
+    //        ACCESSORS
+    // ========================
+
     public function getPasFotoUrlAttribute()
     {
-        return $this->pas_foto_path ? asset('storage/'.$this->pas_foto_path) : asset('images/default-profile.jpg');
+        return $this->pas_foto_path ? asset('storage/' . $this->pas_foto_path) : asset('images/default-profile.jpg');
     }
 
-    // Accessor untuk URL akta
     public function getAktaUrlAttribute()
     {
-        return $this->akta_path ? asset('storage/'.$this->akta_path) : null;
+        return $this->akta_path ? asset('storage/' . $this->akta_path) : null;
     }
 
-    // Accessor untuk nama file akta
     public function getNamaAktaAttribute()
     {
         return $this->akta_path ? basename($this->akta_path) : null;
     }
 
-    // Accessor untuk format tanggal lahir
     public function getTanggalLahirFormattedAttribute()
     {
-        return $this->tanggal_lahir->format('d/m/Y');
+        return $this->tanggal_lahir?->format('d/m/Y');
     }
 
-    // Accessor untuk tempat tanggal lahir lengkap
     public function getTtlAttribute()
     {
-        return $this->tempat_lahir.', '.$this->tanggal_lahir_formatted;
+        return $this->tempat_lahir . ', ' . $this->tanggal_lahir_formatted;
     }
 
-    // Mutator untuk NIS (uppercase)
+    // ========================
+    //        MUTATORS
+    // ========================
+
     public function setNisAttribute($value)
     {
         $this->attributes['nis'] = strtoupper($value);
     }
 
-    // Mutator untuk nama lengkap (proper case)
     public function setNamaLengkapAttribute($value)
     {
         $this->attributes['nama_lengkap'] = ucwords(strtolower($value));
     }
 
-    // Relationship jika diperlukan (contoh: dengan tabel pembayaran/pembelajaran)
-    /*
-    public function pembayaran()
+    // ========================
+    //        SCOPES
+    // ========================
+
+    public function scopeFilter($query, array $filters)
     {
-        return $this->hasMany(Pembayaran::class);
+        $query->when($filters['search'] ?? false, fn($q, $search) =>
+            $q->where('nama_lengkap', 'like', "%$search%")
+              ->orWhere('nis', 'like', "%$search%")
+        );
+
+        $query->when($filters['kelas'] ?? false, fn($q, $kelas) =>
+            $q->where('kelas_id', $kelas)
+        );
+
+        $query->when($filters['status'] ?? false, fn($q, $status) =>
+            $q->where('status', $status)
+        );
     }
-    */
 }
