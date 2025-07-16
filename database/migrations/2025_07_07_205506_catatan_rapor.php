@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('catatan_rapor', function (Blueprint $table) {
@@ -17,17 +14,16 @@ return new class extends Migration
             $table->unsignedBigInteger('kelas_semester_id');
             $table->text('catatan')->nullable();
             $table->unsignedBigInteger('keputusan_kelas_id')->nullable(); // jika naik, pilih kelas tujuan
+            $table->string('predikat')->nullable(); // predikat berdasarkan rata-rata
             $table->timestamps();
 
             $table->foreign('santri_id')->references('id')->on('santri')->onDelete('cascade');
             $table->foreign('kelas_semester_id')->references('id')->on('kelas_semester')->onDelete('cascade');
             $table->foreign('keputusan_kelas_id')->references('id')->on('kelas')->onDelete('set null');
+            $table->enum('status_naik_kelas', ['naik', 'tinggal_kelas'])->default('naik');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('catatan_rapor');

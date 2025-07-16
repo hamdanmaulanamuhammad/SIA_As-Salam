@@ -15,9 +15,6 @@ class NilaiRapor extends Model
         'santri_id',
         'kelas_mapel_semester_id',
         'nilai',
-        'predikat',
-        'catatan',
-        'keputusan' // foreign ke kelas_id baru
     ];
 
     public function santri()
@@ -28,10 +25,5 @@ class NilaiRapor extends Model
     public function kelasMapelSemester()
     {
         return $this->belongsTo(KelasMapelSemester::class);
-    }
-
-    public function kelasTujuan()
-    {
-        return $this->belongsTo(Kelas::class, 'keputusan');
     }
 }

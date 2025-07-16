@@ -4,6 +4,7 @@ use App\Http\Controllers\KelasController;
 use App\Http\Controllers\KelasMapelSemesterController;
 use App\Http\Controllers\KelasSemesterController;
 use App\Http\Controllers\MapelController;
+use App\Http\Controllers\RaporController;
 use App\Http\Controllers\SantriController;
 use App\Http\Controllers\LoginRegisterController;
 use App\Http\Controllers\PengajarController;
@@ -140,6 +141,13 @@ Route::middleware(['auth'])->group(function () {
             Route::get('kelas-semester/{id}/edit', [KelasSemesterController::class, 'edit'])->name('akademik.kelas-semester.edit');
             Route::put('kelas-semester/{id}', [KelasSemesterController::class, 'update'])->name('akademik.kelas-semester.update');
             Route::delete('kelas-semester/{id}', [KelasSemesterController::class, 'destroy'])->name('akademik.kelas-semester.destroy');
+
+            // Rapor routes
+            Route::get('rapor/{kelasSemesterId}', [RaporController::class, 'index'])->name('akademik.rapor.index');
+            Route::get('rapor/{kelasSemesterId}/{santriId}', [RaporController::class, 'show'])->name('akademik.rapor.show');
+            Route::put('rapor/{kelasSemesterId}/{santriId}', [RaporController::class, 'update'])->name('akademik.rapor.update');
+            Route::get('rapor/{kelasSemesterId}/{santriId}/pdf', [RaporController::class, 'generatePdf'])->name('akademik.rapor.pdf');
+            Route::get('rapor/{kelasSemesterId}/{santriId}/preview', [RaporController::class, 'previewRapor'])->name('akademik.rapor.preview');
         });
     });
 

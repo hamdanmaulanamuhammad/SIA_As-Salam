@@ -15,7 +15,9 @@ class Catatan extends Model
         'santri_id',
         'kelas_semester_id',
         'catatan',
-        'keputusan'
+        'keputusan_kelas_id',
+        'predikat',
+        'status_naik_kelas', // tambahan
     ];
 
     public function santri()
@@ -26,5 +28,10 @@ class Catatan extends Model
     public function kelasSemester()
     {
         return $this->belongsTo(KelasSemester::class);
+    }
+
+    public function kelasTujuan()
+    {
+        return $this->belongsTo(Kelas::class, 'keputusan_kelas_id');
     }
 }

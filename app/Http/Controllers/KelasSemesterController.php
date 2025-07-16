@@ -7,6 +7,7 @@ use App\Models\Semester;
 use App\Models\KelasSemester;
 use App\Models\Santri;
 use App\Models\SantriKelasSemester;
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
@@ -17,21 +18,21 @@ class KelasSemesterController extends Controller
     {
         Log::info('=== KelasSemesterController instantiated ===');
     }
-
     public function store(Request $request, $semesterId)
     {
-        Log::warning('=== KelasSemesterController::store dipanggil (SEHARUSNYA TIDAK UNTUK MAPEL) ===');
-        Log::info('Request URL: ' . $request->url());
-        Log::info('Request Method: ' . $request->method());
-        Log::info('Semester ID: ' . $semesterId);
-        Log::info('Request Data: ', $request->all());
+        Log::info('=== KelasSemesterController::store called ===', [
+            'url' => $request->url(),
+            'method' => $request->method(),
+            'semester_id' => $semesterId,
+            'data' => $request->all()
+        ]);
 
-        // Tambahkan pemeriksaan untuk mencegah pemrosesan jika URL salah
+        // Prevent misrouting
         if ($request->url() === url('akademik/kelas-semester/mapel')) {
-            Log::error('Permintaan ke rute mapel salah ditangani oleh KelasSemesterController');
+            Log::error('Request to mapel route incorrectly handled by KelasSemesterController');
             return response()->json([
                 'success' => false,
-                'message' => 'Rute salah: Ini seharusnya ditangani oleh KelasMapelSemesterController.'
+                'message' => 'Invalid route: This should be handled by KelasMapelSemesterController.'
             ], 400);
         }
 
@@ -49,7 +50,7 @@ class KelasSemesterController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validasi gagal pada KelasSemesterController: ', $validator->errors()->toArray());
+            Log::error('Validation failed in KelasSemesterController::store', $validator->errors()->toArray());
             return response()->json([
                 'success' => false,
                 'message' => 'Validasi gagal.',
@@ -68,28 +69,45 @@ class KelasSemesterController extends Controller
             ], 422);
         }
 
-        $kelasSemester = KelasSemester::create([
-            'kelas_id' => $request->kelas_id,
-            'semester_id' => $semesterId,
-            'wali_kelas_id' => $request->wali_kelas_id,
-            'mudir_id' => $request->mudir_id,
-        ]);
+        try {
+            DB::beginTransaction();
 
-        $santri = Santri::where('kelas_id', $request->kelas_id)
-            ->where('status', 'Aktif')
-            ->get();
-
-        foreach ($santri as $s) {
-            SantriKelasSemester::create([
-                'santri_id' => $s->id,
-                'kelas_semester_id' => $kelasSemester->id,
+            $kelasSemester = KelasSemester::create([
+                'kelas_id' => $request->kelas_id,
+                'semester_id' => $semesterId,
+                'wali_kelas_id' => $request->wali_kelas_id,
+                'mudir_id' => $request->mudir_id,
             ]);
-        }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Kelas semester berhasil dibuat dan santri ditambahkan.'
-        ]);
+            $santri = Santri::where('kelas_id', $request->kelas_id)
+                ->where('status', 'Aktif')
+                ->get();
+
+            foreach ($santri as $s) {
+                // Prevent duplicate entries
+                if (!SantriKelasSemester::where('santri_id', $s->id)
+                    ->where('kelas_semester_id', $kelasSemester->id)
+                    ->exists()) {
+                    SantriKelasSemester::create([
+                        'santri_id' => $s->id,
+                        'kelas_semester_id' => $kelasSemester->id,
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Kelas semester berhasil dibuat dan santri ditambahkan.'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error in KelasSemesterController::store: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan data.'
+            ], 500);
+        }
     }
 
     public function index($semesterId)

@@ -31,7 +31,7 @@
                             <span class="ml-4">Kehadiran Pengajar</span>
                         </a>
                     </li>
-                   <li class="relative px-6 py-3">
+                    <li class="relative px-6 py-3">
                         <a class="inline-flex items-center w-full text-sm font-semibold {{ Route::is('recaps.index') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('recaps.index') }}">
                             <img src="{{ asset(Route::is('recaps.index') ? 'assets/images/icons/recap-active.svg' : 'assets/images/icons/recap.svg') }}" alt="Rekap Data Icon" class="w-5 h-5" />
                             <span class="ml-4">Rekap Data</span>
@@ -53,6 +53,12 @@
                         <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->is('registration-request-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ url('/registration-request-admin') }}">
                             <img src="{{ asset(request()->is('registration-request-admin') ? 'assets/images/icons/request-active.svg' : 'assets/images/icons/request.svg') }}" alt="Permintaan Pendaftaran Icon" class="w-5 h-5" />
                             <span class="ml-4">Data Registrasi</span>
+                        </a>
+                    </li>
+                    <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->routeIs('akademik.*') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('akademik.index') }}">
+                            <img src="{{ asset(request()->routeIs('akademik.*') ? 'assets/images/icons/akademik-active.svg' : 'assets/images/icons/akademik.svg') }}" alt="Akademik Icon" class="w-5 h-5" />
+                            <span class="ml-4">Akademik</span>
                         </a>
                     </li>
                 </ul>

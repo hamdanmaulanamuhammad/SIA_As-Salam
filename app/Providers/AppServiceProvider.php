@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Blade;
 use Carbon\Carbon;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,5 +22,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Carbon::setLocale('id');
+        Blade::directive('numberToWords', function ($expression) {
+            return "<?php echo \App\Http\Controllers\RaporController::numberToWords($expression); ?>";
+        });
     }
 }

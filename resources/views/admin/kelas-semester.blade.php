@@ -44,45 +44,47 @@
     @else
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             @foreach ($kelasSemesters as $kelasSemester)
-                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-                    <h4 class="text-lg font-semibold text-gray-800 mb-2">{{ $kelasSemester->kelas->nama_kelas }}</h4>
-                    <p class="text-sm text-gray-600 mb-1"><strong>Wali Kelas:</strong> {{ $kelasSemester->waliKelas ? $kelasSemester->waliKelas->full_name : '-' }}</p>
-                    <p class="text-sm text-gray-600 mb-3"><strong>Mudir:</strong> {{ $kelasSemester->mudir ? $kelasSemester->mudir->full_name : '-' }}</p>
-                    <p class="text-sm text-gray-600 mb-3"><strong>Mata Pelajaran:</strong></p>
-                    @if ($kelasSemester->mapels->isEmpty())
-                        <p class="text-sm text-gray-500 italic">Belum ada mata pelajaran.</p>
-                    @else
-                        <ul class="text-sm text-gray-600 list-disc list-inside mb-3">
-                            @foreach ($kelasSemester->mapels as $mapel)
-                                <li class="flex justify-between items-center">
-                                    {{ $mapel->mataPelajaran->nama_mapel }} ({{ $mapel->mataPelajaran->kategori }})
-                                    <form class="delete-mapel-form" action="{{ route('akademik.kelas-semester.mapel.destroy', $mapel->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-500 hover:text-red-700 text-xs">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @endif
-                    <div class="flex gap-2 mt-3">
-                        <button class="edit-button text-sm px-3 py-1 text-white bg-yellow-500 rounded-md hover:bg-yellow-600" data-id="{{ $kelasSemester->id }}">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <form class="delete-form" action="{{ route('akademik.kelas-semester.destroy', $kelasSemester->id) }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-sm px-3 py-1 text-white bg-red-600 rounded-md hover:bg-red-700">
-                                <i class="fas fa-trash"></i> Hapus
+                <a href="{{ route('akademik.rapor.index', $kelasSemester->id) }}" class="block">
+                    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-2">{{ $kelasSemester->kelas->nama_kelas }}</h4>
+                        <p class="text-sm text-gray-600 mb-1"><strong>Wali Kelas:</strong> {{ $kelasSemester->waliKelas ? $kelasSemester->waliKelas->full_name : '-' }}</p>
+                        <p class="text-sm text-gray-600 mb-3"><strong>Mudir:</strong> {{ $kelasSemester->mudir ? $kelasSemester->mudir->full_name : '-' }}</p>
+                        <p class="text-sm text-gray-600 mb-3"><strong>Mata Pelajaran:</strong></p>
+                        @if ($kelasSemester->mapels->isEmpty())
+                            <p class="text-sm text-gray-500 italic">Belum ada mata pelajaran.</p>
+                        @else
+                            <ul class="text-sm text-gray-600 list-disc list-inside mb-3">
+                                @foreach ($kelasSemester->mapels as $mapel)
+                                    <li class="flex justify-between items-center">
+                                        {{ $mapel->mataPelajaran->nama_mapel }} ({{ $mapel->mataPelajaran->kategori }})
+                                        <form class="delete-mapel-form" action="{{ route('akademik.kelas-semester.mapel.destroy', $mapel->id) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-500 hover:text-red-700 text-xs">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
+                        <div class="flex gap-2 mt-3">
+                            <button class="edit-button text-sm px-3 py-1 text-white bg-yellow-500 rounded-md hover:bg-yellow-600" data-id="{{ $kelasSemester->id }}">
+                                <i class="fas fa-edit"></i> Edit
                             </button>
-                        </form>
-                        <button class="manage-mapel-button text-sm px-3 py-1 text-white bg-green-600 rounded-md hover:bg-green-700" data-id="{{ $kelasSemester->id }}">
-                            <i class="fas fa-book"></i> Kelola Mapel
-                        </button>
+                            <form class="delete-form" action="{{ route('akademik.kelas-semester.destroy', $kelasSemester->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-sm px-3 py-1 text-white bg-red-600 rounded-md hover:bg-red-700">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </button>
+                            </form>
+                            <button class="manage-mapel-button text-sm px-3 py-1 text-white bg-green-600 rounded-md hover:bg-green-700" data-id="{{ $kelasSemester->id }}">
+                                <i class="fas fa-book"></i> Kelola Mapel
+                            </button>
+                        </div>
                     </div>
-                </div>
+                </a>
             @endforeach
         </div>
         <!-- Pagination -->
