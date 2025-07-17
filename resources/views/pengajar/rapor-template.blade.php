@@ -16,16 +16,16 @@
         }
         .container {
             background: white;
-            max-width: 800px !important; /* Scaled down for preview */
+            max-width: 800px !important;
             min-width: 760px !important;
-            min-height: 1130px; /* Scaled down for preview (A4 ratio) */
+            min-height: 1130px;
             margin: 0 auto;
             padding: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             position: relative;
         }
         .pdf-content {
-            width: 760px; /* Scaled down for preview */
+            width: 760px;
             margin: 15px auto;
             padding: 20px;
             box-sizing: border-box;
@@ -75,9 +75,9 @@
             display: flex;
             position: absolute;
             top: 30px;
-            left: 1px; /* Nilai tetap untuk mencegah pergeseran */
-            z-index: 1000; /* Pastikan cap di atas elemen lain */
-            overflow: visible; /* Nonaktifkan overflow untuk mencegah pemotongan */
+            left: 1px;
+            z-index: 1000;
+            overflow: visible;
         }
         .cap-container img {
             max-width: 100%;
@@ -107,13 +107,13 @@
                 background: white;
             }
             .container {
-                width: 210mm; /* A4 width for print */
-                min-height: 297mm; /* A4 height for print */
+                width: 210mm;
+                min-height: 297mm;
                 margin: 0;
                 box-shadow: none;
             }
             .pdf-content {
-                width: 190mm; /* A4 width minus margins for print */
+                width: 190mm;
                 margin: 0 auto;
                 padding: 10mm;
             }
@@ -146,7 +146,7 @@
             <button id="downloadPdf" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
                 Download PDF
             </button>
-            <a href="{{ route('akademik.rapor.show', [$kelasSemester->id, $santri->id]) }}"
+            <a href="{{ route('pengajar.rapor.show', [$kelasSemester->id, $santri->id]) }}"
                class="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700">
                 Kembali
             </a>
@@ -238,7 +238,6 @@
                         <tr class="font-semibold">
                             <td class="border border-black px-2 py-1 text-center" colspan="2">Jumlah Nilai</td>
                             <td class="border border-black px-2 py-1 text-center">{{ $jumlahNilai ?? '-' }}</td>
-                            <!-- PERBAIKAN: Ganti dari {{ $jumlahNilaiTerbilang ?? '-' }} menjadi: -->
                             <td class="border border-black px-2 py-1 text-center" colspan="2">{{ $jumlahNilaiTerbilang ?? '-' }}</td>
                         </tr>
                         <tr class="font-semibold">

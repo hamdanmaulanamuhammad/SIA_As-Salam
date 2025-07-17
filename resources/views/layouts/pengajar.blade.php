@@ -35,6 +35,12 @@
                             <span class="ml-4">Kehadiran</span>
                         </a>
                     </li>
+                    <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->is('pengajar/akademik*') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('pengajar.akademik.index') }}">
+                            <img src="{{ asset(request()->is('pengajar/akademik*') ? 'assets/images/icons/akademik-active.svg' : 'assets/images/icons/akademik.svg') }}" alt="Akademik Icon" class="w-5 h-5" />
+                            <span class="ml-4">Akademik</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </aside>
@@ -62,7 +68,7 @@
                             </span>
                             <div id="dropdown" class="absolute right-0 z-20 hidden mt-2 w-48 bg-white rounded-md shadow-lg">
                                 <div class="py-1">
-                                    <a class="flex px-4 py-2 hover:bg-gray-100" href="{{ route('view-pengajar-profile') }}">
+                                    <a class="flex px-4 py-2 hover:bg-gray-100" href="{{ route('profile.pengajar.index') }}">
                                         <img src="{{ asset('assets/images/icons/profile.svg') }}" alt="Profile" class="w-3 h-3 mr-3">
                                         <span class="block text-sm text-gray-800">Profile</span>
                                     </a>
@@ -101,7 +107,7 @@
             toggleSideMenu() {
                 this.isSideMenuOpen = !this.isSideMenuOpen;
                 document.getElementById('sidebar').classList.toggle('hidden', !this.isSideMenuOpen);
-                document.body.classList.toggle('overflow-hidden', this.isSideMenuOpen); 
+                document.body.classList.toggle('overflow-hidden', this.isSideMenuOpen);
             },
             closeSideMenu() {
                 this.isSideMenuOpen = false;

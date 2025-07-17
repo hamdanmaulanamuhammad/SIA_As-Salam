@@ -89,7 +89,7 @@
                             </span>
                             <div id="dropdown" class="absolute right-0 z-20 hidden mt-2 w-48 bg-white rounded-md shadow-lg">
                                 <div class="py-1">
-                                    <a class="flex px-4 py-2 hover:bg-gray-100" href="{{ route('view-admin-profile') }}">
+                                    <a class="flex px-4 py-2 hover:bg-gray-100" href="{{ route('profile.admin.index') }}">
                                         <img src="{{ asset('assets/images/icons/profile.svg') }}" alt="Profile" class="w-3 h-3 mr-3">
                                         <span class="block text-sm text-gray-800">Profile</span>
                                     </a>

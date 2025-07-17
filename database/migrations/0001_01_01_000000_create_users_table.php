@@ -14,14 +14,17 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id(); // Kolom auto-increment sebagai primary key
             $table->string('username')->unique();
-            $table->string('email')->unique(); 
+            $table->string('email')->unique();
             $table->string('phone')->nullable();
-            $table->string('university')->nullable(); 
-            $table->text('address')->nullable(); 
+            $table->string('university')->nullable();
+            $table->text('address')->nullable();
             $table->string('full_name');
-            $table->string('password'); 
+            $table->string('password');
             $table->enum('role', ['admin', 'pengajar'])->default('pengajar'); // Kolom role dengan default pengajar
-            $table->timestamps(); 
+            $table->string('photo')->nullable();
+            $table->boolean('accepted')->default(false);
+            $table->string('signature')->nullable(); // Kolom untuk menyimpan tanda tangan
+            $table->timestamps();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

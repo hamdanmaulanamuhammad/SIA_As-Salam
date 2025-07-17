@@ -1,0 +1,383 @@
+@extends('layouts.pengajar')
+
+@section('title', 'Menu Akademik')
+
+@section('content')
+<div class="container px-6 mx-auto grid">
+    <div class="flex justify-between items-center mb-6 mt-6">
+        <h1 class="text-2xl font-bold">Menu Akademik</h1>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="mb-6 border-b border-gray-200">
+        <nav class="-mb-px flex space-x-8">
+            <a href="?tab=kelas" id="tab-kelas" class="tab-btn active border-b-2 border-blue-500 py-2 px-1 text-sm font-medium text-blue-600">
+                Kelas
+            </a>
+            <a href="?tab=mapel" id="tab-mapel" class="tab-btn border-b-2 border-transparent py-2 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                Mata Pelajaran
+            </a>
+            <a href="?tab=semester" id="tab-semester" class="tab-btn border-b-2 border-transparent py-2 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                Semester
+            </a>
+        </nav>
+    </div>
+
+    <!-- Tab Content Kelas (View Only) -->
+    <div id="content-kelas" class="tab-content">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Data Kelas</h2>
+            <div class="bg-gray-100 px-4 py-2 rounded-md text-sm text-gray-600">
+                <i class="fa fa-info-circle mr-2"></i>Mode View Only
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full bg-white rounded-lg shadow">
+                <thead>
+                    <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
+                        <th class="px-4 py-3">No</th>
+                        <th class="px-4 py-3">Nama Kelas</th>
+                        <th class="px-4 py-3">Jumlah Santri</th>
+                    </tr>
+                </thead>
+                <tbody id="kelasTableBody" class="bg-white divide-y">
+                    @foreach($kelas as $index => $item)
+                    <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-50' }}">
+                        <td class="px-4 py-3 text-sm">{{ ($kelas->currentPage() - 1) * $kelas->perPage() + $index + 1 }}</td>
+                        <td class="px-4 py-3 text-sm">{{ $item->nama_kelas }}</td>
+                        <td class="px-4 py-3 text-sm">{{ $item->santri_count ?? 0 }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-6">
+            {{ $kelas->appends(['tab' => 'kelas'])->links() }}
+        </div>
+    </div>
+
+    <!-- Tab Content Mata Pelajaran -->
+    <div id="content-mapel" class="tab-content hidden">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Data Mata Pelajaran</h2>
+            <button id="tambahMapelButton" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200">
+                <i class="fa fa-plus mr-2"></i>Tambah Mata Pelajaran
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full bg-white rounded-lg shadow">
+                <thead>
+                    <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
+                        <th class="px-4 py-3">No</th>
+                        <th class="px-4 py-3">Nama Mapel</th>
+                        <th class="px-4 py-3">Kategori</th>
+                        <th class="px-4 py-3">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="mapelTableBody" class="bg-white divide-y">
+                    @foreach($mapels as $index => $item)
+                    <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-50' }}">
+                        <td class="px-4 py-3 text-sm">{{ ($mapels->currentPage() - 1) * $mapels->perPage() + $index + 1 }}</td>
+                        <td class="px-4 py-3 text-sm">{{ $item->nama_mapel }}</td>
+                        <td class="px-4 py-3 text-sm">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full
+                                {{ $item->kategori === 'Hafalan' ? 'bg-green-100 text-green-800' :
+                                   ($item->kategori === 'Teori' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800') }}">
+                                {{ $item->kategori }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-sm">
+                            <div class="flex space-x-2">
+                                <button class="edit-mapel-button w-8 h-8 text-white bg-yellow-500 rounded-md flex items-center justify-center hover:bg-yellow-600" data-id="{{ $item->id }}">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <form action="{{ route('pengajar.akademik.mapel.destroy', $item->id) }}?tab=mapel" method="POST" class="delete-mapel-form">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="w-8 h-8 text-white bg-red-500 rounded-md flex items-center justify-center hover:bg-red-600">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-6">
+            {{ $mapels->appends(['tab' => 'mapel'])->links() }}
+        </div>
+    </div>
+
+    <!-- Tab Content Semester (View Only) -->
+    <div id="content-semester" class="tab-content hidden">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Data Semester</h2>
+            <div class="bg-gray-100 px-4 py-2 rounded-md text-sm text-gray-600">
+                <i class="fa fa-info-circle mr-2"></i>Mode View Only
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full bg-white rounded-lg shadow">
+                <thead>
+                    <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
+                        <th class="px-4 py-3">No</th>
+                        <th class="px-4 py-3">Nama Semester</th>
+                        <th class="px-4 py-3">Tahun Ajaran</th>
+                        <th class="px-4 py-3">Tanggal Mulai</th>
+                        <th class="px-4 py-3">Tanggal Selesai</th>
+                        <th class="px-4 py-3">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="semesterTableBody" class="bg-white divide-y">
+                    @foreach($semesters as $index => $item)
+                    <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-50' }}">
+                        <td class="px-4 py-3 text-sm">{{ ($semesters->currentPage() - 1) * $semesters->perPage() + $index + 1 }}</td>
+                        <td class="px-4 py-3 text-sm">{{ $item->nama_semester }}</td>
+                        <td class="px-4 py-3 text-sm">{{ $item->tahun_ajaran }}</td>
+                        <td class="px-4 py-3 text-sm">{{ $item->tanggal_mulai ? \Carbon\Carbon::parse($item->tanggal_mulai)->format('d/m/Y') : '-' }}</td>
+                        <td class="px-4 py-3 text-sm">{{ $item->tanggal_selesai ? \Carbon\Carbon::parse($item->tanggal_selesai)->format('d/m/Y') : '-' }}</td>
+                        <td class="px-4 py-3 text-sm">
+                            <div class="flex space-x-2">
+                                <a href="{{ route('pengajar.kelas-semester', $item->id) }}" class="w-8 h-8 text-white bg-green-600 rounded-md flex items-center justify-center hover:bg-green-700">
+                                    <i class="fa fa-eye"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-6">
+            {{ $semesters->appends(['tab' => 'semester'])->links() }}
+        </div>
+    </div>
+
+    <!-- Modal for Mapel Form -->
+    <div id="mapel-form-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Form Mata Pelajaran</h3>
+                <button id="close-mapel-form-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <form id="mapel-form" action="{{ route('pengajar.akademik.mapel.store') }}?tab=mapel" method="POST">
+                @csrf
+                <input type="hidden" id="mapel-id" name="id">
+                <input type="hidden" name="_method" id="mapel-method" value="POST">
+                <div class="mb-4">
+                    <label for="nama_mapel" class="block text-sm font-medium text-gray-700 mb-1">Nama Mata Pelajaran <span class="text-red-600">*</span></label>
+                    <input type="text" name="nama_mapel" id="nama_mapel" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" required>
+                </div>
+                <div class="mb-4">
+                    <label for="kategori" class="block text-sm font-medium text-gray-700 mb-1">Kategori <span class="text-red-600">*</span></label>
+                    <select name="kategori" id="kategori" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" required>
+                        <option value="">Pilih Kategori</option>
+                        <option value="Hafalan">Hafalan</option>
+                        <option value="Teori">Teori</option>
+                        <option value="Praktik">Praktik</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancel-mapel-form-button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab Management
+    function showTab(tabName) {
+        console.log('Switching to tab:', tabName);
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.add('hidden');
+        });
+
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active', 'border-blue-500', 'text-blue-600');
+            btn.classList.add('border-transparent', 'text-gray-500');
+        });
+
+        // Show selected tab content
+        const content = document.getElementById('content-' + tabName);
+        if (content) {
+            content.classList.remove('hidden');
+        } else {
+            console.error('Tab content not found for:', tabName);
+        }
+
+        // Add active class to selected tab
+        const activeTab = document.getElementById('tab-' + tabName);
+        if (activeTab) {
+            activeTab.classList.add('active', 'border-blue-500', 'text-blue-600');
+            activeTab.classList.remove('border-transparent', 'text-gray-500');
+        } else {
+            console.error('Tab button not found for:', tabName);
+        }
+
+        // Store the active tab in sessionStorage
+        sessionStorage.setItem('activeTab', tabName);
+    }
+
+    // Tab event listeners
+    document.querySelectorAll('.tab-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const tabName = button.id.replace('tab-', '');
+            showTab(tabName);
+        });
+    });
+
+    // Restore active tab on page load
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabFromUrl = urlParams.get('tab');
+    const validTabs = ['kelas', 'mapel', 'semester'];
+    const lastTab = sessionStorage.getItem('activeTab');
+    const activeTab = tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : (lastTab && validTabs.includes(lastTab) ? lastTab : 'kelas');
+    showTab(activeTab);
+
+    // Mapel Modal Handlers
+    document.getElementById('tambahMapelButton')?.addEventListener('click', () => {
+        sessionStorage.setItem('activeTab', 'mapel');
+        document.getElementById('mapel-form').reset();
+        document.getElementById('mapel-id').value = '';
+        document.getElementById('mapel-method').value = 'POST';
+        document.getElementById('mapel-form').action = "{{ route('pengajar.akademik.mapel.store') }}?tab=mapel";
+        document.getElementById('mapel-form-modal').classList.remove('hidden');
+    });
+
+    document.getElementById('close-mapel-form-modal')?.addEventListener('click', () => {
+        document.getElementById('mapel-form-modal').classList.add('hidden');
+    });
+
+    document.getElementById('cancel-mapel-form-button')?.addEventListener('click', () => {
+        document.getElementById('mapel-form-modal').classList.add('hidden');
+    });
+
+    // Mapel Form Submission
+    document.getElementById('mapel-form')?.addEventListener('submit', function(event) {
+        event.preventDefault();
+        sessionStorage.setItem('activeTab', 'mapel');
+        const formData = new FormData(this);
+        const id = document.getElementById('mapel-id')?.value;
+        const url = id ? `/pengajar/akademik/mapel/${id}?tab=mapel` : this.action;
+
+        fetch(url, {
+            method: "POST",
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                'accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    title: "Berhasil!",
+                    text: data.message,
+                    icon: "success",
+                    confirmButtonText: "OK"
+                }).then(() => {
+                    window.location = "{{ route('pengajar.akademik.index') }}?tab=mapel";
+                });
+            } else {
+                Swal.fire({
+                    title: "Gagal!",
+                    html: data.message || 'Terjadi kesalahan.',
+                    icon: "error",
+                    confirmButtonText: "OK"
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire("Error!", "Terjadi kesalahan pada server.", "error");
+        });
+    });
+
+    // Edit Mapel
+    document.querySelectorAll('.edit-mapel-button').forEach(button => {
+        button.addEventListener('click', () => {
+            sessionStorage.setItem('activeTab', 'mapel');
+            fetch(`/pengajar/akademik/mapel/${button.getAttribute('data-id')}/edit`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('mapel-id').value = data.data.id;
+                        document.getElementById('nama_mapel').value = data.data.nama_mapel;
+                        document.getElementById('kategori').value = data.data.kategori;
+                        document.getElementById('mapel-method').value = 'PUT';
+                        document.getElementById('mapel-form').action = `/pengajar/akademik/mapel/${data.data.id}?tab=mapel`;
+                        document.getElementById('mapel-form-modal').classList.remove('hidden');
+                    } else {
+                        Swal.fire('Gagal!', data.message || 'Data tidak ditemukan.', 'error');
+                    }
+                })
+                .catch(error => {
+                    Swal.fire('Error!', 'Terjadi kesalahan saat mengambil data.', 'error');
+                });
+        });
+    });
+
+    // Delete Mapel
+    document.querySelectorAll('.delete-mapel-form').forEach(form => {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const tabName = new URL(form.action).searchParams.get('tab') || 'mapel';
+            sessionStorage.setItem('activeTab', tabName);
+            Swal.fire({
+                title: "Konfirmasi",
+                text: "Apakah Anda yakin ingin menghapus mata pelajaran ini?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: new FormData(form),
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                text: data.message,
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                window.location = "{{ route('pengajar.akademik.index') }}?tab=" + tabName;
+                            });
+                        } else {
+                            Swal.fire('Gagal!', data.message || 'Terjadi kesalahan.', 'error');
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire('Error!', 'Terjadi kesalahan saat menghapus data.', 'error');
+                    });
+                }
+            });
+        });
+    });
+});
+</script>
+@endsection

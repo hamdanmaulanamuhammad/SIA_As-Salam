@@ -4,6 +4,11 @@ use App\Http\Controllers\KelasController;
 use App\Http\Controllers\KelasMapelSemesterController;
 use App\Http\Controllers\KelasSemesterController;
 use App\Http\Controllers\MapelController;
+use App\Http\Controllers\PengajarAkademikController;
+use App\Http\Controllers\PengajarKelasMapelSemesterController;
+use App\Http\Controllers\PengajarKelasSemesterController;
+use App\Http\Controllers\PengajarMapelController;
+use App\Http\Controllers\PengajarRaporController;
 use App\Http\Controllers\RaporController;
 use App\Http\Controllers\SantriController;
 use App\Http\Controllers\LoginRegisterController;
@@ -85,17 +90,15 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/registration/accept/{id}', [PengajarController::class, 'acceptRegistration'])->name('registration.accept');
         Route::post('/registration/reject/{id}', [PengajarController::class, 'rejectRegistration'])->name('registration.reject');
 
-        // Profile
-        Route::get('/profile-admin', [ProfileController::class, 'showProfile'])->name('view-admin-profile');
-
-        // Rute untuk mengupdate profil admin
-        Route::post('/profile-admin/update', [ProfileController::class, 'updateProfile'])->name('profile.adminupdate');
-
-        // Rute untuk mengupload foto profil admin
-        Route::post('/profile-admin/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.adminuploadPhoto');
-
-        // Rute untuk menghapus foto profil admin
-        Route::delete('/profile-admin/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.admindeletePhoto');
+        // Routes untuk profile dengan prefix
+        Route::prefix('profile/admin')->group(function () {
+            Route::get('/', [ProfileController::class, 'showProfile'])->name('profile.admin.index');
+            Route::post('/update', [ProfileController::class, 'updateProfile'])->name('profile.admin.update');
+            Route::post('/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.admin.uploadPhoto');
+            Route::delete('/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.admin.deletePhoto');
+            Route::post('/upload-signature', [ProfileController::class, 'uploadSignature'])->name('profile.admin.uploadSignature');
+            Route::delete('/delete-signature', [ProfileController::class, 'deleteSignature'])->name('profile.admin.deleteSignature');
+        });
 
         Route::prefix('akademik')->group(function () {
             Route::get('/', [AkademikController::class, 'index'])->name('akademik.index');
@@ -174,15 +177,37 @@ Route::middleware(['auth'])->group(function () {
         })->name('attendance-pengajar');
 
         // Profile
-        Route::get('/profile-pengajar', [ProfileController::class, 'showProfile'])->name('view-pengajar-profile');
+        Route::prefix('profile-pengajar')->group(function () {
+            Route::get('/', [ProfileController::class, 'showProfile'])->name('profile.pengajar.index');
+            Route::post('/update', [ProfileController::class, 'updateProfile'])->name('profile.pengajar.update');
+            Route::post('/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.pengajar.uploadPhoto');
+            Route::delete('/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.pengajar.deletePhoto');
+            Route::post('/upload-signature', [ProfileController::class, 'uploadSignature'])->name('profile.pengajar.uploadSignature');
+            Route::delete('/delete-signature', [ProfileController::class, 'deleteSignature'])->name('profile.pengajar.deleteSignature');
+        });
 
-        // Rute untuk mengupdate profil pengajar
-        Route::post('/profile-pengajar/update', [ProfileController::class, 'updateProfile'])->name('profile.pengajar-update');
+       Route::prefix('pengajar/akademik')->group(function () {
+            // Route yang sudah ada (dari implementasi sebelumnya)
+            Route::get('/', [PengajarAkademikController::class, 'index'])->name('pengajar.akademik.index');
+            Route::get('semester/{semester}/kelas-semester', [PengajarKelasSemesterController::class, 'index'])->name('pengajar.kelas-semester');
+            Route::post('semester/{semester}/kelas-semester/store', [PengajarKelasSemesterController::class, 'store'])->name('pengajar.kelas-semester.store');
+            Route::get('kelas-semester/{id}/edit', [PengajarKelasSemesterController::class, 'edit'])->name('pengajar.kelas-semester.edit');
+            Route::put('kelas-semester/{id}', [PengajarKelasSemesterController::class, 'update'])->name('pengajar.kelas-semester.update');
+            Route::delete('kelas-semester/{id}', [PengajarKelasSemesterController::class, 'destroy'])->name('pengajar.kelas-semester.destroy');
+            Route::post('kelas-semester/mapel', [PengajarKelasMapelSemesterController::class, 'store'])->name('pengajar.kelas-semester.mapel.store');
+            Route::delete('kelas-semester/mapel/{id}', [PengajarKelasMapelSemesterController::class, 'destroy'])->name('pengajar.kelas-semester.mapel.destroy');
+            Route::get('mapel/create', [PengajarMapelController::class, 'create'])->name('pengajar.akademik.mapel.create');
+            Route::post('mapel', [PengajarMapelController::class, 'store'])->name('pengajar.akademik.mapel.store');
+            Route::get('mapel/{id}/edit', [PengajarMapelController::class, 'edit'])->name('pengajar.akademik.mapel.edit');
+            Route::put('mapel/{id}', [PengajarMapelController::class, 'update'])->name('pengajar.akademik.mapel.update');
+            Route::delete('mapel/{id}', [PengajarMapelController::class, 'destroy'])->name('pengajar.akademik.mapel.destroy');
 
-        // Rute untuk mengupload foto profil pengajar
-        Route::post('/profile-pengajar/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.pengajar-uploadPhoto');
-
-        // Rute untuk menghapus foto profil pengajar
-        Route::post('/profile-pengajar/delete-photo', [ProfileController::class, 'deletePhoto'])->name('profile.pengajar-deletePhoto');
+            // Route baru untuk rapor pengajar
+            Route::get('rapor/{kelasSemesterId}', [PengajarRaporController::class, 'index'])->name('pengajar.rapor.index');
+            Route::get('rapor/{kelasSemesterId}/{santriId}', [PengajarRaporController::class, 'show'])->name('pengajar.rapor.show');
+            Route::put('rapor/{kelasSemesterId}/{santriId}', [PengajarRaporController::class, 'update'])->name('pengajar.rapor.update');
+            Route::get('rapor/{kelasSemesterId}/{santriId}/preview', [PengajarRaporController::class, 'previewRapor'])->name('pengajar.rapor.preview');
+            Route::get('rapor/{kelasSemesterId}/{santriId}/pdf', [PengajarRaporController::class, 'generatePdf'])->name('pengajar.rapor.pdf');
+        });
     });
 });

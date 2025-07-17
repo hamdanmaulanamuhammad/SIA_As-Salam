@@ -16,16 +16,17 @@ class User extends Authenticatable
      * @var array<string>
      */
     protected $fillable = [
-        'username',      
-        'full_name',     
-        'email',         
-        'phone',         
-        'university',    
-        'address',       
-        'password',      
+        'username',
+        'full_name',
+        'email',
+        'phone',
+        'university',
+        'address',
+        'password',
         'role',
         'photo',
-        'accepted',          
+        'accepted',
+        'signature',
     ];
 
     /**
@@ -56,5 +57,4 @@ class User extends Authenticatable
      * @param string $value
      * @return void
      */
-    
 }
