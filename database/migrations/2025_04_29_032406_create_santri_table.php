@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('santri', function (Blueprint $table) {
+         Schema::create('santri', function (Blueprint $table) {
             $table->id();
 
             // Identitas Santri
@@ -25,26 +25,20 @@ return new class extends Migration
             $table->string('hobi')->nullable();
             $table->text('riwayat_penyakit')->nullable();
             $table->text('alamat')->nullable();
+            $table->year('tahun_bergabung'); // Kolom tahun bergabung
 
             // Akademik
             $table->string('sekolah')->nullable();
-            $table->string('kelas')->nullable(); // Kelas di sekolah formal
-            $table->string('jilid_juz')->nullable(); // Tahapan baca Al-Qur’an (Juz, Jilid, dst)
-            $table->string('status')->default('Aktif'); // Aktif / Non-Aktif / Lulus, dll
+            $table->string('kelas')->nullable(); // Kelas di sekolah (string)
+            $table->string('jilid_juz')->nullable();
+            $table->string('status')->default('Aktif');
 
-            // Relasi ke kelas TPA (bukan sekolah)
-            $table->unsignedBigInteger('kelas_awal_id')->nullable(); // Kelas saat pertama masuk
-            $table->unsignedBigInteger('kelas_id')->nullable();       // Kelas aktif sekarang
+            // Relasi ke kelas TPA
+            $table->unsignedBigInteger('kelas_awal_id')->nullable();
+            $table->unsignedBigInteger('kelas_id')->nullable();
 
-            // Orang Tua / Wali
-            $table->string('nama_ayah')->nullable();
-            $table->string('nama_ibu')->nullable();
-            $table->string('pekerjaan_ayah')->nullable();
-            $table->string('pekerjaan_ibu')->nullable();
-            $table->string('no_hp_ayah')->nullable();
-            $table->string('no_hp_ibu')->nullable();
-
-            $table->string('nama_wali')->nullable();       // opsional jika ada wali khusus
+            // Wali
+            $table->string('nama_wali')->nullable();
             $table->string('pekerjaan_wali')->nullable();
             $table->string('no_hp_wali')->nullable();
 

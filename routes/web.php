@@ -68,12 +68,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/santri/{id}', [SantriController::class, 'show'])->name('santri.show');
         Route::get('/santri/{id}/download-akta', [SantriController::class, 'downloadAkta'])->name('download.akta');
 
-
-        // Presensi Manual
-        Route::get('/manual-attendance-admin', function () {
-            return view('admin.manual-attendance-admin');
-        })->name('manual-attendance-admin');
-
         // Data Pengajar
         Route::get('/data-pengajar', [PengajarController::class, 'showTeacherList'])->name('pengajar.show');
         Route::get('/teachers/{id}', [PengajarController::class, 'showTeacherDetail'])->name('teachers.detail');
@@ -82,6 +76,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/teachers/{id}/contracts', [PengajarController::class, 'storeContract'])->name('contracts.store');
         Route::put('/teachers/{id}/contracts/{contract_id}', [PengajarController::class, 'updateContract'])->name('contracts.update');
         Route::delete('/teachers/{id}/contracts/{contract_id}', [PengajarController::class, 'deleteContract'])->name('contracts.destroy');
+
         // Permintaan Pendaftaran
         // Rute untuk menampilkan permintaan registrasi
         Route::get('/registration-request-admin', [PengajarController::class, 'showRegistrationRequests'])->name('registration-request-admin');
@@ -159,11 +154,6 @@ Route::middleware(['auth'])->group(function () {
         // Dashboard
         Route::get('/dashboard-pengajar', [PresenceController::class, 'indexPengajar'])->name('dashboard-pengajar');
 
-        // Data Recap
-        Route::get('/data-recap-pengajar', function () {
-            return view('pengajar.data-recap-pengajar');
-        })->name('data-recap-pengajar');
-
         //Presensi
         Route::get('/presence', [PresenceController::class, 'index'])->name('presence.index');
         Route::post('/presence', [PresenceController::class, 'store'])->name('pengajar.presence.store');
@@ -172,9 +162,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/presence/{id}', [PresenceController::class, 'destroy'])->name('pengajar.presence.destroy');
 
         // Kehadiran
-        Route::get('/attendance-pengajar', function () {
-            return view('pengajar.attendance-pengajar');
-        })->name('attendance-pengajar');
+       Route::get('/attendance-pengajar', [PresenceController::class, 'attendancePengajar'])->name('attendance-pengajar');
 
         // Profile
         Route::prefix('profile-pengajar')->group(function () {

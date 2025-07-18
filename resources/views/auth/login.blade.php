@@ -5,13 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - SIA As-Salam</title>
     @vite('resources/css/app.css')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="flex items-center min-h-screen p-6 bg-gray-50">
         <div class="flex-1 h-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-xl">
             <div class="flex flex-col overflow-y-auto md:flex-row">
                 <div class="h-32 md:h-auto md:w-1/2">
-                    <img aria-hidden="true" class="object-cover w-full h-full" src="{{ asset('assets/images/logo-square.jpeg') }}" alt="Logo" />
+                    <img aria-hidden="true" class="object-cover w-full h-full" src="{{ asset('assets/images/LogoAuth.png') }}" alt="Logo" />
                 </div>
                 <div class="flex items-center justify-center p-6 sm:p-12 md:w-1/2">
                     <div class="w-full">
@@ -24,7 +26,12 @@
                             </label>
                             <label class="block mt-4 text-base mb-10" for="password">
                                 <span class="text-gray-700">Password</span>
-                                <input id="password" class="block w-full p-2 mt-1 text-sm lg:text-lg border-gray-300 rounded-md focus:border-blue-600 focus:outline-none focus:shadow-outline-blue form-input dark:bg-gray-100 dark:border-gray-600" name="password" placeholder="***************" type="password" required />
+                                <div class="relative">
+                                    <input id="password" class="block w-full p-2 mt-1 text-sm lg:text-lg border-gray-300 rounded-md focus:border-blue-600 focus:outline-none focus:shadow-outline-blue form-input dark:bg-gray-100 dark:border-gray-600 pr-10" name="password" placeholder="***************" type="password" required />
+                                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('password')">
+                                        <i id="password-eye" class="fas fa-eye text-gray-500 hover:text-gray-700"></i>
+                                    </button>
+                                </div>
                             </label>
                             <button type="submit" class="block w-full px-4 py-3 mt-4 text-sm lg:text-lg font-medium leading-5 text-center text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">Log in</button>
                         </form>
@@ -37,5 +44,51 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function togglePassword(fieldId) {
+            const passwordField = document.getElementById(fieldId);
+            const eyeIcon = document.getElementById(fieldId + '-eye');
+
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Show success message
+        @if(session('success'))
+            Swal.fire({
+                title: 'Berhasil!',
+                text: '{{ session('success') }}',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+        @endif
+
+        // Show error messages
+        @if($errors->any())
+            let errorMessage = '';
+            @foreach($errors->all() as $error)
+                errorMessage += '{{ $error }}\n';
+            @endforeach
+
+            Swal.fire({
+                title: 'Error!',
+                text: errorMessage,
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true
+            });
+        @endif
+    </script>
 </body>
 </html>

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Santri extends Model
@@ -24,6 +24,7 @@ class Santri extends Model
         'hobi',
         'riwayat_penyakit',
         'alamat',
+        'tahun_bergabung',
 
         // Akademik
         'sekolah',
@@ -33,43 +34,35 @@ class Santri extends Model
         'kelas_awal_id',
         'kelas_id',
 
-        // Orang Tua/Wali
-        'nama_ayah',
-        'nama_ibu',
-        'pekerjaan_ayah',
-        'pekerjaan_ibu',
-        'no_hp_ayah',
-        'no_hp_ibu',
+        // Wali
         'nama_wali',
         'pekerjaan_wali',
         'no_hp_wali',
 
         // Dokumen
         'pas_foto_path',
-        'akta_path'
+        'akta_path',
     ];
 
     protected $casts = [
         'tanggal_lahir' => 'date',
+        'tahun_bergabung' => 'integer',
     ];
 
     // ========================
     //        RELATIONS
     // ========================
 
-    // Kelas aktif saat ini
     public function kelas()
     {
         return $this->belongsTo(Kelas::class, 'kelas_id');
     }
 
-    // Kelas saat pertama masuk
     public function kelasAwal()
     {
         return $this->belongsTo(Kelas::class, 'kelas_awal_id');
     }
 
-    // Semua riwayat semester (pivot)
     public function kelasSemester()
     {
         return $this->hasMany(SantriKelasSemester::class);
@@ -136,5 +129,10 @@ class Santri extends Model
         $query->when($filters['status'] ?? false, fn($q, $status) =>
             $q->where('status', $status)
         );
+    }
+
+    public function kelasRelation()
+    {
+        return $this->belongsTo(Kelas::class, 'kelas_id');
     }
 }

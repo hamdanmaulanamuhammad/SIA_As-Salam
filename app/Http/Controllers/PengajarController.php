@@ -111,4 +111,57 @@ class PengajarController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Kontrak dihapus.']);
     }
+
+    public function showRegistrationRequests()
+{
+    // Ambil user yang belum diterima (accepted = false)
+    $users = User::where('accepted', false)
+                 ->where('role', 'pengajar')
+                 ->orderBy('created_at', 'desc')
+                 ->paginate(10);
+
+    return view('admin.registration-request-admin', compact('users'));
+}
+
+    public function acceptRegistration($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+
+            // Update accepted menjadi true
+            $user->update([
+                'accepted' => true
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pendaftaran berhasil diterima.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function rejectRegistration($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+
+            // Hapus user yang ditolak
+            $user->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pendaftaran berhasil ditolak.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ]);
+        }
+    }
 }

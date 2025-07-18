@@ -1,7 +1,6 @@
 @extends('layouts.pengajar')
 
 @section('title', 'Rekap Data')
-
 @section('content')
     <div class="container px-6 mx-auto">
         <h2 class="text-2xl font-semibold text-gray-700 mt-8 mb-6">Januari 2025</h2>

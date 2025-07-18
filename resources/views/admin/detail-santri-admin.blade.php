@@ -118,6 +118,10 @@
                             <label class="block text-sm text-gray-500">Jilid/Juz</label>
                             <p class="font-medium">{{ $santri->jilid_juz ?? '-' }}</p>
                         </div>
+                        <div>
+                            <label class="block text-sm text-gray-500">Kelas TPA</label>
+                            <p class="font-medium">{{ $santri->kelasRelation->nama_kelas ?? '-' }}</p>
+                        </div>
                     </div>
                 </div>
 
@@ -127,37 +131,6 @@
                     <div>
                         <label class="block text-sm text-gray-500">Riwayat Penyakit</label>
                         <p class="font-medium">{{ $santri->riwayat_penyakit ?? '-' }}</p>
-                    </div>
-                </div>
-
-                <!-- Parents Information -->
-                <div class="bg-white p-5 rounded-lg border border-gray-200 mb-6">
-                    <h2 class="text-lg font-semibold text-blue-600 mb-4 pb-2 border-b border-gray-200">Informasi Orang Tua</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-sm text-gray-500">Nama Ayah</label>
-                            <p class="font-medium">{{ $santri->nama_ayah }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm text-gray-500">Pekerjaan Ayah</label>
-                            <p class="font-medium">{{ $santri->pekerjaan_ayah ?? '-' }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm text-gray-500">No. HP Ayah</label>
-                            <p class="font-medium">{{ $santri->no_hp_ayah ?? '-' }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm text-gray-500">Nama Ibu</label>
-                            <p class="font-medium">{{ $santri->nama_ibu }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm text-gray-500">Pekerjaan Ibu</label>
-                            <p class="font-medium">{{ $santri->pekerjaan_ibu ?? '-' }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm text-gray-500">No. HP Ibu</label>
-                            <p class="font-medium">{{ $santri->no_hp_ibu ?? '-' }}</p>
-                        </div>
                     </div>
                 </div>
 
@@ -253,12 +226,12 @@
                                 <input type="text" name="sekolah" id="sekolah" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" value="{{ $santri->sekolah ?? '' }}">
                             </div>
                             <div>
-                                <label for="kelas" class="block text-sm font-medium text-gray-700 mb-1">Kelas <span class="text-red-600">*</span></label>
-                                <select name="kelas" id="kelas" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" required>
+                                <label for="kelas_id" class="block text-sm font-medium text-gray-700 mb-1">Kelas <span class="text-red-600">*</span></label>
+                                <select name="kelas_id" id="kelas_id" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" required>
                                     <option value="">Pilih Kelas</option>
-                                    <option value="Mustawa 1" {{ $santri->kelas == 'Mustawa 1' ? 'selected' : '' }}>Mustawa 1</option>
-                                    <option value="Mustawa 2" {{ $santri->kelas == 'Mustawa 2' ? 'selected' : '' }}>Mustawa 2</option>
-                                    <option value="Mustawa 3" {{ $santri->kelas == 'Mustawa 3' ? 'selected' : '' }}>Mustawa 3</option>
+                                    @foreach(\App\Models\Kelas::all() as $kelas)
+                                        <option value="{{ $kelas->id }}" {{ $santri->kelas_id == $kelas->id ? 'selected' : '' }}>{{ $kelas->nama_kelas }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div>

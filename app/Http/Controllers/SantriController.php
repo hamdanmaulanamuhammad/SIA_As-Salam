@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kelas;
 use App\Models\Santri;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class SantriController extends Controller
 {
@@ -21,20 +23,21 @@ class SantriController extends Controller
         $status = $request->input('status');
         $perPage = $request->input('per_page', 10);
 
-        // Query dasar
-        $query = Santri::query();
+        // Query dasar dengan eager loading
+        $query = Santri::with('kelasRelation');
 
         // Filter berdasarkan pencarian
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('nama_lengkap', 'like', '%' . $search . '%')
-                  ->orWhere('nis', 'like', '%' . $search . '%');
+                ->orWhere('nis', 'like', '%' . $search . '%')
+                ->orWhere('nama_panggilan', 'like', '%' . $search . '%');
             });
         }
 
-        // Filter berdasarkan kelas
+        // Filter berdasarkan kelas_id
         if ($kelas) {
-            $query->where('kelas', $kelas);
+            $query->where('kelas_id', $kelas);
         }
 
         // Filter berdasarkan status
@@ -56,27 +59,31 @@ class SantriController extends Controller
             'per_page' => $perPage
         ]);
 
-        return view('admin.data-santri-admin', compact('santri'));
-    }
+        // Ambil data kelas untuk dropdown
+        $kelasList = Kelas::select('id', 'nama_kelas')->get();
 
-    /**
-     * Show the form for creating a new resource.
-     */
+        // Jika request adalah AJAX, return partial view atau JSON
+        if ($request->ajax()) {
+            return view('admin.data-santri-admin', compact('santri', 'kelasList'));
+        }
+
+        return view('admin.data-santri-admin', compact('santri', 'kelasList'));
+    }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        // Validasi data
+        // Validasi data dengan perbaikan untuk PDF
         $validator = Validator::make($request->all(), [
             // Identitas Santri
-            'nis' => 'required|unique:santri|max:20',
             'nama_lengkap' => 'required|max:100',
             'nama_panggilan' => 'nullable|max:50',
             'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
             'tempat_lahir' => 'required|max:50',
             'tanggal_lahir' => 'required|date',
+            'tahun_bergabung' => 'required|digits:4|integer|min:2000|max:' . date('Y'),
             'hobi' => 'nullable|max:100',
             'riwayat_penyakit' => 'nullable|max:255',
             'alamat' => 'required|max:255',
@@ -86,24 +93,21 @@ class SantriController extends Controller
             'kelas' => 'required|max:50',
             'jilid_juz' => 'nullable|max:50',
             'status' => 'required|in:Aktif,Tidak Aktif',
+            'kelas_id' => 'nullable|exists:kelas,id',
+            'kelas_awal_id' => 'nullable|exists:kelas,id',
 
-            // Orang Tua/Wali
-            'nama_ayah' => 'required|max:100',
-            'nama_ibu' => 'required|max:100',
-            'pekerjaan_ayah' => 'nullable|max:50',
-            'pekerjaan_ibu' => 'nullable|max:50',
-            'no_hp_ayah' => 'nullable|max:20',
-            'no_hp_ibu' => 'nullable|max:20',
+            // Wali
             'nama_wali' => 'nullable|max:100',
             'pekerjaan_wali' => 'nullable|max:50',
             'no_hp_wali' => 'nullable|max:20',
 
-            // Dokumen
-            'pas_foto' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            // Dokumen - PERBAIKAN VALIDASI
+            'pas_foto' => 'required|file|image|mimes:jpeg,png,jpg|max:2048',
             'akta' => 'required|file|mimes:pdf,jpeg,png,jpg|max:5120',
         ]);
 
         if ($validator->fails()) {
+            Log::error('Validation failed:', $validator->errors()->toArray());
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors()
@@ -111,26 +115,51 @@ class SantriController extends Controller
         }
 
         try {
+            // Log untuk debugging
+            Log::info('File upload attempt', [
+                'pas_foto' => $request->hasFile('pas_foto') ? 'Present' : 'Not present',
+                'akta' => $request->hasFile('akta') ? 'Present' : 'Not present',
+                'akta_mime' => $request->hasFile('akta') ? $request->file('akta')->getMimeType() : 'N/A',
+                'akta_extension' => $request->hasFile('akta') ? $request->file('akta')->getClientOriginalExtension() : 'N/A'
+            ]);
+
             // Hitung umur
             $tanggalLahir = new \DateTime($request->tanggal_lahir);
             $today = new \DateTime();
             $umur = $today->diff($tanggalLahir)->y;
 
+            // Generate NIS
+            $tahun = substr($request->tahun_bergabung, -2);
+            $prefix = $request->jenis_kelamin === 'Perempuan' ? 'SAA' : 'SIA';
+            $lastSantri = Santri::where('nis', 'like', "$prefix$tahun%")
+                ->orderBy('nis', 'desc')
+                ->first();
+            $lastNumber = $lastSantri ? (int) substr($lastSantri->nis, -5) : 0;
+            $newNumber = str_pad($lastNumber + 1, 5, '0', STR_PAD_LEFT);
+            $nis = $prefix . $tahun . $newNumber;
+
             // Upload pas foto
             $pasFotoPath = $this->uploadFile($request->file('pas_foto'), 'pas_foto');
+            if (!$pasFotoPath) {
+                throw new \Exception('Gagal upload pas foto');
+            }
 
             // Upload akta
             $aktaPath = $this->uploadFile($request->file('akta'), 'akta');
+            if (!$aktaPath) {
+                throw new \Exception('Gagal upload akta');
+            }
 
             // Simpan data santri
             $santri = Santri::create([
                 // Identitas Santri
-                'nis' => $request->nis,
+                'nis' => $nis,
                 'nama_lengkap' => $request->nama_lengkap,
                 'nama_panggilan' => $request->nama_panggilan,
                 'jenis_kelamin' => $request->jenis_kelamin,
                 'tempat_lahir' => $request->tempat_lahir,
                 'tanggal_lahir' => $request->tanggal_lahir,
+                'tahun_bergabung' => $request->tahun_bergabung,
                 'umur' => $umur,
                 'hobi' => $request->hobi,
                 'riwayat_penyakit' => $request->riwayat_penyakit,
@@ -141,14 +170,10 @@ class SantriController extends Controller
                 'kelas' => $request->kelas,
                 'jilid_juz' => $request->jilid_juz,
                 'status' => $request->status,
+                'kelas_awal_id' => $request->kelas_awal_id,
+                'kelas_id' => $request->kelas_id,
 
-                // Orang Tua/Wali
-                'nama_ayah' => $request->nama_ayah,
-                'nama_ibu' => $request->nama_ibu,
-                'pekerjaan_ayah' => $request->pekerjaan_ayah,
-                'pekerjaan_ibu' => $request->pekerjaan_ibu,
-                'no_hp_ayah' => $request->no_hp_ayah,
-                'no_hp_ibu' => $request->no_hp_ibu,
+                // Wali
                 'nama_wali' => $request->nama_wali,
                 'pekerjaan_wali' => $request->pekerjaan_wali,
                 'no_hp_wali' => $request->no_hp_wali,
@@ -158,6 +183,8 @@ class SantriController extends Controller
                 'akta_path' => $aktaPath,
             ]);
 
+            Log::info('Santri created successfully', ['santri_id' => $santri->id]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Data santri berhasil disimpan',
@@ -165,6 +192,11 @@ class SantriController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Error creating santri:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
@@ -192,6 +224,7 @@ class SantriController extends Controller
             'data' => $santri
         ]);
     }
+
     /**
      * Update the specified resource in storage.
      */
@@ -199,7 +232,7 @@ class SantriController extends Controller
     {
         $santri = Santri::findOrFail($id);
 
-        // Validasi data
+        // Validasi data dengan perbaikan untuk PDF
         $validator = Validator::make($request->all(), [
             // Identitas Santri
             'nis' => 'required|max:20|unique:santri,nis,' . $id,
@@ -229,12 +262,13 @@ class SantriController extends Controller
             'pekerjaan_wali' => 'nullable|max:50',
             'no_hp_wali' => 'nullable|max:20',
 
-            // Dokumen
-            'pas_foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            // Dokumen - PERBAIKAN VALIDASI
+            'pas_foto' => 'nullable|file|image|mimes:jpeg,png,jpg|max:2048',
             'akta' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:5120',
         ]);
 
         if ($validator->fails()) {
+            Log::error('Update validation failed:', $validator->errors()->toArray());
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors()
@@ -254,20 +288,36 @@ class SantriController extends Controller
             // Handle file uploads
             $pasFotoPath = $santri->pas_foto_path;
             if ($request->hasFile('pas_foto')) {
+                Log::info('Updating pas foto for santri', ['santri_id' => $id]);
+
                 // Hapus file lama jika ada
-                if ($pasFotoPath) {
-                    Storage::delete($pasFotoPath);
+                if ($pasFotoPath && Storage::disk('public')->exists($pasFotoPath)) {
+                    Storage::disk('public')->delete($pasFotoPath);
                 }
+
                 $pasFotoPath = $this->uploadFile($request->file('pas_foto'), 'pas_foto');
+                if (!$pasFotoPath) {
+                    throw new \Exception('Gagal upload pas foto');
+                }
             }
 
             $aktaPath = $santri->akta_path;
             if ($request->hasFile('akta')) {
+                Log::info('Updating akta for santri', [
+                    'santri_id' => $id,
+                    'mime_type' => $request->file('akta')->getMimeType(),
+                    'extension' => $request->file('akta')->getClientOriginalExtension()
+                ]);
+
                 // Hapus file lama jika ada
-                if ($aktaPath) {
-                    Storage::delete($aktaPath);
+                if ($aktaPath && Storage::disk('public')->exists($aktaPath)) {
+                    Storage::disk('public')->delete($aktaPath);
                 }
+
                 $aktaPath = $this->uploadFile($request->file('akta'), 'akta');
+                if (!$aktaPath) {
+                    throw new \Exception('Gagal upload akta');
+                }
             }
 
             // Update data santri
@@ -306,6 +356,8 @@ class SantriController extends Controller
                 'akta_path' => $aktaPath,
             ]);
 
+            Log::info('Santri updated successfully', ['santri_id' => $santri->id]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Data santri berhasil diperbarui',
@@ -313,6 +365,11 @@ class SantriController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Error updating santri:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
@@ -329,11 +386,11 @@ class SantriController extends Controller
             $santri = Santri::findOrFail($id);
 
             // Hapus file terkait
-            if ($santri->pas_foto_path) {
-                Storage::delete($santri->pas_foto_path);
+            if ($santri->pas_foto_path && Storage::disk('public')->exists($santri->pas_foto_path)) {
+                Storage::disk('public')->delete($santri->pas_foto_path);
             }
-            if ($santri->akta_path) {
-                Storage::delete($santri->akta_path);
+            if ($santri->akta_path && Storage::disk('public')->exists($santri->akta_path)) {
+                Storage::disk('public')->delete($santri->akta_path);
             }
 
             $santri->delete();
@@ -344,6 +401,11 @@ class SantriController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Error deleting santri:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
@@ -352,27 +414,88 @@ class SantriController extends Controller
     }
 
     /**
-     * Helper function untuk upload file
+     * Helper function untuk upload file - DIPERBAIKI
      */
-    private function uploadFile($file, $type)
+    private function uploadFile($file, $directory)
     {
-        if (!$file) {
+        try {
+            if (!$file || !$file->isValid()) {
+                Log::error('Invalid file for upload', ['directory' => $directory]);
+                return null;
+            }
+
+            // Validasi file
+            $maxSize = $directory === 'pas_foto' ? 2048 : 5120; // KB
+            if ($file->getSize() > $maxSize * 1024) {
+                Log::error('File too large', [
+                    'directory' => $directory,
+                    'size' => $file->getSize(),
+                    'max_size' => $maxSize * 1024
+                ]);
+                return null;
+            }
+
+            // Generate unique filename
+            $originalName = $file->getClientOriginalName();
+            $extension = $file->getClientOriginalExtension();
+            $filename = time() . '_' . Str::random(10) . '.' . $extension;
+
+            Log::info('Uploading file', [
+                'directory' => $directory,
+                'original_name' => $originalName,
+                'filename' => $filename,
+                'mime_type' => $file->getMimeType(),
+                'size' => $file->getSize()
+            ]);
+
+            // Upload file
+            $path = $file->storeAs($directory, $filename, 'public');
+
+            if ($path) {
+                Log::info('File uploaded successfully', [
+                    'path' => $path,
+                    'full_path' => storage_path('app/public/' . $path)
+                ]);
+                return $path;
+            } else {
+                Log::error('Failed to store file', ['directory' => $directory]);
+                return null;
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Exception during file upload:', [
+                'message' => $e->getMessage(),
+                'directory' => $directory,
+                'trace' => $e->getTraceAsString()
+            ]);
             return null;
         }
-
-        $extension = $file->getClientOriginalExtension();
-        $filename = $type . '_' . Str::random(20) . '.' . $extension;
-        $path = $file->storeAs('santri_documents/' . $type, $filename, 'public');
-
-        return $path;
     }
 
     public function downloadAkta($id)
     {
-        $santri = Santri::findOrFail($id);
-        if ($santri->akta_path) {
-            return Storage::download($santri->akta_path, basename($santri->akta_path));
+        try {
+            $santri = Santri::findOrFail($id);
+
+            if (!$santri->akta_path) {
+                return redirect()->back()->with('error', 'File akta tidak ditemukan.');
+            }
+
+            $fullPath = storage_path('app/public/' . $santri->akta_path);
+
+            if (!file_exists($fullPath)) {
+                return redirect()->back()->with('error', 'File akta tidak ditemukan di server.');
+            }
+
+            return response()->download($fullPath, basename($santri->akta_path));
+
+        } catch (\Exception $e) {
+            Log::error('Error downloading akta:', [
+                'santri_id' => $id,
+                'message' => $e->getMessage()
+            ]);
+
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengunduh file.');
         }
-        return redirect()->back()->with('error', 'File akta tidak ditemukan.');
     }
 }

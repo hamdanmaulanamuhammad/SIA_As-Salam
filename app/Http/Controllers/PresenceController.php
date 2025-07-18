@@ -9,6 +9,7 @@ use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Log;
+use Carbon\Carbon;
 
 class PresenceController extends Controller
 {
@@ -20,6 +21,7 @@ class PresenceController extends Controller
         $users = User::where('role', 'pengajar')->get();
         return view('admin.presence-admin', compact('presences', 'users'));
     }
+
     public function indexPengajar()
     {
         $user_id = Auth::id();
@@ -36,6 +38,64 @@ class PresenceController extends Controller
         return view('pengajar.dashboard-pengajar', compact('presences', 'recentPresences'));
     }
 
+    // Halaman attendance pengajar dengan rekap dan riwayat
+    public function attendancePengajar(Request $request)
+    {
+        $user_id = Auth::id();
+        $currentDate = Carbon::now();
+
+        // Rekap 1 bulan terbaru
+        $startOfMonth = $currentDate->copy()->startOfMonth();
+        $endOfMonth = $currentDate->copy()->endOfMonth();
+
+        $monthlyRecap = [
+            'present_days' => Presence::where('user_id', $user_id)
+                                    ->whereBetween('date', [$startOfMonth, $endOfMonth])
+                                    ->count(),
+            'month_name' => $currentDate->format('F Y')
+        ];
+
+        // Riwayat presensi bulan ini
+        $monthlyPresences = Presence::where('user_id', $user_id)
+                                  ->whereBetween('date', [$startOfMonth, $endOfMonth])
+                                  ->orderBy('date', 'desc')
+                                  ->get();
+
+        // Filter untuk riwayat presensi keseluruhan
+        $year = $request->get('year');
+        $month = $request->get('month');
+
+        $presenceHistory = Presence::where('user_id', $user_id)
+                                 ->when($year, function($query, $year) {
+                                     return $query->whereYear('date', $year);
+                                 })
+                                 ->when($month, function($query, $month) {
+                                     return $query->whereMonth('date', $month);
+                                 })
+                                 ->orderBy('date', 'desc')
+                                 ->paginate(10);
+
+        // Daftar tahun yang tersedia (berdasarkan data presensi)
+        $availableYears = Presence::where('user_id', $user_id)
+                                ->selectRaw('YEAR(date) as year')
+                                ->distinct()
+                                ->orderBy('year', 'desc')
+                                ->pluck('year');
+
+        // Jika tidak ada data, tambahkan tahun saat ini
+        if ($availableYears->isEmpty()) {
+            $availableYears = collect([$currentDate->year]);
+        }
+
+        return view('pengajar.attendance-pengajar', compact(
+            'monthlyRecap',
+            'monthlyPresences',
+            'presenceHistory',
+            'availableYears',
+            'year',
+            'month'
+        ));
+    }
 
     // Menyimpan data presensi baru
     public function store(Request $request)
