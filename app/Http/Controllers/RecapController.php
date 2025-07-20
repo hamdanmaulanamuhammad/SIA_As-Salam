@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Recap;
 use App\Models\User;
 use App\Models\Presence;
+use App\Models\AdditionalMukafaah;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
@@ -19,14 +21,11 @@ class RecapController extends Controller
 
     public function store(Request $request)
     {
-        // Log input untuk debugging
         \Log::info('Tanggal input: ' . print_r($request->input('tanggal'), true));
 
-        // Ambil input tanggal dan konversi ke array jika berupa string
         $tanggalInput = $request->input('tanggal');
         if (is_string($tanggalInput)) {
             $tanggal = array_map('trim', explode(',', $tanggalInput));
-            // Validasi format Y-m-d untuk setiap tanggal
             foreach ($tanggal as $date) {
                 if (!Carbon::createFromFormat('Y-m-d', $date, 'Asia/Jakarta')) {
                     return redirect()->back()->with('error', 'Tanggal tidak valid: ' . $date)->withInput();
@@ -36,7 +35,6 @@ class RecapController extends Controller
             $tanggal = is_array($tanggalInput) ? $tanggalInput : [];
         }
 
-        // Gabungkan input lain dengan tanggal yang sudah dikonversi
         $data = $request->all();
         $data['tanggal'] = $tanggal;
 
@@ -78,16 +76,19 @@ class RecapController extends Controller
 
     public function show($id)
     {
-        $recap = Recap::findOrFail($id);
+        $recap = Recap::with('additionalMukafaahs')->findOrFail($id);
         $pengajars = User::where('role', 'pengajar')->where('accepted', '1')->get();
         $dates = json_decode($recap->dates, true);
         $presences = Presence::whereIn('date', $dates)
             ->whereIn('user_id', $pengajars->pluck('id'))
             ->get()
             ->groupBy('user_id');
+
         \Log::info('Recap ID: ' . $id . ', Batas Keterlambatan: ' . $recap->batas_keterlambatan . ', Mukafaah: ' . $recap->mukafaah . ', Bonus: ' . $recap->bonus);
         \Log::info('Dates: ' . json_encode($dates));
         \Log::info('Presences: ' . json_encode($presences->toArray()));
+        \Log::info('Additional Mukafaahs: ' . json_encode($recap->additionalMukafaahs->toArray()));
+
         return view('admin.details-recap-admin', compact('recap', 'pengajars', 'dates', 'presences'));
     }
 
@@ -101,14 +102,11 @@ class RecapController extends Controller
     {
         $recap = Recap::findOrFail($id);
 
-        // Log input untuk debugging
         \Log::info('Tanggal input: ' . print_r($request->input('tanggal'), true));
 
-        // Ambil input tanggal dan konversi ke array jika berupa string
         $tanggalInput = $request->input('tanggal');
         if (is_string($tanggalInput)) {
             $tanggal = array_map('trim', explode(',', $tanggalInput));
-            // Validasi format Y-m-d untuk setiap tanggal
             foreach ($tanggal as $date) {
                 if (!Carbon::createFromFormat('Y-m-d', $date, 'Asia/Jakarta')) {
                     return redirect()->back()->with('error', 'Tanggal tidak valid: ' . $date)->withInput();
@@ -118,7 +116,6 @@ class RecapController extends Controller
             $tanggal = is_array($tanggalInput) ? $tanggalInput : [];
         }
 
-        // Gabungkan input lain dengan tanggal yang sudah dikonversi
         $data = $request->all();
         $data['tanggal'] = $tanggal;
 
@@ -178,6 +175,93 @@ class RecapController extends Controller
         return view('admin.data-recap-admin', compact('recaps'));
     }
 
+    public function storeAdditionalMukafaah(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+            'amount' => 'required|numeric|min:0',
+            'description' => 'nullable|string|max:255',
+        ], [
+            'user_id.required' => 'Pengajar wajib dipilih.',
+            'user_id.exists' => 'Pengajar tidak valid.',
+            'amount.required' => 'Nominal mukafaah tambahan wajib diisi.',
+            'amount.numeric' => 'Nominal harus berupa angka.',
+            'description.string' => 'Keterangan harus berupa teks.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal: ' . $validator->errors()->first()
+            ], 422);
+        }
+
+        $recap = Recap::findOrFail($id);
+
+        AdditionalMukafaah::create([
+            'recap_id' => $recap->id,
+            'user_id' => $request->user_id,
+            'additional_mukafaah' => $request->amount,
+            'description' => $request->description ?? null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Mukafaah tambahan berhasil disimpan.'
+        ]);
+    }
+
+    public function editAdditionalMukafaah($id, $mukafaahId)
+    {
+        $mukafaah = AdditionalMukafaah::where('recap_id', $id)->findOrFail($mukafaahId);
+        return response()->json($mukafaah);
+    }
+
+    public function updateAdditionalMukafaah(Request $request, $id, $mukafaahId)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+            'amount' => 'required|numeric|min:0',
+            'description' => 'nullable|string|max:255',
+        ], [
+            'user_id.required' => 'Pengajar wajib dipilih.',
+            'user_id.exists' => 'Pengajar tidak valid.',
+            'amount.required' => 'Nominal mukafaah tambahan wajib diisi.',
+            'amount.numeric' => 'Nominal harus berupa angka.',
+            'description.string' => 'Keterangan harus berupa teks.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal: ' . $validator->errors()->first()
+            ], 422);
+        }
+
+        $mukafaah = AdditionalMukafaah::where('recap_id', $id)->findOrFail($mukafaahId);
+        $mukafaah->update([
+            'user_id' => $request->user_id,
+            'additional_mukafaah' => $request->amount,
+            'description' => $request->description ?? null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Mukafaah tambahan berhasil diperbarui.'
+        ]);
+    }
+
+    public function destroyAdditionalMukafaah($id, $mukafaahId)
+    {
+        $mukafaah = AdditionalMukafaah::where('recap_id', $id)->findOrFail($mukafaahId);
+        $mukafaah->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Mukafaah tambahan berhasil dihapus.'
+        ]);
+    }
+
     private function getPeriodeFromTanggal($tanggal)
     {
         if (empty($tanggal) || !is_array($tanggal) || !isset($tanggal[0])) {
@@ -193,3 +277,4 @@ class RecapController extends Controller
         }
     }
 }
+?>

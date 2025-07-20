@@ -169,7 +169,7 @@
                                     </button>
                                 </form>
                                 <a href="{{ route('akademik.kelas-semester', $item->id) }}" class="w-8 h-8 text-white bg-green-600 rounded-md flex items-center justify-center hover:bg-green-700">
-                                    <i class="fa fa-eye"></i>
+                                    <i class="fa fa-arrow-right"></i>
                                 </a>
                             </div>
                         </td>

@@ -13,6 +13,6 @@ class MataPelajaranKategori extends Model
 
     public function mataPelajaran()
     {
-        return $this->belongsTo(MataPelajaran::class);
+        return $this->belongsTo(Mapel::class);
     }
 }

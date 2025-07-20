@@ -12,6 +12,11 @@ class Recap extends Model
 
     protected $fillable = ['periode', 'batas_keterlambatan', 'mukafaah', 'bonus', 'dates'];
 
+    public function additionalMukafaahs()
+    {
+        return $this->hasMany(AdditionalMukafaah::class);
+    }
+
     public function getPeriodeAttribute($value)
     {
         try {
@@ -20,7 +25,7 @@ class Recap extends Model
                 ->translatedFormat('F Y');
         } catch (\Exception $e) {
             \Log::error('Failed to parse periode: ' . $e->getMessage(), ['periode' => $value]);
-            return $value; // Kembalikan nilai mentah jika gagal
+            return $value;
         }
     }
 }

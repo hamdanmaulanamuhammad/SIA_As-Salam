@@ -68,6 +68,11 @@ class Santri extends Model
         return $this->hasMany(SantriKelasSemester::class);
     }
 
+    public function infaqSantris()
+    {
+        return $this->hasMany(InfaqSantri::class, 'santri_id');
+    }
+
     // ========================
     //        ACCESSORS
     // ========================

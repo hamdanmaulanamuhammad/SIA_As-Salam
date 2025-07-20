@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@yield('title') - SIA As-Salam</title>
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/icons/favicon.png') }}">
     @vite('resources/css/app.css')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -32,14 +33,26 @@
                         </a>
                     </li>
                     <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold {{ Route::is('recaps.index') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('recaps.index') }}">
-                            <img src="{{ asset(Route::is('recaps.index') ? 'assets/images/icons/recap-active.svg' : 'assets/images/icons/recap.svg') }}" alt="Rekap Data Icon" class="w-5 h-5" />
-                            <span class="ml-4">Rekap Data</span>
+                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->routeIs('recaps.*') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('recaps.index') }}">
+                            <img src="{{ asset(request()->routeIs('recaps.*') ? 'assets/images/icons/recap-active.svg' : 'assets/images/icons/recap.svg') }}" alt="Rekap Data Icon" class="w-5 h-5" />
+                            <span class="ml-4">Rekap Mukafaah</span>
                         </a>
                     </li>
                     <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->routeIs('santri-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ url('/data-santri') }}">
-                            <img src="{{ asset(request()->routeIs('santri-admin') || request()->is('manual-attendance-admin') ? 'assets/images/icons/attendance-active.svg' : 'assets/images/icons/attendance.svg') }}" alt="Attendance Icon" class="w-5 h-5" />
+                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->routeIs('akademik.*') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('akademik.index') }}">
+                            <img src="{{ asset(request()->routeIs('akademik.*') ? 'assets/images/icons/akademik-active.svg' : 'assets/images/icons/akademik.svg') }}" alt="Akademik Icon" class="w-5 h-5" />
+                            <span class="ml-4">Akademik</span>
+                        </a>
+                    </li>
+                    <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->routeIs('keuangan.*') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('keuangan.index') }}">
+                            <img src="{{ asset(request()->routeIs('keuangan.*') ? 'assets/images/icons/keuangan-active.svg' : 'assets/images/icons/keuangan.svg') }}" alt="Keuangan Icon" class="w-5 h-5" />
+                            <span class="ml-4">Keuangan</span>
+                        </a>
+                    </li>
+                    <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->routeIs('santri.*') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ url('/santri/data-santri') }}">
+                            <img src="{{ asset(request()->routeIs('santri.*') ? 'assets/images/icons/attendance-active.svg' : 'assets/images/icons/attendance.svg') }}" alt="Santri Icon" class="w-5 h-5" />
                             <span class="ml-4">Santri</span>
                         </a>
                     </li>
@@ -53,12 +66,6 @@
                         <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->is('registration-request-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ url('/registration-request-admin') }}">
                             <img src="{{ asset(request()->is('registration-request-admin') ? 'assets/images/icons/request-active.svg' : 'assets/images/icons/request.svg') }}" alt="Permintaan Pendaftaran Icon" class="w-5 h-5" />
                             <span class="ml-4">Data Registrasi</span>
-                        </a>
-                    </li>
-                    <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->routeIs('akademik.*') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('akademik.index') }}">
-                            <img src="{{ asset(request()->routeIs('akademik.*') ? 'assets/images/icons/akademik-active.svg' : 'assets/images/icons/akademik.svg') }}" alt="Akademik Icon" class="w-5 h-5" />
-                            <span class="ml-4">Akademik</span>
                         </a>
                     </li>
                 </ul>

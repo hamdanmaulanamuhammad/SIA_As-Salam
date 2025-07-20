@@ -90,7 +90,7 @@
                     <td class="px-4 py-3 text-sm">{{ $item->nama_panggilan ?? '-' }}</td>
                     <td class="px-4 py-3 text-sm">{{ $item->jenis_kelamin }}</td>
                     <td class="px-4 py-3 text-sm">{{ $item->kelasRelation->nama_kelas ?? '-' }}</td>
-                    <td class="px-4 py-3 text-sm">
+                    <td class="px-4 py-3 text-sm min-w-28">
                         <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $item->status === 'Aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                             {{ $item->status }}
                         </span>
@@ -324,7 +324,7 @@
             params.append('per_page', entriesSelect.value);
 
             // Gunakan fetch untuk AJAX request
-            fetch(`{{ route("santri-admin") }}?${params.toString()}`, {
+            fetch(`{{ route("santri.index") }}?${params.toString()}`, {
                 method: 'GET',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -363,7 +363,7 @@
                 // Fallback ke form submission biasa jika AJAX gagal
                 const form = document.createElement('form');
                 form.method = 'GET';
-                form.action = '{{ route("santri-admin") }}';
+                form.action = '{{ route("santri.index") }}';
 
                 if (searchInput.value.trim()) {
                     const search = document.createElement('input');

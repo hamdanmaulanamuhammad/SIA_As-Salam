@@ -112,28 +112,28 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-5">
                     <div>
                         <label for="batas_keterlambatan" class="block text-sm font-medium text-gray-700 mb-1">Batas Keterlambatan <span class="text-red-600">*</span></label>
-                        <input type="time" name="batas_keterlambatan" id="batas_keterlambatan" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" value="{{ old('batas_keterlambatan') }}" required>
+                        <input type="time" name="batas_keterlambatan" id="batas_keterlambatan" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="{{ old('batas_keterlambatan') }}" required>
                         @error('batas_keterlambatan')
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
                         <label for="mukafaah" class="block text-sm font-medium text-gray-700 mb-1">Mukafaah (Rp) <span class="text-red-600">*</span></label>
-                        <input type="number" name="mukafaah" id="mukafaah" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" value="{{ old('mukafaah') }}" required>
+                        <input type="number" name="mukafaah" id="mukafaah" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="{{ old('mukafaah') }}" required>
                         @error('mukafaah')
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
                         <label for="bonus" class="block text-sm font-medium text-gray-700 mb-1">Bonus Penuh (Rp) <span class="text-red-600">*</span></label>
-                        <input type="number" name="bonus" id="bonus" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" value="{{ old('bonus') }}" required>
+                        <input type="number" name="bonus" id="bonus" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" value="{{ old('bonus') }}" required>
                         @error('bonus')
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
                     </div>
                     <div class="md:col-span-2">
                         <label for="tanggal" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Presensi <span class="text-red-600">*</span></label>
-                        <input type="text" name="tanggal" id="tanggal" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" placeholder="Pilih tanggal" required>
+                        <input type="text" name="tanggal" id="tanggal" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" placeholder="Pilih tanggal" required>
                         @error('tanggal')
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror

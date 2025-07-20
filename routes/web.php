@@ -1,8 +1,12 @@
 <?php
+use App\Http\Controllers\AdministrasiBulananController;
 use App\Http\Controllers\AkademikController;
+use App\Http\Controllers\BukuKasController;
+use App\Http\Controllers\InfaqController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\KelasMapelSemesterController;
 use App\Http\Controllers\KelasSemesterController;
+use App\Http\Controllers\KeuanganController;
 use App\Http\Controllers\MapelController;
 use App\Http\Controllers\PengajarAkademikController;
 use App\Http\Controllers\PengajarKelasMapelSemesterController;
@@ -49,24 +53,31 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/presence-admin/{id}', [PresenceController::class, 'destroy'])->name('presence.destroy');
 
         // Data Recap
-        Route::get('/recaps', [RecapController::class, 'index'])->name('recaps.index');
-        Route::post('/recaps', [RecapController::class, 'store'])->name('recaps.store');
-        Route::get('/recaps/{id}', [RecapController::class, 'show'])->name('recaps.show');
-        Route::get('/recaps/{id}/edit', [RecapController::class, 'edit'])->name('recaps.edit');
-        Route::put('/recaps/{id}', [RecapController::class, 'update'])->name('recaps.update');
-        Route::delete('/recaps/{id}', [RecapController::class, 'destroy'])->name('recaps.destroy');
+        Route::prefix('recaps')->name('recaps.')->group(function() {
+            Route::get('/', [RecapController::class, 'index'])->name('index');
+            Route::post('/', [RecapController::class, 'store'])->name('store');
+            Route::get('/{id}', [RecapController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [RecapController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [RecapController::class, 'update'])->name('update');
+            Route::delete('/{id}', [RecapController::class, 'destroy'])->name('destroy');
+            Route::post('/{id}/additional-mukafaahs', [RecapController::class, 'storeAdditionalMukafaah'])->name('additional.store');
+            Route::get('/{id}/additional-mukafaahs/edit/{mukafaahId}', [RecapController::class, 'editAdditionalMukafaah'])->name('additional.edit');
+            Route::put('/{id}/additional-mukafaahs/{mukafaahId}', [RecapController::class, 'updateAdditionalMukafaah'])->name('additional.update');
+            Route::delete('/{id}/additional-mukafaahs/{mukafaahId}', [RecapController::class, 'destroyAdditionalMukafaah'])->name('additional.destroy');
+        });
 
-        // Data Santri
-        Route::get('/data-santri', [SantriController::class, 'index'])->name('santri-admin');
-        Route::post('/santri', [SantriController::class, 'store'])->name('santri.store');
-        Route::get('/santri/{id}', [SantriController::class, 'show'])->name('santri.show');
-        Route::get('/santri/{id}/edit', [SantriController::class, 'edit'])->name('santri.edit');
-        Route::put('/santri/{id}', [SantriController::class, 'update'])->name('santri.update');
-        Route::delete('/santri/{id}', [SantriController::class, 'destroy'])->name('santri.destroy');
+        Route::prefix('santri')->group(function () {
+            // Data Santri
+            Route::get('/data-santri', [SantriController::class, 'index'])->name('santri.index');
+            Route::post('/store', [SantriController::class, 'store'])->name('santri.store');
+            Route::get('/{id}/edit', [SantriController::class, 'edit'])->name('santri.edit');
+            Route::put('/{id}', [SantriController::class, 'update'])->name('santri.update');
+            Route::delete('/{id}', [SantriController::class, 'destroy'])->name('santri.destroy');
 
-        //Detail Santri
-        Route::get('/santri/{id}', [SantriController::class, 'show'])->name('santri.show');
-        Route::get('/santri/{id}/download-akta', [SantriController::class, 'downloadAkta'])->name('download.akta');
+            // Detail Santri
+            Route::get('/{id}', [SantriController::class, 'show'])->name('santri.show');
+            Route::get('/{id}/download-akta', [SantriController::class, 'downloadAkta'])->name('download.akta');
+        });
 
         // Data Pengajar
         Route::get('/data-pengajar', [PengajarController::class, 'showTeacherList'])->name('pengajar.show');
@@ -146,6 +157,49 @@ Route::middleware(['auth'])->group(function () {
             Route::put('rapor/{kelasSemesterId}/{santriId}', [RaporController::class, 'update'])->name('akademik.rapor.update');
             Route::get('rapor/{kelasSemesterId}/{santriId}/pdf', [RaporController::class, 'generatePdf'])->name('akademik.rapor.pdf');
             Route::get('rapor/{kelasSemesterId}/{santriId}/preview', [RaporController::class, 'previewRapor'])->name('akademik.rapor.preview');
+        });
+
+        Route::prefix('keuangan')->group(function () {
+            Route::get('/', [KeuanganController::class, 'index'])->name('keuangan.index');
+
+            Route::prefix('infaq')->group(function () {
+            Route::get('/tahunan', [InfaqController::class, 'indexInfaqTahunan'])->name('keuangan.infaq.tahunan.index');
+            Route::post('/tahunan', [InfaqController::class, 'storeInfaqTahunan'])->name('keuangan.infaq.tahunan.store');
+            Route::get('/tahunan/{id}/edit', [InfaqController::class, 'editInfaqTahunan'])->name('keuangan.infaq.tahunan.edit');
+            Route::put('/tahunan/{id}', [InfaqController::class, 'updateInfaqTahunan'])->name('keuangan.infaq.tahunan.update');
+            Route::delete('/tahunan/{id}', [InfaqController::class, 'destroyInfaqTahunan'])->name('keuangan.infaq.tahunan.destroy');
+            Route::get('/tahunan/{infaqTahunanId}/santri', [InfaqController::class, 'showInfaqSantri'])->name('keuangan.infaq.santri.index');
+            Route::post('/tahunan/{infaqTahunanId}/santri', [InfaqController::class, 'storeInfaqSantri'])->name('keuangan.infaq.santri.store');
+            Route::get('/tahunan/{infaqTahunanId}/santri/{id}/edit', [InfaqController::class, 'editInfaqSantri'])->name('keuangan.infaq.santri.edit');
+            Route::put('/tahunan/{infaqTahunanId}/santri/{id}', [InfaqController::class, 'updateInfaqSantri'])->name('keuangan.infaq.santri.update');
+            Route::delete('/tahunan/{infaqTahunanId}/santri/{id}', [InfaqController::class, 'destroyInfaqSantri'])->name('keuangan.infaq.santri.destroy');
+        });
+
+            Route::prefix('administrasi-bulanan')->group(function () {
+                Route::get('/', [AdministrasiBulananController::class, 'index'])->name('keuangan.administrasi-bulanan.index');
+                Route::post('/', [AdministrasiBulananController::class, 'store'])->name('keuangan.administrasi-bulanan.store');
+                Route::get('/{id}/edit', [AdministrasiBulananController::class, 'edit'])->name('keuangan.administrasi-bulanan.edit');
+                Route::put('/{id}', [AdministrasiBulananController::class, 'update'])->name('keuangan.administrasi-bulanan.update');
+                Route::delete('/{id}', [AdministrasiBulananController::class, 'destroy'])->name('keuangan.administrasi-bulanan.destroy');
+                Route::get('/{administrasiBulananId}/pengeluaran', [AdministrasiBulananController::class, 'indexPengeluaranBulanan'])->name('keuangan.administrasi-bulanan.pengeluaran.index');
+                Route::post('/{administrasiBulananId}/pengeluaran', [AdministrasiBulananController::class, 'storePengeluaranBulanan'])->name('keuangan.administrasi-bulanan.pengeluaran.store');
+                Route::get('/{administrasiBulananId}/pengeluaran/{id}/edit', [AdministrasiBulananController::class, 'editPengeluaranBulanan'])->name('keuangan.administrasi-bulanan.pengeluaran.edit');
+                Route::put('/{administrasiBulananId}/pengeluaran/{id}', [AdministrasiBulananController::class, 'updatePengeluaranBulanan'])->name('keuangan.administrasi-bulanan.pengeluaran.update');
+                Route::delete('/{administrasiBulananId}/pengeluaran/{id}', [AdministrasiBulananController::class, 'destroyPengeluaranBulanan'])->name('keuangan.administrasi-bulanan.pengeluaran.destroy');
+            });
+
+            Route::prefix('buku-kas')->group(function () {
+                Route::get('/', [BukuKasController::class, 'index'])->name('keuangan.buku-kas.index');
+                Route::post('/', [BukuKasController::class, 'store'])->name('keuangan.buku-kas.store');
+                Route::get('/{id}/edit', [BukuKasController::class, 'edit'])->name('keuangan.buku-kas.edit');
+                Route::put('/{id}', [BukuKasController::class, 'update'])->name('keuangan.buku-kas.update');
+                Route::delete('/{id}', [BukuKasController::class, 'destroy'])->name('keuangan.buku-kas.destroy');
+                Route::get('/{bukuKasId}/transaksi', [BukuKasController::class, 'indexTransaksiKas'])->name('keuangan.buku-kas.transaksi.index');
+                Route::post('/{bukuKasId}/transaksi', [BukuKasController::class, 'storeTransaksiKas'])->name('keuangan.buku-kas.transaksi.store');
+                Route::get('/{bukuKasId}/transaksi/{id}/edit', [BukuKasController::class, 'editTransaksiKas'])->name('keuangan.buku-kas.transaksi.edit');
+                Route::put('/{bukuKasId}/transaksi/{id}', [BukuKasController::class, 'updateTransaksiKas'])->name('keuangan.buku-kas.transaksi.update');
+                Route::delete('/{bukuKasId}/transaksi/{id}', [BukuKasController::class, 'destroyTransaksiKas'])->name('keuangan.buku-kas.transaksi.destroy');
+            });
         });
     });
 

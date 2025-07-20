@@ -209,9 +209,11 @@ class SantriController extends Controller
      */
     public function show($id)
     {
-        $santri = Santri::findOrFail($id);
-        return view('admin.detail-santri-admin', compact('santri'));
+        $santri = Santri::with('kelasRelation')->findOrFail($id);
+        $kelasList = Kelas::select('id', 'nama_kelas')->get();
+        return view('admin.detail-santri-admin', compact('santri', 'kelasList'));
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -225,6 +227,22 @@ class SantriController extends Controller
         ]);
     }
 
+    private function formatAktaFileName($santri)
+    {
+        if (!$santri->akta_path) {
+            return '-';
+        }
+
+        // Bersihkan nama santri dari karakter yang tidak diinginkan
+        $namaSantri = str_replace(' ', '_', $santri->nama_lengkap);
+        $namaSantri = preg_replace('/[^A-Za-z0-9_]/', '', $namaSantri);
+
+        // Ambil ekstensi file
+        $extension = pathinfo($santri->akta_path, PATHINFO_EXTENSION);
+
+        return "Akta_{$namaSantri}.{$extension}";
+    }
+
     /**
      * Update the specified resource in storage.
      */
@@ -235,12 +253,12 @@ class SantriController extends Controller
         // Validasi data dengan perbaikan untuk PDF
         $validator = Validator::make($request->all(), [
             // Identitas Santri
-            'nis' => 'required|max:20|unique:santri,nis,' . $id,
             'nama_lengkap' => 'required|max:100',
             'nama_panggilan' => 'nullable|max:50',
             'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
             'tempat_lahir' => 'required|max:50',
             'tanggal_lahir' => 'required|date',
+            'tahun_bergabung' => 'required|digits:4|integer|min:2000|max:' . date('Y'),
             'hobi' => 'nullable|max:100',
             'riwayat_penyakit' => 'nullable|max:255',
             'alamat' => 'required|max:255',
@@ -250,19 +268,14 @@ class SantriController extends Controller
             'kelas' => 'required|max:50',
             'jilid_juz' => 'nullable|max:50',
             'status' => 'required|in:Aktif,Tidak Aktif',
+            'kelas_id' => 'nullable|exists:kelas,id',
+            'kelas_awal_id' => 'nullable|exists:kelas,id',
 
-            // Orang Tua/Wali
-            'nama_ayah' => 'required|max:100',
-            'nama_ibu' => 'required|max:100',
-            'pekerjaan_ayah' => 'nullable|max:50',
-            'pekerjaan_ibu' => 'nullable|max:50',
-            'no_hp_ayah' => 'nullable|max:20',
-            'no_hp_ibu' => 'nullable|max:20',
+            // Wali
             'nama_wali' => 'nullable|max:100',
             'pekerjaan_wali' => 'nullable|max:50',
             'no_hp_wali' => 'nullable|max:20',
 
-            // Dokumen - PERBAIKAN VALIDASI
             'pas_foto' => 'nullable|file|image|mimes:jpeg,png,jpg|max:2048',
             'akta' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:5120',
         ]);
@@ -299,6 +312,9 @@ class SantriController extends Controller
                 if (!$pasFotoPath) {
                     throw new \Exception('Gagal upload pas foto');
                 }
+            } elseif ($request->has('pas_foto_existing')) {
+                // Gunakan file existing jika ada
+                $pasFotoPath = $request->pas_foto_existing;
             }
 
             $aktaPath = $santri->akta_path;
@@ -318,17 +334,20 @@ class SantriController extends Controller
                 if (!$aktaPath) {
                     throw new \Exception('Gagal upload akta');
                 }
+            } elseif ($request->has('akta_existing')) {
+                // Gunakan file existing jika ada
+                $aktaPath = $request->akta_existing;
             }
 
             // Update data santri
             $santri->update([
                 // Identitas Santri
-                'nis' => $request->nis,
                 'nama_lengkap' => $request->nama_lengkap,
                 'nama_panggilan' => $request->nama_panggilan,
                 'jenis_kelamin' => $request->jenis_kelamin,
                 'tempat_lahir' => $request->tempat_lahir,
                 'tanggal_lahir' => $request->tanggal_lahir,
+                'tahun_bergabung' => $request->tahun_bergabung,
                 'umur' => $umur,
                 'hobi' => $request->hobi,
                 'riwayat_penyakit' => $request->riwayat_penyakit,
@@ -339,19 +358,14 @@ class SantriController extends Controller
                 'kelas' => $request->kelas,
                 'jilid_juz' => $request->jilid_juz,
                 'status' => $request->status,
+                'kelas_id' => $request->kelas_id,
 
                 // Orang Tua/Wali
-                'nama_ayah' => $request->nama_ayah,
-                'nama_ibu' => $request->nama_ibu,
-                'pekerjaan_ayah' => $request->pekerjaan_ayah,
-                'pekerjaan_ibu' => $request->pekerjaan_ibu,
-                'no_hp_ayah' => $request->no_hp_ayah,
-                'no_hp_ibu' => $request->no_hp_ibu,
                 'nama_wali' => $request->nama_wali,
                 'pekerjaan_wali' => $request->pekerjaan_wali,
                 'no_hp_wali' => $request->no_hp_wali,
 
-                // Dokumen
+                // Dokumen - hanya update jika ada file baru
                 'pas_foto_path' => $pasFotoPath,
                 'akta_path' => $aktaPath,
             ]);
@@ -487,7 +501,10 @@ class SantriController extends Controller
                 return redirect()->back()->with('error', 'File akta tidak ditemukan di server.');
             }
 
-            return response()->download($fullPath, basename($santri->akta_path));
+            // Format nama file download
+            $downloadName = $this->formatAktaFileName($santri);
+
+            return response()->download($fullPath, $downloadName);
 
         } catch (\Exception $e) {
             Log::error('Error downloading akta:', [
