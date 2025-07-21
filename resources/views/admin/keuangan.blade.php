@@ -23,6 +23,9 @@
             <a href="?tab=buku-kas" id="tab-buku-kas" class="tab-btn border-b-2 border-transparent py-2 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
                 Buku Kas
             </a>
+            <a href="?tab=bank-accounts" id="tab-bank-accounts" class="tab-btn border-b-2 border-transparent py-2 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                Rekening
+            </a>
         </nav>
     </div>
 
@@ -34,7 +37,6 @@
                 <i class="fa fa-plus mr-2"></i>Infaq
             </button>
         </div>
-
         <div class="overflow-x-auto">
             <table class="w-full bg-white rounded-lg shadow">
                 <thead>
@@ -55,7 +57,6 @@
                         $totalWajib = $item->infaqSantris->sum('infaq_wajib');
                         $totalSukarela = $item->infaqSantris->sum('infaq_sukarela');
                         $totalInfaqItem = $totalWajib + $totalSukarela;
-                        // Asumsi infaq wajib per santri per tahun adalah 12 bulan x 10.000 = 120.000
                         $expectedWajib = $item->infaqSantris->count() * 12 * 10000;
                         $kekurangan = $expectedWajib - $totalWajib;
                     @endphp
@@ -102,7 +103,6 @@
                 <i class="fa fa-plus mr-2"></i>Administrasi Bulanan
             </button>
         </div>
-
         <div class="overflow-x-auto">
             <table class="w-full bg-white rounded-lg shadow">
                 <thead>
@@ -110,6 +110,7 @@
                         <th class="px-4 py-3">No</th>
                         <th class="px-4 py-3">Bulan</th>
                         <th class="px-4 py-3">Tahun</th>
+                        <th class="px-4 py-3">Rekening</th>
                         <th class="px-4 py-3">Jumlah Pengeluaran</th>
                         <th class="px-4 py-3">Aksi</th>
                     </tr>
@@ -120,6 +121,9 @@
                         <td class="px-4 py-3 text-sm">{{ ($administrasiBulanan->currentPage() - 1) * $administrasiBulanan->perPage() + $index + 1 }}</td>
                         <td class="px-4 py-3 text-sm">{{ $item->bulan }}</td>
                         <td class="px-4 py-3 text-sm">{{ $item->tahun }}</td>
+                        <td class="px-4 py-3 text-sm">
+                            {{ $item->bankAccount ? ($item->bankAccount->bank_name . ' - ' . $item->bankAccount->account_number . ' - ' . $item->bankAccount->account_holder) : '-' }}
+                        </td>
                         <td class="px-4 py-3 text-sm">{{ $item->pengeluaranBulanan->count() }}</td>
                         <td class="px-4 py-3 text-sm">
                             <div class="flex space-x-2">
@@ -156,7 +160,6 @@
                 <i class="fa fa-plus mr-2"></i>Buku Kas
             </button>
         </div>
-
         <div class="overflow-x-auto">
             <table class="w-full bg-white rounded-lg shadow">
                 <thead>
@@ -197,6 +200,53 @@
         </div>
         <div class="mt-6">
             {{ $bukuKas->appends(['tab' => 'buku-kas'])->links() }}
+        </div>
+    </div>
+
+    <!-- Tab Content Rekening -->
+    <div id="content-bank-accounts" class="tab-content hidden">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Data Rekening</h2>
+            <button id="tambahBankAccountButton" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200">
+                <i class="fa fa-plus mr-2"></i>Rekening
+            </button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full bg-white rounded-lg shadow">
+                <thead>
+                    <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
+                        <th class="px-4 py-3">No</th>
+                        <th class="px-4 py-3">Nama Bank</th>
+                        <th class="px-4 py-3">Nomor Rekening</th>
+                        <th class="px-4 py-3">Nama Pemilik</th>
+                        <th class="px-4 py-3">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="bankAccountsTableBody" class="bg-white divide-y">
+                    @foreach($bankAccounts as $index => $account)
+                    <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-50' }}">
+                        <td class="px-4 py-3 text-sm">{{ $index + 1 }}</td>
+                        <td class="px-4 py-3 text-sm">{{ $account->bank_name }}</td>
+                        <td class="px-4 py-3 text-sm">{{ $account->account_number }}</td>
+                        <td class="px-4 py-3 text-sm">{{ $account->account_holder }}</td>
+                        <td class="px-4 py-3 text-sm">
+                            <div class="flex space-x-2">
+                                <button class="edit-bank-account-button w-8 h-8 text-white bg-yellow-500 rounded-md flex items-center justify-center hover:bg-yellow-600" data-id="{{ $account->id }}">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <form action="{{ route('keuangan.bank-accounts.destroy', $account->id) }}?tab=bank-accounts" method="POST" class="delete-bank-account-form">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="w-8 h-8 text-white bg-red-500 rounded-md flex items-center justify-center hover:bg-red-600">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -242,17 +292,23 @@
                     <label for="bulan" class="block text-sm font-medium text-gray-700 mb-1">Bulan <span class="text-red-600">*</span></label>
                     <select name="bulan" id="bulan" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
                         <option value="">Pilih Bulan</option>
-                        @foreach ([
-                            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-                            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-                        ] as $bulan)
+                        @foreach (['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'] as $bulan)
                             <option value="{{ $bulan }}">{{ $bulan }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="mb-4">
                     <label for="tahun_administrasi" class="block text-sm font-medium text-gray-700 mb-1">Tahun <span class="text-red-600">*</span></label>
-                    <input type="number" name="tahun" id="tahun_administrasi" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
+                    <input type="number" name="tahun" id="tahun_administrasi" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" min="2000" max="2100" required>
+                </div>
+                <div class="mb-4">
+                    <label for="bank_account_id" class="block text-sm font-medium text-gray-700 mb-1">Rekening Tujuan</label>
+                    <select name="bank_account_id" id="bank_account_id" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1">
+                        <option value="">Pilih Rekening (Opsional)</option>
+                        @foreach($bankAccounts as $account)
+                            <option value="{{ $account->id }}">{{ $account->bank_name }} - {{ $account->account_number }} - {{ $account->account_holder }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 <div class="flex justify-end space-x-2">
                     <button type="button" id="cancel-administrasi-bulanan-form-button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
@@ -281,7 +337,39 @@
                 </div>
                 <div class="flex justify-end space-x-2">
                     <button type="button" id="cancel-buku-kas-form-button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
-                    <button Ascending
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Bank Account Form -->
+    <div id="bank-account-form-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Form Rekening</h3>
+                <button id="close-bank-account-form-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <form id="bank-account-form" action="{{ route('keuangan.bank-accounts.store') }}?tab=bank-accounts" method="POST">
+                @csrf
+                <input type="hidden" id="bank-account-id" name="id">
+                <input type="hidden" name="_method" id="bank-account-method" value="POST">
+                <div class="mb-4">
+                    <label for="bank_name" class="block text-sm font-medium text-gray-700 mb-1">Nama Bank <span class="text-red-600">*</span></label>
+                    <input type="text" name="bank_name" id="bank_name" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
+                </div>
+                <div class="mb-4">
+                    <label for="account_number" class="block text-sm font-medium text-gray-700 mb-1">Nomor Rekening <span class="text-red-600">*</span></label>
+                    <input type="text" name="account_number" id="account_number" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
+                </div>
+                <div class="mb-4">
+                    <label for="account_holder" class="block text-sm font-medium text-gray-700 mb-1">Nama Pemilik <span class="text-red-600">*</span></label>
+                    <input type="text" name="account_holder" id="account_holder" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancel-bank-account-form-button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
                     <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">Simpan</button>
                 </div>
             </form>
@@ -291,6 +379,7 @@
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const routes = {
         infaqTahunanStore: "{{ route('keuangan.infaq.tahunan.store') }}",
@@ -305,13 +394,16 @@
         bukuKasEdit: "{{ route('keuangan.buku-kas.edit', ':id') }}",
         bukuKasUpdate: "{{ route('keuangan.buku-kas.update', ':id') }}",
         bukuKasDestroy: "{{ route('keuangan.buku-kas.destroy', ':id') }}",
+        bankAccountStore: "{{ route('keuangan.bank-accounts.store') }}",
+        bankAccountEdit: "{{ route('keuangan.bank-accounts.edit', ':id') }}",
+        bankAccountUpdate: "{{ route('keuangan.bank-accounts.update', ':id') }}",
+        bankAccountDestroy: "{{ route('keuangan.bank-accounts.destroy', ':id') }}",
         keuanganIndex: "{{ route('keuangan.index') }}"
     };
 
     document.addEventListener('DOMContentLoaded', function() {
         // Fungsi untuk menangani tab
         function showTab(tabName) {
-            console.log('Switching to tab:', tabName);
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.add('hidden');
             });
@@ -335,7 +427,7 @@
 
         // Inisialisasi tab berdasarkan URL atau sessionStorage
         const urlParams = new URLSearchParams(window.location.search);
-        const validTabs = ['infaq', 'administrasi-bulanan', 'buku-kas'];
+        const validTabs = ['infaq', 'administrasi-bulanan', 'buku-kas', 'bank-accounts'];
         const tabFromUrl = urlParams.get('tab');
         const lastTab = sessionStorage.getItem('activeTab');
         const activeTab = tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : (lastTab && validTabs.includes(lastTab) ? lastTab : 'infaq');
@@ -433,7 +525,13 @@
                             const form = document.getElementById(formId);
                             form.querySelector('input[name="id"]').value = data.data.id;
                             Object.keys(fields).forEach(key => {
-                                document.getElementById(fields[key]).value = data.data[key];
+                                const element = document.getElementById(fields[key]);
+                                // Handle nullable bank_account_id for select elements
+                                if (element.tagName === 'SELECT' && key === 'bank_account_id') {
+                                    element.value = data.data[key] || '';
+                                } else {
+                                    element.value = data.data[key];
+                                }
                             });
                             form.querySelector('input[name="_method"]').value = 'PUT';
                             form.action = routesConfig.update.replace(':id', data.data.id) + `?tab=${tabName}`;
@@ -526,7 +624,7 @@
             });
         }
 
-        // Inisialisasi fungsi
+        // Inisialisasi fungsi untuk tab yang sudah ada
         submitForm('infaq-tahunan-form', 'infaq', {
             store: routes.infaqTahunanStore,
             update: routes.infaqTahunanUpdate
@@ -542,6 +640,11 @@
             update: routes.bukuKasUpdate
         });
 
+        submitForm('bank-account-form', 'bank-accounts', {
+            store: routes.bankAccountStore,
+            update: routes.bankAccountUpdate
+        });
+
         editData('edit-infaq-tahunan-button', 'infaq', 'infaq-tahunan-form-modal', 'infaq-tahunan-form', {
             tahun: 'tahun_infaq'
         }, {
@@ -551,7 +654,8 @@
 
         editData('edit-administrasi-bulanan-button', 'administrasi-bulanan', 'administrasi-bulanan-form-modal', 'administrasi-bulanan-form', {
             bulan: 'bulan',
-            tahun: 'tahun_administrasi'
+            tahun: 'tahun_administrasi',
+            bank_account_id: 'bank_account_id'
         }, {
             edit: routes.administrasiBulananEdit,
             update: routes.administrasiBulananUpdate
@@ -564,15 +668,25 @@
             update: routes.bukuKasUpdate
         });
 
+        editData('edit-bank-account-button', 'bank-accounts', 'bank-account-form-modal', 'bank-account-form', {
+            bank_name: 'bank_name',
+            account_number: 'account_number',
+            account_holder: 'account_holder'
+        }, {
+            edit: routes.bankAccountEdit,
+            update: routes.bankAccountUpdate
+        });
+
         deleteData('delete-infaq-tahunan-form', 'infaq', 'Infaq Tahunan', routes.infaqTahunanDestroy);
         deleteData('delete-administrasi-bulanan-form', 'administrasi-bulanan', 'Administrasi Bulanan', routes.administrasiBulananDestroy);
         deleteData('delete-buku-kas-form', 'buku-kas', 'Buku Kas', routes.bukuKasDestroy);
+        deleteData('delete-bank-account-form', 'bank-accounts', 'Rekening', routes.bankAccountDestroy);
 
         validateYearInput('tahun_infaq');
         validateYearInput('tahun_administrasi');
         validateYearInput('tahun_buku_kas');
 
-        // Modal Handlers
+        // Modal Handlers untuk tab yang sudah ada
         document.getElementById('tambahInfaqTahunanButton')?.addEventListener('click', () => {
             sessionStorage.setItem('activeTab', 'infaq');
             document.getElementById('infaq-tahunan-form').reset();
@@ -597,6 +711,7 @@
             document.getElementById('administrasi-bulanan-id').value = '';
             document.getElementById('administrasi-bulanan-method').value = 'POST';
             document.getElementById('administrasi-bulanan-form').action = routes.administrasiBulananStore + '?tab=administrasi-bulanan';
+            document.querySelector('#administrasi-bulanan-form-modal h3').textContent = 'Form Administrasi Bulanan';
             document.getElementById('administrasi-bulanan-form-modal').classList.remove('hidden');
         });
 
@@ -614,6 +729,7 @@
             document.getElementById('buku-kas-id').value = '';
             document.getElementById('buku-kas-method').value = 'POST';
             document.getElementById('buku-kas-form').action = routes.bukuKasStore + '?tab=buku-kas';
+            document.querySelector('#buku-kas-form-modal h3').textContent = 'Form Buku Kas';
             document.getElementById('buku-kas-form-modal').classList.remove('hidden');
         });
 
@@ -623,6 +739,24 @@
 
         document.getElementById('cancel-buku-kas-form-button')?.addEventListener('click', () => {
             document.getElementById('buku-kas-form-modal').classList.add('hidden');
+        });
+
+        document.getElementById('tambahBankAccountButton')?.addEventListener('click', () => {
+            sessionStorage.setItem('activeTab', 'bank-accounts');
+            document.getElementById('bank-account-form').reset();
+            document.getElementById('bank-account-id').value = '';
+            document.getElementById('bank-account-method').value = 'POST';
+            document.getElementById('bank-account-form').action = routes.bankAccountStore + '?tab=bank-accounts';
+            document.querySelector('#bank-account-form-modal h3').textContent = 'Form Rekening';
+            document.getElementById('bank-account-form-modal').classList.remove('hidden');
+        });
+
+        document.getElementById('close-bank-account-form-modal')?.addEventListener('click', () => {
+            document.getElementById('bank-account-form-modal').classList.add('hidden');
+        });
+
+        document.getElementById('cancel-bank-account-form-button')?.addEventListener('click', () => {
+            document.getElementById('bank-account-form-modal').classList.add('hidden');
         });
     });
 </script>

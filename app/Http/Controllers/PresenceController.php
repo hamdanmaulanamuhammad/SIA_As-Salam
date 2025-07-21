@@ -13,13 +13,73 @@ use Carbon\Carbon;
 
 class PresenceController extends Controller
 {
-    // Menampilkan halaman presensi
-    public function index()
+    public function index(Request $request)
     {
-        // Mengambil semua data presensi beserta data pengguna
+        // Mengambil data presensi hari ini
         $presences = Presence::with('user')->whereDate('date', date('Y-m-d'))->get();
         $users = User::where('role', 'pengajar')->get();
-        return view('admin.presence-admin', compact('presences', 'users'));
+
+        // Filter untuk riwayat kehadiran
+        $pengajar = $request->input('pengajar');
+        $tahun = $request->input('tahun');
+        $bulan = $request->input('bulan');
+        $perPage = $request->input('per_page', 10);
+
+        // Query untuk riwayat kehadiran
+        $historyQuery = Presence::with('user');
+
+        // Filter berdasarkan pengajar
+        if ($pengajar) {
+            $historyQuery->where('user_id', $pengajar);
+        }
+
+        // Filter berdasarkan tahun
+        if ($tahun) {
+            $historyQuery->whereYear('date', $tahun);
+        }
+
+        // Filter berdasarkan bulan
+        if ($bulan) {
+            $historyQuery->whereMonth('date', $bulan);
+        }
+
+        // Urutkan berdasarkan tanggal terbaru
+        $historyQuery->orderBy('date', 'desc');
+
+        // Paginasi
+        $historyPresences = $historyQuery->paginate($perPage, ['*'], 'page');
+
+        // Tambahkan parameter query ke pagination links
+        $historyPresences->appends([
+            'pengajar' => $pengajar,
+            'tahun' => $tahun,
+            'bulan' => $bulan,
+            'per_page' => $perPage
+        ]);
+
+        // Ambil tahun yang tersedia berdasarkan data presensi
+        $availableYears = Presence::selectRaw('YEAR(date) as year')
+                                ->distinct()
+                                ->orderBy('year', 'desc')
+                                ->pluck('year');
+
+        // Jika tidak ada data, tambahkan tahun saat ini
+        if ($availableYears->isEmpty()) {
+            $availableYears = collect([date('Y')]);
+        }
+
+        // Tentukan apakah paginasi diperlukan
+        $showPagination = $historyPresences->total() > $perPage;
+
+        // Jika request adalah AJAX, return JSON dengan tabel dan paginasi
+        if ($request->ajax()) {
+            return response()->json([
+                'table' => view('admin.presence-admin', compact('presences', 'users', 'historyPresences', 'availableYears', 'showPagination'))->renderSections()['content'],
+                'pagination' => $showPagination ? $historyPresences->links()->toHtml() : '',
+            ]);
+        }
+
+        return view('admin.presence-admin', compact('presences', 'users', 'historyPresences', 'availableYears', 'showPagination'));
     }
 
     public function indexPengajar()

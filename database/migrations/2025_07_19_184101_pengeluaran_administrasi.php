@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('administrasi_bulanan_id')->constrained('administrasi_bulanans')->onDelete('cascade');
             $table->string('nama_pengeluaran');
+            $table->foreignId('bank_account_id')->nullable()->constrained('bank_accounts')->onDelete('set null');
             $table->integer('jumlah');
             $table->text('keterangan')->nullable();
             $table->timestamps();

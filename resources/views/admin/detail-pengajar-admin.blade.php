@@ -5,8 +5,6 @@
 
 @section('content')
     <div class="container mx-auto p-6">
-        <h2 class="text-2xl font-semibold text-gray-700 mt-6 mb-4">Detail Pengajar</h2>
-
         <!-- Teacher Profile -->
         <div class="bg-white rounded-lg shadow p-6 mb-6">
             <div class="p-8">
@@ -127,7 +125,7 @@
                             <th class="px-4 py-3">Kelas</th>
                             <th class="px-4 py-3">Materi</th>
                             <th class="px-4 py-3">Bukti</th>
-                            <th class="px-4 py-3">Masalah</th>
+                            <th class="px-4 py-3">Kendala</th>
                             <th class="px-4 py-3">Saran</th>
 
                         </tr>
@@ -266,7 +264,7 @@
 
     <!-- Contract Modal -->
     @if($isPengajar)
-    <div id="contractModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+    <div id="contractModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
         <div class="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 id="contractModalTitle" class="text-lg font-semibold mb-4">Tambah Kontrak</h3>
             <form id="contractForm" method="POST">

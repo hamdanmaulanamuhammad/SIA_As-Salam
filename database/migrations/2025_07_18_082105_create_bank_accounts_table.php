@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('administrasi_bulanans', function (Blueprint $table) {
+        Schema::create('bank_accounts', function (Blueprint $table) {
             $table->id();
-            $table->string('bulan'); // Januari, Februari, dst
-            $table->string('tahun'); // 2025, dst
-            $table->foreignId('bank_account_id')->nullable()->constrained()->onDelete('set null');
+            $table->string('bank_name')->nullable();
+            $table->string('account_number')->nullable();
+            $table->string('account_holder')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('administrasi_bulanans');
+        Schema::dropIfExists('bank_accounts');
     }
 };

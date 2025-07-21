@@ -44,7 +44,7 @@
                 </div>
 
                 <!-- Quick Info Box -->
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <div class="bg-white p-5 rounded-lg border border-gray-200 mb-6">
                     <h3 class="font-medium text-gray-700 mb-2">Informasi Singkat</h3>
                     <div class="space-y-2">
                         <div>

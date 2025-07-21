@@ -29,7 +29,7 @@
                     <li class="relative px-6 py-3">
                         <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->is('presence-admin') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('presence-admin') }}">
                             <img src="{{ asset(request()->is('presence-admin') ? 'assets/images/icons/presence-active.svg' : 'assets/images/icons/presence.svg') }}" alt="Events Icon" class="w-5 h-5" />
-                            <span class="ml-4">Kehadiran Pengajar</span>
+                            <span class="ml-4">Presensi</span>
                         </a>
                     </li>
                     <li class="relative px-6 py-3">
@@ -57,8 +57,8 @@
                         </a>
                     </li>
                     <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->routeIs('pengajar.show') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ url('/data-pengajar') }}">
-                            <img src="{{ asset(request()->routeIs('pengajar.show') ? 'assets/images/icons/teachers-active.svg' : 'assets/images/icons/teachers.svg') }}" alt="Teacher Details Icon" class="w-5 h-5" />
+                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->routeIs(['pengajar.show', 'teachers.*', 'contracts.*']) ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ url('/teachers/data') }}">
+                            <img src="{{ asset(request()->routeIs(['pengajar.show', 'teachers.*', 'contracts.*']) ? 'assets/images/icons/teachers-active.svg' : 'assets/images/icons/teachers.svg') }}" alt="Teacher Details Icon" class="w-5 h-5" />
                             <span class="ml-4">Data Pengajar</span>
                         </a>
                     </li>

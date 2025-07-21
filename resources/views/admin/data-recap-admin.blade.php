@@ -6,10 +6,10 @@
 <div class="container px-6 mx-auto grid">
 
     <!-- Header -->
-    <div class="flex justify-between items-center mt-6 mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Daftar Rekap Presensi</h1>
-        <button id="tambahRekapButton" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200">
-            <i class="fas fa-plus mr-2"></i> Tambah Rekap
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mt-6 mb-6">
+        <h1 class="text-2xl font-bold text-gray-800 text-center md:text-left">Daftar Rekap Presensi</h1>
+        <button id="tambahRekapButton" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200 w-full md:w-auto">
+            <i class="fas fa-plus mr-2"></i>Rekap Mukafaah
         </button>
     </div>
 

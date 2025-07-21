@@ -10,7 +10,18 @@ class PengeluaranBulanan extends Model
 
     protected $table = 'pengeluaran_administrasi';
 
-    protected $fillable = ['administrasi_bulanan_id', 'keterangan', 'jumlah'];
+    protected $fillable = [
+        'administrasi_bulanan_id',
+        'nama_pengeluaran',
+        'jumlah',
+        'keterangan',
+        'bank_account_id',
+    ];
+
+    public function bankAccount()
+    {
+        return $this->belongsTo(BankAccount::class);
+    }
 
     public function administrasi()
     {

@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\AdministrasiBulananController;
 use App\Http\Controllers\AkademikController;
+use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\BukuKasController;
 use App\Http\Controllers\InfaqController;
 use App\Http\Controllers\KelasController;
@@ -80,13 +81,15 @@ Route::middleware(['auth'])->group(function () {
         });
 
         // Data Pengajar
-        Route::get('/data-pengajar', [PengajarController::class, 'showTeacherList'])->name('pengajar.show');
-        Route::get('/teachers/{id}', [PengajarController::class, 'showTeacherDetail'])->name('teachers.detail');
-        Route::put('/teachers/{id}', [PengajarController::class, 'update'])->name('teachers.update');
-        Route::delete('/teachers/{id}', [PengajarController::class, 'deleteTeacher'])->name('teachers.delete');
-        Route::post('/teachers/{id}/contracts', [PengajarController::class, 'storeContract'])->name('contracts.store');
-        Route::put('/teachers/{id}/contracts/{contract_id}', [PengajarController::class, 'updateContract'])->name('contracts.update');
-        Route::delete('/teachers/{id}/contracts/{contract_id}', [PengajarController::class, 'deleteContract'])->name('contracts.destroy');
+        Route::prefix('teachers')->group(function () {
+            Route::get('/data', [PengajarController::class, 'showTeacherList'])->name('pengajar.show');
+            Route::get('/{id}', [PengajarController::class, 'showTeacherDetail'])->name('teachers.detail');
+            Route::put('/{id}', [PengajarController::class, 'update'])->name('teachers.update');
+            Route::delete('/{id}', [PengajarController::class, 'deleteTeacher'])->name('teachers.delete');
+            Route::post('/{id}/contracts', [PengajarController::class, 'storeContract'])->name('contracts.store');
+            Route::put('/{id}/contracts/{contract_id}', [PengajarController::class, 'updateContract'])->name('contracts.update');
+            Route::delete('/{id}/contracts/{contract_id}', [PengajarController::class, 'deleteContract'])->name('contracts.destroy');
+        });
 
         // Permintaan Pendaftaran
         // Rute untuk menampilkan permintaan registrasi
@@ -163,17 +166,17 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', [KeuanganController::class, 'index'])->name('keuangan.index');
 
             Route::prefix('infaq')->group(function () {
-            Route::get('/tahunan', [InfaqController::class, 'indexInfaqTahunan'])->name('keuangan.infaq.tahunan.index');
-            Route::post('/tahunan', [InfaqController::class, 'storeInfaqTahunan'])->name('keuangan.infaq.tahunan.store');
-            Route::get('/tahunan/{id}/edit', [InfaqController::class, 'editInfaqTahunan'])->name('keuangan.infaq.tahunan.edit');
-            Route::put('/tahunan/{id}', [InfaqController::class, 'updateInfaqTahunan'])->name('keuangan.infaq.tahunan.update');
-            Route::delete('/tahunan/{id}', [InfaqController::class, 'destroyInfaqTahunan'])->name('keuangan.infaq.tahunan.destroy');
-            Route::get('/tahunan/{infaqTahunanId}/santri', [InfaqController::class, 'showInfaqSantri'])->name('keuangan.infaq.santri.index');
-            Route::post('/tahunan/{infaqTahunanId}/santri', [InfaqController::class, 'storeInfaqSantri'])->name('keuangan.infaq.santri.store');
-            Route::get('/tahunan/{infaqTahunanId}/santri/{id}/edit', [InfaqController::class, 'editInfaqSantri'])->name('keuangan.infaq.santri.edit');
-            Route::put('/tahunan/{infaqTahunanId}/santri/{id}', [InfaqController::class, 'updateInfaqSantri'])->name('keuangan.infaq.santri.update');
-            Route::delete('/tahunan/{infaqTahunanId}/santri/{id}', [InfaqController::class, 'destroyInfaqSantri'])->name('keuangan.infaq.santri.destroy');
-        });
+                Route::get('/tahunan', [InfaqController::class, 'indexInfaqTahunan'])->name('keuangan.infaq.tahunan.index');
+                Route::post('/tahunan', [InfaqController::class, 'storeInfaqTahunan'])->name('keuangan.infaq.tahunan.store');
+                Route::get('/tahunan/{id}/edit', [InfaqController::class, 'editInfaqTahunan'])->name('keuangan.infaq.tahunan.edit');
+                Route::put('/tahunan/{id}', [InfaqController::class, 'updateInfaqTahunan'])->name('keuangan.infaq.tahunan.update');
+                Route::delete('/tahunan/{id}', [InfaqController::class, 'destroyInfaqTahunan'])->name('keuangan.infaq.tahunan.destroy');
+                Route::get('/tahunan/{infaqTahunanId}/santri', [InfaqController::class, 'showInfaqSantri'])->name('keuangan.infaq.santri.index');
+                Route::post('/tahunan/{infaqTahunanId}/santri', [InfaqController::class, 'storeInfaqSantri'])->name('keuangan.infaq.santri.store');
+                Route::get('/tahunan/{infaqTahunanId}/santri/{id}/edit', [InfaqController::class, 'editInfaqSantri'])->name('keuangan.infaq.santri.edit');
+                Route::put('/tahunan/{infaqTahunanId}/santri/{id}', [InfaqController::class, 'updateInfaqSantri'])->name('keuangan.infaq.santri.update');
+                Route::delete('/tahunan/{infaqTahunanId}/santri/{id}', [InfaqController::class, 'destroyInfaqSantri'])->name('keuangan.infaq.santri.destroy');
+            });
 
             Route::prefix('administrasi-bulanan')->group(function () {
                 Route::get('/', [AdministrasiBulananController::class, 'index'])->name('keuangan.administrasi-bulanan.index');
@@ -199,6 +202,14 @@ Route::middleware(['auth'])->group(function () {
                 Route::get('/{bukuKasId}/transaksi/{id}/edit', [BukuKasController::class, 'editTransaksiKas'])->name('keuangan.buku-kas.transaksi.edit');
                 Route::put('/{bukuKasId}/transaksi/{id}', [BukuKasController::class, 'updateTransaksiKas'])->name('keuangan.buku-kas.transaksi.update');
                 Route::delete('/{bukuKasId}/transaksi/{id}', [BukuKasController::class, 'destroyTransaksiKas'])->name('keuangan.buku-kas.transaksi.destroy');
+            });
+
+            Route::prefix('bank-accounts')->group(function () {
+                Route::get('/', [BankAccountController::class, 'index'])->name('keuangan.bank-accounts.index');
+                Route::post('/', [BankAccountController::class, 'store'])->name('keuangan.bank-accounts.store');
+                Route::get('/{id}/edit', [BankAccountController::class, 'edit'])->name('keuangan.bank-accounts.edit');
+                Route::put('/{id}', [BankAccountController::class, 'update'])->name('keuangan.bank-accounts.update');
+                Route::delete('/{id}', [BankAccountController::class, 'destroy'])->name('keuangan.bank-accounts.destroy');
             });
         });
     });
