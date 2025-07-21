@@ -28,7 +28,10 @@ class RecapController extends Controller
             $tanggal = array_map('trim', explode(',', $tanggalInput));
             foreach ($tanggal as $date) {
                 if (!Carbon::createFromFormat('Y-m-d', $date, 'Asia/Jakarta')) {
-                    return redirect()->back()->with('error', 'Tanggal tidak valid: ' . $date)->withInput();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Tanggal tidak valid: ' . $date
+                    ], 422);
                 }
             }
         } else {
@@ -58,7 +61,10 @@ class RecapController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput()->with('error', 'Gagal menyimpan rekap. Periksa input Anda.');
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
         }
 
         $periode = $this->getPeriodeFromTanggal($tanggal);
@@ -71,7 +77,10 @@ class RecapController extends Controller
             'dates' => json_encode($tanggal),
         ]);
 
-        return redirect()->route('recaps.index')->with('success', 'Rekap presensi berhasil disimpan.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Rekap presensi berhasil disimpan.'
+        ]);
     }
 
     public function show($id)
@@ -95,7 +104,10 @@ class RecapController extends Controller
     public function edit($id)
     {
         $recap = Recap::findOrFail($id);
-        return view('admin.data-recap-admin', ['recaps' => Recap::all(), 'editRecap' => $recap]);
+        return response()->json([
+            'success' => true,
+            'data' => $recap
+        ]);
     }
 
     public function update(Request $request, $id)
@@ -109,7 +121,10 @@ class RecapController extends Controller
             $tanggal = array_map('trim', explode(',', $tanggalInput));
             foreach ($tanggal as $date) {
                 if (!Carbon::createFromFormat('Y-m-d', $date, 'Asia/Jakarta')) {
-                    return redirect()->back()->with('error', 'Tanggal tidak valid: ' . $date)->withInput();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Tanggal tidak valid: ' . $date
+                    ], 422);
                 }
             }
         } else {
@@ -139,7 +154,10 @@ class RecapController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput()->with('error', 'Gagal memperbarui rekap. Periksa input Anda.');
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
         }
 
         $periode = $this->getPeriodeFromTanggal($tanggal);
@@ -152,14 +170,20 @@ class RecapController extends Controller
             'dates' => json_encode($tanggal),
         ]);
 
-        return redirect()->route('recaps.index')->with('success', 'Rekap presensi berhasil diperbarui.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Rekap presensi berhasil diperbarui.'
+        ]);
     }
 
     public function destroy($id)
     {
         $recap = Recap::findOrFail($id);
         $recap->delete();
-        return redirect()->route('recaps.index')->with('success', 'Rekap presensi berhasil dihapus.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Rekap presensi berhasil dihapus.'
+        ]);
     }
 
     public function filter(Request $request)
@@ -172,7 +196,10 @@ class RecapController extends Controller
         }
 
         $recaps = $query->get();
-        return view('admin.data-recap-admin', compact('recaps'));
+        return response()->json([
+            'success' => true,
+            'data' => $recaps
+        ]);
     }
 
     public function storeAdditionalMukafaah(Request $request, $id)
@@ -192,7 +219,7 @@ class RecapController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal: ' . $validator->errors()->first()
+                'message' => $validator->errors()->first()
             ], 422);
         }
 
@@ -213,8 +240,38 @@ class RecapController extends Controller
 
     public function editAdditionalMukafaah($id, $mukafaahId)
     {
-        $mukafaah = AdditionalMukafaah::where('recap_id', $id)->findOrFail($mukafaahId);
-        return response()->json($mukafaah);
+        try {
+            // Pastikan recap exists
+            $recap = Recap::findOrFail($id);
+
+            // Find mukafaah dengan kondisi yang benar
+            $mukafaah = AdditionalMukafaah::where('recap_id', $id)
+                ->where('id', $mukafaahId)
+                ->first();
+
+            if (!$mukafaah) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data mukafaah tidak ditemukan.'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $mukafaah
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error in editAdditionalMukafaah: ' . $e->getMessage(), [
+                'recap_id' => $id,
+                'mukafaah_id' => $mukafaahId,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan server: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function updateAdditionalMukafaah(Request $request, $id, $mukafaahId)
@@ -234,21 +291,49 @@ class RecapController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal: ' . $validator->errors()->first()
+                'message' => $validator->errors()->first()
             ], 422);
         }
 
-        $mukafaah = AdditionalMukafaah::where('recap_id', $id)->findOrFail($mukafaahId);
-        $mukafaah->update([
-            'user_id' => $request->user_id,
-            'additional_mukafaah' => $request->amount,
-            'description' => $request->description ?? null,
-        ]);
+        try {
+            // Pastikan recap exists
+            $recap = Recap::findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Mukafaah tambahan berhasil diperbarui.'
-        ]);
+            // Find dan update mukafaah
+            $mukafaah = AdditionalMukafaah::where('recap_id', $id)
+                ->where('id', $mukafaahId)
+                ->first();
+
+            if (!$mukafaah) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data mukafaah tidak ditemukan.'
+                ], 404);
+            }
+
+            $mukafaah->update([
+                'user_id' => $request->user_id,
+                'additional_mukafaah' => $request->amount,
+                'description' => $request->description ?? null,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Mukafaah tambahan berhasil diperbarui.'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error in updateAdditionalMukafaah: ' . $e->getMessage(), [
+                'recap_id' => $id,
+                'mukafaah_id' => $mukafaahId,
+                'request_data' => $request->all(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan server: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function destroyAdditionalMukafaah($id, $mukafaahId)
@@ -277,4 +362,3 @@ class RecapController extends Controller
         }
     }
 }
-?>

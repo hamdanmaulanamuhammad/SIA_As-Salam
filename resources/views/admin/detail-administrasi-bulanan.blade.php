@@ -14,8 +14,14 @@
             <i class="fa fa-arrow-left mr-2"></i>Kembali
         </a>
     </div>
+    <!-- Display message if recap is missing -->
+    @if($recapMissing)
+        <div class="mb-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 max-h-fit rounded-md">
+            <p class="text-md"><strong>Peringatan:</strong> Tidak ada rekapan mukafaah untuk periode {{ $administrasi->bulan }} {{ $administrasi->tahun }}. Silakan buat rekapan terlebih dahulu.</p>
+        </div>
+    @endif
 
-    <div class=" sticky overflow-y-auto rounded-lg shadow-md">
+    <div class="rounded-lg shadow-md">
     <!-- Informasi Rekening -->
     <div class="bg-white p-6 mt-6 rounded-lg shadow-sm">
         <h2 class="text-xl font-semibold text-gray-800 text-center md:text-left mb-4">Informasi Rekening</h2>
@@ -53,18 +59,21 @@
         @endif
     </div>
 
-
         <!-- Tabel Pengeluaran Bulanan -->
         <div class="bg-white p-6">
             <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-y-4 mb-4">
-                <h2 class="text-xl font-semibold text-center md:text-left">
-                    Data Pengeluaran
-                </h2>
-                <button id="tambahPengeluaranButton"
-                        class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200 w-full md:w-auto">
+            <h2 class="text-xl font-semibold text-center md:text-left">
+                Data Pengeluaran
+            </h2>
+            <div class="flex space-x-2">
+                <button id="tambahPengeluaranButton" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200 w-full md:w-auto">
                     <i class="fa fa-plus mr-2"></i>Pengeluaran
                 </button>
+                <button id="downloadPdfButton" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition duration-200 w-full md:w-auto">
+                    <i class="fa fa-download mr-2"></i>Download PDF
+                </button>
             </div>
+        </div>
 
             <div class="overflow-x-auto">
                 <table class="w-full bg-white text-sm">
@@ -134,9 +143,6 @@
                             <td class="px-4 py-3 text-sm">{{ ($pengeluaran->currentPage() - 1) * $pengeluaran->perPage() + $index + 2 }}</td>
                             <td class="px-4 py-3 text-sm">{{ $item->nama_pengeluaran ?? '-' }}</td>
                             <td class="px-4 py-3 text-sm text-blue-600 font-medium">{{ 'Rp ' . number_format($item->jumlah, 0, ',', '.') }}</td>
-                            <td class="px-4 py-3 text-sm">
-                                {{ $administrasi->bankAccount ? ($administrasi->bankAccount->bank_name . ' - ' . $administrasi->bankAccount->account_number . ' - ' . $administrasi->bankAccount->account_holder) : '-' }}
-                            </td>
                             <td class="px-4 py-3 text-sm">{{ $item->keterangan ?? '-' }}</td>
                             <td class="px-4 py-3 text-sm">{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y H:i') }}</td>
                             <td class="px-4 py-3 text-sm">
@@ -472,6 +478,14 @@
             const modal = document.getElementById('pengeluaran-form-modal');
             const submitButton = form.querySelector('button[type="submit"]');
 
+            const grandTotal = {{ isset($grandTotal) ? $grandTotal : 0 }};
+            if (grandTotal === 0) {
+                console.log('No recap data available.');
+            } else {
+                // Process grandTotal
+                console.log('Grand Total: ' + grandTotal);
+            }
+
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
 
@@ -656,6 +670,10 @@
 
         document.getElementById('cancel-pengeluaran-form-button').addEventListener('click', () => {
             document.getElementById('pengeluaran-form-modal').classList.add('hidden');
+        });
+
+        document.getElementById('downloadPdfButton').addEventListener('click', () => {
+            window.location.href = "{{ route('keuangan.administrasi-bulanan.download-pdf', $administrasi->id) }}";
         });
 
         // Inisialisasi fungsi

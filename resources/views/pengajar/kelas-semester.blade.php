@@ -17,27 +17,6 @@
         </div>
     </div>
 
-    <!-- Notifikasi -->
-    @if (session('success'))
-        <div class="mb-4 p-4 text-sm text-green-700 bg-green-100 rounded-lg">
-            {{ session('success') }}
-        </div>
-    @endif
-    @if (session('error'))
-        <div class="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg">
-            {{ session('error') }}
-        </div>
-    @endif
-    @if ($errors->any())
-        <div class="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
     <!-- Card Kelas -->
     @if ($kelasSemesters->isEmpty())
         <p class="text-gray-600">Belum ada kelas yang ditambahkan untuk semester ini.</p>

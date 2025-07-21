@@ -18,7 +18,7 @@
     </div>
 
     <!-- Sticky Container for Tabel Kelola Mukafaah Tambahan -->
-    <div class="sticky top-0 z-10 bg-white">
+    <div>
         <!-- Tabel Kelola Mukafaah Tambahan -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <div class="flex justify-between items-center mb-4">
@@ -134,7 +134,7 @@
     </div>
 
     <!-- Scrollable Container for Pengajar Cards -->
-    <div class="max-h-[calc(100vh-300px)] overflow-y-auto">
+    <div>
         <!-- Modal untuk Form Mukafaah Tambahan -->
         <div id="mukafaah-form-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
             <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md max-h-screen overflow-y-auto">
@@ -420,22 +420,6 @@
         </div>
     </div>
 </div>
-
-<style>
-    /* Ensure the sticky table stays at the top */
-    .sticky {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        background-color: white;
-    }
-
-    /* Set max height for scrollable container */
-    .max-h-\[calc\(100vh-300px\)\] {
-        max-height: calc(100vh - 300px);
-        overflow-y: auto;
-    }
-</style>
 @endsection
 
 @section('scripts')
@@ -468,18 +452,36 @@
 
             const formData = new FormData(this);
             const id = document.getElementById('mukafaah-id')?.value;
-            const url = id ? `/recaps/{{ $recap->id }}/additional-mukafaahs/${id}` : this.action;
-            formData.append('_method', id ? 'PUT' : 'POST');
+
+            // URL yang benar sesuai dengan route
+            let url;
+            if (id) {
+                // Update existing mukafaah
+                url = `/recaps/{{ $recap->id }}/additional-mukafaahs/${id}`;
+                formData.append('_method', 'PUT');
+            } else {
+                // Create new mukafaah
+                url = this.action; // Menggunakan action yang sudah di-set
+                formData.append('_method', 'POST');
+            }
+
+            console.log('Submitting to URL:', url); // Debug log
+            console.log('Method:', id ? 'PUT' : 'POST'); // Debug log
 
             fetch(url, {
-                method: "POST",
+                method: "POST", // Selalu POST karena Laravel method spoofing
                 body: formData,
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
                     'accept': 'application/json'
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 Swal.fire({
                     title: data.success ? "Berhasil!" : "Gagal!",
@@ -487,33 +489,55 @@
                     icon: data.success ? "success" : "error",
                     confirmButtonText: "OK"
                 }).then(() => {
-                    if (data.success) location.reload();
+                    if (data.success) {
+                        document.getElementById('mukafaah-form-modal').classList.add('hidden');
+                        location.reload();
+                    }
                 });
             })
             .catch(error => {
                 console.error("Error:", error);
-                Swal.fire("Error!", "Terjadi kesalahan pada server.", "error");
-                location.reload();
+                Swal.fire("Error!", `Terjadi kesalahan: ${error.message}`, "error");
             });
         });
 
         // Menangani tombol edit
         document.querySelectorAll('.edit-mukafaah-button').forEach(button => {
             button.addEventListener('click', () => {
-                fetch(`/recaps/{{ $recap->id }}/additional-mukafaahs/edit/${button.getAttribute('data-id')}`)
-                    .then(response => response.json())
+                const mukafaahId = button.getAttribute('data-id');
+                // URL harus konsisten dengan route di controller
+                const url = `/recaps/{{ $recap->id }}/additional-mukafaahs/${mukafaahId}/edit`;
+
+                console.log('Fetching edit data from:', url); // Debug log
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        document.getElementById('mukafaah-id').value = data.id;
-                        document.getElementById('user_id').value = data.user_id;
-                        document.getElementById('description').value = data.description;
-                        document.getElementById('amount').value = data.additional_mukafaah;
-                        document.getElementById('mukafaah-form').action = `/recaps/{{ $recap->id }}/additional-mukafaahs/${data.id}`;
-                        document.getElementById('mukafaah-method').value = 'PUT';
-                        document.getElementById('mukafaah-form-modal').classList.remove('hidden');
+                        if (data.success && data.data) {
+                            // Populate form dengan data yang diterima
+                            document.getElementById('mukafaah-id').value = data.data.id;
+                            document.getElementById('user_id').value = data.data.user_id;
+                            document.getElementById('description').value = data.data.description || '';
+                            document.getElementById('amount').value = data.data.additional_mukafaah;
+
+                            // Set form action dan method untuk update
+                            document.getElementById('mukafaah-form').action = `/recaps/{{ $recap->id }}/additional-mukafaahs/${data.data.id}`;
+                            document.getElementById('mukafaah-method').value = 'PUT';
+
+                            // Show modal
+                            document.getElementById('mukafaah-form-modal').classList.remove('hidden');
+                        } else {
+                            throw new Error(data.message || 'Data tidak ditemukan');
+                        }
                     })
                     .catch(error => {
                         console.error("Error:", error);
-                        Swal.fire("Error!", "Gagal mengambil data mukafaah.", "error");
+                        Swal.fire("Error!", `Gagal mengambil data mukafaah: ${error.message}`, "error");
                     });
             });
         });

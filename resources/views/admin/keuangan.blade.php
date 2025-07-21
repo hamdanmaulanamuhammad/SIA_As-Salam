@@ -124,7 +124,7 @@
                         <td class="px-4 py-3 text-sm">
                             {{ $item->bankAccount ? ($item->bankAccount->bank_name . ' - ' . $item->bankAccount->account_number . ' - ' . $item->bankAccount->account_holder) : '-' }}
                         </td>
-                        <td class="px-4 py-3 text-sm">{{ $item->pengeluaranBulanan->count() }}</td>
+                        <td class="px-4 py-3 text-sm">{{ $item->pengeluaranBulanan->count() + 1 }}</td>
                         <td class="px-4 py-3 text-sm">
                             <div class="flex space-x-2">
                                 <button class="edit-administrasi-bulanan-button w-8 h-8 text-white bg-yellow-500 rounded-md flex items-center justify-center hover:bg-yellow-600" data-id="{{ $item->id }}">

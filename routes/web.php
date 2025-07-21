@@ -3,6 +3,7 @@ use App\Http\Controllers\AdministrasiBulananController;
 use App\Http\Controllers\AkademikController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\BukuKasController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InfaqController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\KelasMapelSemesterController;
@@ -42,9 +43,7 @@ Route::middleware(['auth'])->group(function () {
     // Admin Route
     Route::middleware([CheckRole::class . ':admin'])->group(function () {
         // Dashboard
-        Route::get('/dashboard-admin', function () {
-            return view('admin.dashboard-admin');
-        })->name('dashboard-admin');
+        Route::get('/dashboard-admin', [DashboardController::class, 'indexAdmin'])->name('dashboard-admin');
 
         // Presence
         Route::get('/presence-admin', [PresenceController::class, 'index'])->name('presence-admin');
@@ -56,13 +55,14 @@ Route::middleware(['auth'])->group(function () {
         // Data Recap
         Route::prefix('recaps')->name('recaps.')->group(function() {
             Route::get('/', [RecapController::class, 'index'])->name('index');
+            Route::get('/filter', [RecapController::class, 'filter'])->name('filter');
             Route::post('/', [RecapController::class, 'store'])->name('store');
             Route::get('/{id}', [RecapController::class, 'show'])->name('show');
             Route::get('/{id}/edit', [RecapController::class, 'edit'])->name('edit');
             Route::put('/{id}', [RecapController::class, 'update'])->name('update');
             Route::delete('/{id}', [RecapController::class, 'destroy'])->name('destroy');
             Route::post('/{id}/additional-mukafaahs', [RecapController::class, 'storeAdditionalMukafaah'])->name('additional.store');
-            Route::get('/{id}/additional-mukafaahs/edit/{mukafaahId}', [RecapController::class, 'editAdditionalMukafaah'])->name('additional.edit');
+            Route::get('/{id}/additional-mukafaahs/{mukafaahId}/edit', [RecapController::class, 'editAdditionalMukafaah'])->name('additional.edit');
             Route::put('/{id}/additional-mukafaahs/{mukafaahId}', [RecapController::class, 'updateAdditionalMukafaah'])->name('additional.update');
             Route::delete('/{id}/additional-mukafaahs/{mukafaahId}', [RecapController::class, 'destroyAdditionalMukafaah'])->name('additional.destroy');
         });
@@ -84,7 +84,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('teachers')->group(function () {
             Route::get('/data', [PengajarController::class, 'showTeacherList'])->name('pengajar.show');
             Route::get('/{id}', [PengajarController::class, 'showTeacherDetail'])->name('teachers.detail');
-            Route::put('/{id}', [PengajarController::class, 'update'])->name('teachers.update');
+            Route::put('/{id}/reset-password', [PengajarController::class, 'resetPassword'])->name('teachers.reset-password');
             Route::delete('/{id}', [PengajarController::class, 'deleteTeacher'])->name('teachers.delete');
             Route::post('/{id}/contracts', [PengajarController::class, 'storeContract'])->name('contracts.store');
             Route::put('/{id}/contracts/{contract_id}', [PengajarController::class, 'updateContract'])->name('contracts.update');
@@ -189,6 +189,7 @@ Route::middleware(['auth'])->group(function () {
                 Route::get('/{administrasiBulananId}/pengeluaran/{id}/edit', [AdministrasiBulananController::class, 'editPengeluaranBulanan'])->name('keuangan.administrasi-bulanan.pengeluaran.edit');
                 Route::put('/{administrasiBulananId}/pengeluaran/{id}', [AdministrasiBulananController::class, 'updatePengeluaranBulanan'])->name('keuangan.administrasi-bulanan.pengeluaran.update');
                 Route::delete('/{administrasiBulananId}/pengeluaran/{id}', [AdministrasiBulananController::class, 'destroyPengeluaranBulanan'])->name('keuangan.administrasi-bulanan.pengeluaran.destroy');
+                Route::get('/{id}/download-pdf', [AdministrasiBulananController::class, 'downloadPdf'])->name('keuangan.administrasi-bulanan.download-pdf');
             });
 
             Route::prefix('buku-kas')->group(function () {
@@ -217,7 +218,7 @@ Route::middleware(['auth'])->group(function () {
     // Pengajar Route
     Route::middleware([CheckRole::class . ':pengajar'])->group(function () {
         // Dashboard
-        Route::get('/dashboard-pengajar', [PresenceController::class, 'indexPengajar'])->name('dashboard-pengajar');
+        Route::get('/dashboard-pengajar', [DashboardController::class, 'indexPengajar'])->name('dashboard-pengajar');
 
         //Presensi
         Route::get('/presence', [PresenceController::class, 'index'])->name('presence.index');

@@ -8,10 +8,11 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
-    // Menampilkan profil admin
+    // Menampilkan profil
     public function showProfile()
     {
         $user = Auth::user();
@@ -20,187 +21,226 @@ class ProfileController extends Controller
         } elseif ($user->role === 'pengajar') {
             return view('pengajar.profile-pengajar', compact('user'));
         }
+        return response()->json([
+            'success' => false,
+            'message' => 'Role tidak dikenali.'
+        ], 400);
     }
 
     // Mengupdate data profil
     public function updateProfile(Request $request)
     {
-        $request->validate([
-            'full_name' => 'required|string|max:100',
-            'username' => 'required|string|max:50',
-            'phone' => 'required|string|max:15',
-            'email' => 'required|email',
-        ]);
+        try {
+            $request->validate([
+                'full_name' => 'required|string|max:100',
+                'username' => 'required|string|max:50|unique:users,username,' . Auth::id(),
+                'phone' => 'required|string|max:15',
+                'email' => 'required|email|unique:users,email,' . Auth::id(),
+            ], [
+                'full_name.required' => 'Nama lengkap wajib diisi.',
+                'username.required' => 'Username wajib diisi.',
+                'username.unique' => 'Username sudah digunakan.',
+                'phone.required' => 'No HP wajib diisi.',
+                'email.required' => 'Email wajib diisi.',
+                'email.email' => 'Format email tidak valid.',
+                'email.unique' => 'Email sudah digunakan.'
+            ]);
 
-        $user = Auth::user();
-        $user->full_name = $request->full_name;
-        $user->username = $request->username;
-        $user->phone = $request->phone;
-        $user->email = $request->email;
-        $user->save();
+            $user = Auth::user();
+            $user->full_name = $request->full_name;
+            $user->username = $request->username;
+            $user->phone = $request->phone;
+            $user->email = $request->email;
+            $user->save();
 
-        // Menentukan route berdasarkan role user
-        if ($user->role === 'admin') {
-            return redirect()->back()->with('success','berhasil memperbarui profile');
-        } elseif ($user->role === 'pengajar') {
-            return redirect()->back()->with('success','berhasil memperbarui profile');
+            Log::info('Profile updated successfully', ['user_id' => $user->id]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profil berhasil diperbarui.'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation failed in updateProfile', ['errors' => $e->errors()]);
+            return response()->json([
+                'success' => false,
+                'message' => $e->errors()[array_key_first($e->errors())][0]
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Error updating profile', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat memperbarui profil.'
+            ], 500);
         }
-
-        // Jika role tidak dikenali, kirim error
-        return response()->json([
-            'success' => false,
-            'message' => 'Terjadi kesalahan dalam memperbarui profil.'
-        ], 400);
     }
 
     // Mengupload foto profil
     public function uploadPhoto(Request $request)
     {
-        // Validasi input
-        $request->validate([
-            'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        try {
+            $request->validate([
+                'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ], [
+                'photo.required' => 'File foto wajib diisi.',
+                'photo.image' => 'File harus berupa gambar.',
+                'photo.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif.',
+                'photo.max' => 'Ukuran gambar maksimal 2MB.'
+            ]);
 
-        $user = Auth::user();
+            $user = Auth::user();
 
-        // Hapus foto lama jika ada
-        if ($user->photo) {
-            Storage::delete($user->photo);
-        }
+            if ($user->photo) {
+                Storage::delete($user->photo);
+            }
 
-        // Simpan foto baru
-        $path = $request->file('photo')->store('profile_photos', 'public');
-        $user->photo = $path;
-        $user->save();
+            $path = $request->file('photo')->store('profile_photos', 'public');
+            $user->photo = $path;
+            $user->save();
 
-        // Menyimpan pesan sukses ke session
-        if ($user->role === 'admin') {
-            return redirect()->route('profile.admin.index')->with('success', 'Foto profil berhasil diunggah.');
-        } elseif ($user->role === 'pengajar') {
-            return redirect()->route('profile.pengajar.index')->with('success', 'Foto profil berhasil diunggah.');
+            Log::info('Photo uploaded successfully', ['user_id' => $user->id, 'path' => $path]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Foto profil berhasil diunggah.'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation failed in uploadPhoto', ['errors' => $e->errors()]);
+            return response()->json([
+                'success' => false,
+                'message' => $e->errors()[array_key_first($e->errors())][0]
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Error uploading photo', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengunggah foto.'
+            ], 500);
         }
     }
 
     // Menghapus foto profil
     public function deletePhoto(Request $request)
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        // Hapus foto dari storage
-        if ($user->photo) {
-            Storage::delete($user->photo);
-            $user->photo = null; // Set foto ke null
-            $user->save();
-        }
+            if ($user->photo) {
+                Storage::delete($user->photo);
+                $user->photo = null;
+                $user->save();
 
-        // Menyimpan pesan sukses ke session
-        if ($user->role === 'admin') {
+                Log::info('Photo deleted successfully', ['user_id' => $user->id]);
+            }
+
             return response()->json([
                 'success' => true,
-                'message' => 'Foto profil berhasil dihapus.',
-                'redirect' => route('profile.admin.index')
+                'message' => 'Foto profil berhasil dihapus.'
             ]);
-        } elseif ($user->role === 'pengajar') {
+        } catch (\Exception $e) {
+            Log::error('Error deleting photo', ['error' => $e->getMessage()]);
             return response()->json([
-                'success' => true,
-                'message' => 'Foto profil berhasil dihapus.',
-                'redirect' => route('profile.pengajar.index')
-            ]);
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menghapus foto.'
+            ], 500);
         }
     }
 
     // Mengupload tanda tangan
     public function uploadSignature(Request $request)
     {
-        $request->validate([
-            'signature' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'x' => 'required|numeric',
-            'y' => 'required|numeric',
-            'width' => 'required|numeric',
-            'height' => 'required|numeric',
-        ]);
+        try {
+            $request->validate([
+                'signature' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+                'x' => 'required|numeric',
+                'y' => 'required|numeric',
+                'width' => 'required|numeric',
+                'height' => 'required|numeric',
+            ], [
+                'signature.required' => 'File tanda tangan wajib diisi.',
+                'signature.image' => 'File harus berupa gambar.',
+                'signature.mimes' => 'Format gambar harus jpeg, png, atau jpg.',
+                'signature.max' => 'Ukuran gambar maksimal 2MB.',
+                'x.required' => 'Koordinat X wajib diisi.',
+                'y.required' => 'Koordinat Y wajib diisi.',
+                'width.required' => 'Lebar wajib diisi.',
+                'height.required' => 'Tinggi wajib diisi.'
+            ]);
 
-        $user = Auth::user();
+            $user = Auth::user();
 
-        // Hapus tanda tangan lama jika ada
-        if ($user->signature) {
-            Storage::disk('public')->delete($user->signature);
-        }
+            if ($user->signature) {
+                Storage::disk('public')->delete($user->signature);
+            }
 
-        // Proses cropping dan simpan tanda tangan baru
-        $file = $request->file('signature');
-        $tempPath = $file->store('temp', 'public');
+            $file = $request->file('signature');
+            $tempPath = $file->store('temp', 'public');
+            $signatureDir = 'rapor/ttd';
+            if (!Storage::disk('public')->exists($signatureDir)) {
+                Storage::disk('public')->makeDirectory($signatureDir);
+            }
 
-        // Buat direktori jika belum ada
-        $signatureDir = 'rapor/ttd';
-        if (!Storage::disk('public')->exists($signatureDir)) {
-            Storage::disk('public')->makeDirectory($signatureDir);
-        }
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read(Storage::disk('public')->path($tempPath));
+            $image->crop(
+                (int)$request->width,
+                (int)$request->height,
+                (int)$request->x,
+                (int)$request->y
+            );
+            $image->resize(912, 462);
+            $filename = 'signature_' . $user->id . '_' . time() . '.png';
+            $signaturePath = $signatureDir . '/' . $filename;
+            $image->save(Storage::disk('public')->path($signaturePath));
+            Storage::disk('public')->delete($tempPath);
 
-        // Inisialisasi Image Manager dengan GD driver
-        $manager = new ImageManager(new Driver());
+            $user->signature = $signaturePath;
+            $user->save();
 
-        // Baca dan crop gambar
-        $image = $manager->read(Storage::disk('public')->path($tempPath));
+            Log::info('Signature uploaded successfully', ['user_id' => $user->id, 'path' => $signaturePath]);
 
-        // Crop gambar sesuai parameter
-        $image->crop(
-            (int)$request->width,
-            (int)$request->height,
-            (int)$request->x,
-            (int)$request->y
-        );
-
-        // Resize ke ukuran yang diinginkan
-        $image->resize(912, 462);
-
-        // Simpan dengan nama file yang unik
-        $filename = 'signature_' . $user->id . '_' . time() . '.png';
-        $signaturePath = $signatureDir . '/' . $filename;
-
-        // Simpan gambar
-        $image->save(Storage::disk('public')->path($signaturePath));
-
-        // Hapus file temporary
-        Storage::disk('public')->delete($tempPath);
-
-        // Update database
-        $user->signature = $signaturePath;
-        $user->save();
-
-        // Redirect berdasarkan role
-        if ($user->role === 'admin') {
-            return redirect()->route('profile.admin.index')->with('success', 'Tanda tangan berhasil diunggah.');
-        } elseif ($user->role === 'pengajar') {
-            return redirect()->route('profile.pengajar.index')->with('success', 'Tanda tangan berhasil diunggah.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Tanda tangan berhasil diunggah.'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation failed in uploadSignature', ['errors' => $e->errors()]);
+            return response()->json([
+                'success' => false,
+                'message' => $e->errors()[array_key_first($e->errors())][0]
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Error uploading signature', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengunggah tanda tangan.'
+            ], 500);
         }
     }
 
     // Menghapus tanda tangan
     public function deleteSignature(Request $request)
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        // Hapus tanda tangan dari storage
-        if ($user->signature) {
-            Storage::disk('public')->delete($user->signature);
-            $user->signature = null;
-            $user->save();
-        }
+            if ($user->signature) {
+                Storage::disk('public')->delete($user->signature);
+                $user->signature = null;
+                $user->save();
 
-        // Menyimpan pesan sukses ke session
-        if ($user->role === 'admin') {
+                Log::info('Signature deleted successfully', ['user_id' => $user->id]);
+            }
+
             return response()->json([
                 'success' => true,
-                'message' => 'Tanda tangan berhasil dihapus.',
-                'redirect' => route('profile.admin.index')
+                'message' => 'Tanda tangan berhasil dihapus.'
             ]);
-        } elseif ($user->role === 'pengajar') {
+        } catch (\Exception $e) {
+            Log::error('Error deleting signature', ['error' => $e->getMessage()]);
             return response()->json([
-                'success' => true,
-                'message' => 'Tanda tangan berhasil dihapus.',
-                'redirect' => route('profile.pengajar.index')
-            ]);
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menghapus tanda tangan.'
+            ], 500);
         }
     }
 }

@@ -1,4 +1,3 @@
-<!-- resources/views/admin/detail-pengajar-admin.blade.php -->
 @extends('layouts.admin')
 
 @section('title', 'Detail Pengajar')
@@ -18,7 +17,7 @@
                             <p class="mt-2 text-gray-500">{{ $teacher->university }}</p>
                         </div>
                     </div>
-                    <button onclick="openEditProfileModal()" class="bg-blue-600 text-white px-4 py-2 rounded">Edit Profil</button>
+                    <button onclick="openResetPasswordModal()" class="bg-blue-600 text-white px-4 py-2 rounded">Reset Password</button>
                 </div>
 
                 <div class="mt-8 border-t-2 border-gray-100 pt-6">
@@ -127,7 +126,6 @@
                             <th class="px-4 py-3">Bukti</th>
                             <th class="px-4 py-3">Kendala</th>
                             <th class="px-4 py-3">Saran</th>
-
                         </tr>
                     </thead>
                     <tbody class="divide-y">
@@ -160,42 +158,23 @@
         </div>
     </div>
 
-    <!-- Edit Profile Modal -->
-    <div id="profileModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
+    <!-- Reset Password Modal -->
+    <div id="resetPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
         <div class="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 class="text-lg font-semibold mb-4">Edit Profil Pengajar</h3>
-            <form id="profileForm" action="{{ route('teachers.update', $teacher->id) }}" method="POST" enctype="multipart/form-data">
+            <h3 class="text-lg font-semibold mb-4">Reset Password Pengajar</h3>
+            <form id="resetPasswordForm" action="{{ route('teachers.reset-password', $teacher->id) }}" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="mb-4">
-                    <label class="block text-gray-700">Nama Lengkap</label>
-                    <input type="text" name="full_name" value="{{ $teacher->full_name }}" class="w-full border rounded px-3 py-2" required>
+                    <label class="block text-gray-700">Password Baru</label>
+                    <input type="password" name="password" class="w-full border rounded px-3 py-2" required>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-gray-700">Email</label>
-                    <input type="email" name="email" value="{{ $teacher->email }}" class="w-full border rounded px-3 py-2" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700">No Telp</label>
-                    <input type="text" name="phone" value="{{ $teacher->phone }}" class="w-full border rounded px-3 py-2" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700">Universitas</label>
-                    <input type="text" name="university" value="{{ $teacher->university }}" class="w-full border rounded px-3 py-2" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700">Alamat</label>
-                    <textarea name="address" class="w-full border rounded px-3 py-2" required>{{ $teacher->address }}</textarea>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700">Foto Profil</label>
-                    <input type="file" name="photo" class="w-full border rounded px-3 py-2" accept="image/*">
-                    @if($teacher->photo)
-                        <img src="{{ asset('storage/' . $teacher->photo) }}" alt="Current Photo" class="mt-2 w-24 h-24 rounded-full">
-                    @endif
+                    <label class="block text-gray-700">Konfirmasi Password</label>
+                    <input type="password" name="password_confirmation" class="w-full border rounded px-3 py-2" required>
                 </div>
                 <div class="flex justify-end gap-2">
-                    <button type="button" onclick="closeProfileModal()" class="bg-gray-500 text-white px-4 py-2 rounded">Batal</button>
+                    <button type="button" onclick="closeResetPasswordModal()" class="bg-gray-500 text-white px-4 py-2 rounded">Batal</button>
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Simpan</button>
                 </div>
             </form>
@@ -241,7 +220,7 @@
                     <textarea id="presence_material" name="material" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required></textarea>
                 </div>
                 <div class="mb-4">
-                    <label for="presence_proof" class="block text-sm font-medium text-gray-700">Bukti Mengajar</label>
+                    <label for="presence_proof" class="block text- sm font-medium text-gray-700">Bukti Mengajar</label>
                     <input type="file" id="presence_proof" name="proof" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" accept="image/*"/>
                     <input type="hidden" id="presence_proof_existing" name="proof_existing">
                     <img id="presence_proof_preview" class="mt-2 w-full rounded-md shadow-md hidden" alt="Bukti Mengajar Sebelumnya">
@@ -303,15 +282,15 @@
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Profile Modal
-        function openEditProfileModal() {
-            document.getElementById('profileModal').classList.remove('hidden');
+        // Reset Password Modal
+        function openResetPasswordModal() {
+            document.getElementById('resetPasswordModal').classList.remove('hidden');
+            document.getElementById('resetPasswordForm').reset();
         }
 
-        function closeProfileModal() {
-            document.getElementById('profileModal').classList.add('hidden');
+        function closeResetPasswordModal() {
+            document.getElementById('resetPasswordModal').classList.add('hidden');
         }
-
 
         // Show Proof Image in SweetAlert
         function showProofImage(imageUrl) {
@@ -414,26 +393,30 @@
         });
         @endif
 
-        // Handle Profile Form Submission
-        document.getElementById('profileForm').addEventListener('submit', function(e) {
+        // Handle Reset Password Form Submission
+        document.getElementById('resetPasswordForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const form = this;
             fetch(form.action, {
                 method: 'POST', // Laravel handles @method('PUT') via _method field
-                body: new FormData(form)
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(Object.fromEntries(new FormData(form)))
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    Swal.fire('Berhasil!', 'Profil telah diperbarui.', 'success').then(() => {
-                        location.reload();
+                    Swal.fire('Berhasil!', 'Password telah direset.', 'success').then(() => {
+                        closeResetPasswordModal();
                     });
                 } else {
-                    Swal.fire('Error!', data.message || 'Terjadi kesalahan saat memperbarui profil.', 'error');
+                    Swal.fire('Error!', data.message || 'Terjadi kesalahan saat mereset password.', 'error');
                 }
             })
             .catch(error => {
-                Swal.fire('Error!', 'Terjadi kesalahan saat memperbarui profil.', 'error');
+                Swal.fire('Error!', 'Terjadi kesalahan saat mereset password.', 'error');
             });
         });
     </script>
