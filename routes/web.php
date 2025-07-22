@@ -225,7 +225,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/presence', [PresenceController::class, 'store'])->name('pengajar.presence.store');
         Route::get('/presence-pengajar/edit/{id}', [PresenceController::class, 'edit'])->name('pengajar.presence.edit');
         Route::put('/presence/{id}', [PresenceController::class, 'update'])->name('pengajar.presence.update');
-        Route::delete('/presence/{id}', [PresenceController::class, 'destroy'])->name('pengajar.presence.destroy');
+        Route::delete('/pengajar/presence/{id}', [PresenceController::class, 'destroyOwn'])->name('pengajar.presence.destroy');
 
         // Kehadiran
        Route::get('/attendance-pengajar', [PresenceController::class, 'attendancePengajar'])->name('attendance-pengajar');

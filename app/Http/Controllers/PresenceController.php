@@ -8,7 +8,6 @@ use Auth;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Log;
 use Carbon\Carbon;
 
 class PresenceController extends Controller
@@ -160,9 +159,6 @@ class PresenceController extends Controller
     // Menyimpan data presensi baru
     public function store(Request $request)
     {
-        // Log untuk debugging
-        Log::info('Data diterima:', $request->all());
-
         // Cek route untuk menentukan apakah request dari admin atau pengajar
         $route = $request->route()->getName();
         $isFromPengajar = strpos($route, 'pengajar') !== false;
@@ -180,7 +176,7 @@ class PresenceController extends Controller
                 'end_time' => 'required|date_format:H:i',
                 'class' => 'required|string',
                 'material' => 'required|string',
-                'proof' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'proof' => 'nullable|image|mimes:jpeg,png,jpg,gif,heic|max:2048',
                 'issues' => 'nullable|string',
             ]);
         } catch (ValidationException $e) {
@@ -263,17 +259,7 @@ class PresenceController extends Controller
         // Simpan bukti baru jika ada
         if ($request->hasFile('proof')) {
             $file = $request->file('proof');
-            $extension = strtolower($file->getClientOriginalExtension());
-
-            if ($extension === 'heic') {
-                // Konversi HEIC ke JPG
-                $convertedPath = 'proofs/' . time() . '_' . pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '.jpg';
-                HeicToJpg::convert($file->getPathname())->saveAs(storage_path('app/public/' . $convertedPath));
-                $presence->proof = $convertedPath;
-            } else {
-                // Simpan file non-HEIC seperti biasa
-                $presence->proof = $file->storeAs('proofs', time() . '_' . $file->getClientOriginalName(), 'public');
-            }
+            $presence->proof = $file->storeAs('proofs', time() . '_' . $file->getClientOriginalName(), 'public');
         }
 
         // Tentukan hari berdasarkan tanggal
@@ -299,13 +285,109 @@ class PresenceController extends Controller
     // Metode untuk menghapus data presensi
     public function destroy($id)
     {
-        $presence = Presence::findOrFail($id);
-        $presence->delete();
+        try {
+            $presence = Presence::findOrFail($id);
 
-        if (request()->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Presensi berhasil dihapus.']);
+            // Hapus file bukti jika ada
+            if ($presence->proof) {
+                $filePath = storage_path('app/public/' . $presence->proof);
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+            }
+
+            $presence->delete();
+
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data presensi berhasil dihapus.'
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Data presensi berhasil dihapus.');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data presensi tidak ditemukan.'
+                ], 404);
+            }
+
+            return redirect()->back()->with('error', 'Data presensi tidak ditemukan.');
+
+        } catch (\Exception $e) {
+            \Log::error('Error deleting presence (admin): ' . $e->getMessage());
+
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan saat menghapus data presensi.'
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus data presensi.');
         }
+    }
 
-        return redirect()->back()->with('success', 'Presensi berhasil dihapus.');
+    public function destroyOwn($id)
+    {
+        try {
+            // Debug log
+            \Log::info('Attempting to delete presence ID: ' . $id . ' for user: ' . Auth::id());
+
+            // Cari presensi berdasarkan ID dan pastikan milik user yang sedang login
+            $presence = Presence::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->first();
+
+            if (!$presence) {
+                \Log::warning('Presence not found or access denied');
+
+                if (request()->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Data presensi tidak ditemukan atau Anda tidak memiliki akses untuk menghapusnya.'
+                    ], 404);
+                }
+
+                return redirect()->back()->with('error', 'Data presensi tidak ditemukan atau Anda tidak memiliki akses untuk menghapusnya.');
+            }
+
+            // Hapus file bukti jika ada
+            if ($presence->proof) {
+                $filePath = storage_path('app/public/' . $presence->proof);
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                    \Log::info('Proof file deleted: ' . $filePath);
+                }
+            }
+
+            $presence->delete();
+            \Log::info('Presence deleted successfully');
+
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data presensi berhasil dihapus.'
+                ], 200);
+            }
+
+            return redirect()->back()->with('success', 'Data presensi berhasil dihapus.');
+
+        } catch (\Exception $e) {
+            \Log::error('Error deleting own presence: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan saat menghapus data presensi: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus data presensi.');
+        }
     }
 }

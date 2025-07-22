@@ -16,9 +16,7 @@
             Periode: {{ \Carbon\Carbon::createFromFormat('Y-m', $recap->getRawOriginal('periode'), 'Asia/Jakarta')->locale('id')->translatedFormat('F Y') }}
         </span>
     </div>
-
-    <!-- Sticky Container for Tabel Kelola Mukafaah Tambahan -->
-    <div>
+    <div class="overflow-x-auto">
         <!-- Tabel Kelola Mukafaah Tambahan -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <div class="flex justify-between items-center mb-4">

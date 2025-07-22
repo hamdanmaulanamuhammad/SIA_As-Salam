@@ -62,7 +62,7 @@
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Data Mata Pelajaran</h2>
             <button id="tambahMapelButton" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200">
-                <i class="fa fa-plus mr-2"></i>Tambah Mata Pelajaran
+                <i class="fa fa-plus mr-2"></i>Mata Pelajaran
             </button>
         </div>
 
@@ -113,7 +113,7 @@
     </div>
 
     <!-- Tab Content Semester (View Only) -->
-    <div id="content-semester" class="tab-content hidden">
+    <div id="content-semester" class="tab-content hidden overflow-x-auto">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Data Semester</h2>
             <div class="bg-gray-100 px-4 py-2 rounded-md text-sm text-gray-600">
@@ -144,7 +144,7 @@
                         <td class="px-4 py-3 text-sm">
                             <div class="flex space-x-2">
                                 <a href="{{ route('pengajar.kelas-semester', $item->id) }}" class="w-8 h-8 text-white bg-green-600 rounded-md flex items-center justify-center hover:bg-green-700">
-                                    <i class="fa fa-eye"></i>
+                                    <i class="fa fa-arrow-right"></i>
                                 </a>
                             </div>
                         </td>

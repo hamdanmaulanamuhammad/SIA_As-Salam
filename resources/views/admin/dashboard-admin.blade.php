@@ -56,7 +56,7 @@
         <!-- Tabel Presensi Hari Ini -->
         <h3 class="text-lg font-semibold text-gray-800 mb-4">Presensi Hari Ini ({{ now()->format('d/m/Y') }})</h3>
         <div class="overflow-x-auto">
-            <table class="w-full bg-white rounded-lg shadow">
+            <table class="w-full bg-white rounded-lg shadow mb-10">
                 <thead>
                     <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
                         <th class="px-4 py-3">No</th>
@@ -79,7 +79,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-4 py-3 text-center text-gray-600">Tidak ada data presensi hari ini.</td>
+                            <td colspan="5" class="px-4 py-3 text-center text-gray-600">Tidak ada data presensi hari ini.</td>
                         </tr>
                     @endforelse
                 </tbody>

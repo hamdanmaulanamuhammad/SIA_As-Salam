@@ -3,7 +3,7 @@
 @section('title', 'Presensi Pengajar')
 
 @section('content')
-    <div class="container px-6 mx-auto grid">
+    <div class="container px-4 sm:px-6 mx-auto grid">
         <div class="flex justify-end mb-6 mt-6">
             <button id="create-presence-button" class="text-sm px-4 py-2 text-white bg-blue-600 border border-blue-600 rounded-md hover:bg-blue-700 transition duration-200">
                 <i class="fas fa-plus"></i> Tambah Presensi
@@ -59,14 +59,14 @@
             </table>
         </div>
 
-         <h3 class="text-lg font-semibold text-gray-800 mb-6 mt-8">Riwayat Kehadiran Seluruh Pengajar</h3>
+        <h3 class="text-lg font-semibold text-gray-800 mb-6 mt-8">Riwayat Kehadiran Seluruh Pengajar</h3>
 
         <!-- Filter dan Search -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <div class="flex flex-col gap-4">
-                <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex flex-col sm:flex-row gap-4">
                     <!-- Filter Nama Pengajar -->
-                    <select id="pengajarFilter" name="pengajar" class="w-full md:w-48 px-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring focus:border-blue-300">
+                    <select id="pengajarFilter" name="pengajar" class="w-full sm:w-48 px-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring focus:border-blue-300">
                         <option value="">Semua Pengajar</option>
                         @foreach($users as $user)
                             <option value="{{ $user->id }}" {{ request('pengajar') == $user->id ? 'selected' : '' }}>{{ $user->full_name }}</option>
@@ -74,7 +74,7 @@
                     </select>
 
                     <!-- Filter Tahun -->
-                    <select id="tahunFilter" name="tahun" class="w-full md:w-32 px-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring focus:border-blue-300 min-w-40">
+                    <select id="tahunFilter" name="tahun" class="w-full sm:w-32 px-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring focus:border-blue-300 min-w-40">
                         <option value="">Semua Tahun</option>
                         @foreach($availableYears as $year)
                             <option value="{{ $year }}" {{ request('tahun') == $year ? 'selected' : '' }}>{{ $year }}</option>
@@ -82,7 +82,7 @@
                     </select>
 
                     <!-- Filter Bulan -->
-                    <select id="bulanFilter" name="bulan" class="w-full md:w-32 px-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring focus:border-blue-300 min-w-40">
+                    <select id="bulanFilter" name="bulan" class="w-full sm:w-32 px-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring focus:border-blue-300 min-w-40">
                         <option value="">Semua Bulan</option>
                         <option value="1" {{ request('bulan') == '1' ? 'selected' : '' }}>Januari</option>
                         <option value="2" {{ request('bulan') == '2' ? 'selected' : '' }}>Februari</option>
@@ -114,7 +114,7 @@
         </div>
 
         <!-- Tabel Riwayat Kehadiran -->
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto mb-10">
             <table class="w-full mt-4 bg-white rounded-lg shadow">
                 <thead>
                     <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
@@ -177,9 +177,11 @@
 
         <!-- Modal untuk Form Presensi -->
         <div id="presence-form-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
-            <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md max-h-screen overflow-y-auto">
-                <span id="close-presence-form-modal" class="float-right cursor-pointer text-gray-500">&times;</span>
-                <h2 class="text-lg font-semibold">Form Presensi</h2>
+            <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 w-full sm:w-11/12 max-w-md max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Form Presensi</h2>
+                    <span id="close-presence-form-modal" class="cursor-pointer text-gray-500 text-2xl">×</span>
+                </div>
                 <form id="presence-form" action="{{ route('presence.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" id="presence-id" name="id">
@@ -206,7 +208,9 @@
                         <input type="time" id="end-time" name="end_time" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required />
                     </div>
                     <div class="mb-4">
-                        <label for="class" class="block text-sm font-medium text-gray-700">Kelas yang Diajar</label>
+                        <label for="class" class="!’
+
+                            block text-sm font-medium text-gray-700">Kelas yang Diajar</label>
                         <select id="class" name="class" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
                             <option value="Mustawa 1">Mustawa 1</option>
                             <option value="Mustawa 2">Mustawa 2</option>
@@ -219,7 +223,7 @@
                     </div>
                     <div class="mb-4">
                         <label for="presence-proof" class="block text-sm font-medium text-gray-700">Bukti Mengajar</label>
-                        <input type="file" id="presence-proof" name="proof" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" accept="image/*" required/>
+                        <input type="file" id="presence-proof" name="proof" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" accept="image/*,.heic,.heif" required/>
                         <input type="hidden" id="presence-proof-existing" name="proof_existing">
                         <img id="presence-proof-preview" class="mt-2 w-full rounded-md shadow-md hidden" alt="Bukti Mengajar Sebelumnya">
                     </div>
@@ -227,7 +231,6 @@
                         <label for="issues" class="block text-sm font-medium text-gray-700">Kendala (Opsional)</label>
                         <textarea id="issues" name="issues" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1"></textarea>
                     </div>
-
                     <div class="flex justify-end">
                         <button type="button" id="cancel-presence-form-button" class="px-4 py-2 mr-2 text-sm text-white bg-gray-400 rounded-md hover:bg-gray-500">Batal</button>
                         <button type="submit" class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700">Simpan</button>
@@ -241,9 +244,19 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    const maxSizeMB = 2; // Batas ukuran file dalam MB
+    const maxWidth = 1920; // Lebar maksimum gambar
+    const maxHeight = 1080; // Tinggi maksimum gambar
+    const quality = 0.5; // Kualitas gambar tetap 50%
+
+    // Fungsi untuk memeriksa apakah file adalah HEIC/HEIF
+    function isHEIC(file) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        return ext === 'heic' || ext === 'heif' || file.type === 'image/heic' || file.type === 'image/heif';
+    }
+
     // Menangani tombol untuk membuka form presensi
     document.getElementById('create-presence-button')?.addEventListener('click', () => {
-        // Reset form
         document.getElementById('presence-form').reset();
         document.getElementById('presence-id').value = '';
         document.getElementById('presence-method').value = 'POST';
@@ -261,6 +274,98 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('cancel-presence-form-button')?.addEventListener('click', () => {
         document.getElementById('presence-form-modal')?.classList.add('hidden');
     });
+
+    // Menangani pratinjau dan kompresi gambar
+    document.getElementById('presence-proof')?.addEventListener('change', async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const preview = document.getElementById('presence-proof-preview');
+
+        try {
+            let blob = file;
+            // Cek jika file adalah HEIC
+            if (isHEIC(file)) {
+                if (typeof heic2any === 'undefined') {
+                    throw new Error('Pustaka heic2any tidak dimuat.');
+                }
+                blob = await heic2any({
+                    blob: file,
+                    toType: 'image/jpeg',
+                    quality: quality
+                });
+            }
+
+            // Kompresi dan resize gambar
+            const compressedBlob = await compressImage(blob, maxWidth, maxHeight, quality);
+            const reader = new FileReader();
+            reader.onload = () => {
+                preview.src = reader.result;
+                preview.classList.remove('hidden');
+            };
+            reader.readAsDataURL(compressedBlob);
+
+            // Ganti file input dengan file yang sudah dikompresi
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(new File([compressedBlob], file.name.replace(/\.heic$/i, '.jpg'), { type: 'image/jpeg' }));
+            event.target.files = dataTransfer.files;
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire('Error!', 'Gagal memproses gambar. Pastikan pustaka heic2any dimuat dan file valid.', 'error');
+        }
+    });
+
+    // Fungsi untuk mengompresi dan mengubah ukuran gambar
+    async function compressImage(file, maxWidth, maxHeight, quality) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                img.src = e.target.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                let width = img.width;
+                let height = img.height;
+
+                // Hitung dimensi baru dengan mempertahankan rasio aspek
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width = Math.round((width * maxHeight) / height);
+                        height = maxHeight;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                canvas.toBlob(
+                    (blob) => {
+                        if (blob && blob.size / (1024 * 1024) > maxSizeMB) {
+                            Swal.fire('Peringatan!', 'Ukuran gambar masih terlalu besar meskipun sudah dikompresi.', 'warning');
+                            reject(new Error('Ukuran gambar melebihi batas'));
+                        } else {
+                            resolve(blob);
+                        }
+                    },
+                    'image/jpeg',
+                    quality
+                );
+            };
+            img.onerror = reject;
+        });
+    }
 
     // Menangani pengiriman form presensi dengan AJAX
     document.getElementById('presence-form')?.addEventListener('submit', function (event) {
@@ -400,7 +505,6 @@ document.addEventListener('DOMContentLoaded', () => {
             per_page: perPage
         });
 
-        // Hapus parameter kosong
         Object.keys(Object.fromEntries(params)).forEach(key => {
             if (!params.get(key)) {
                 params.delete(key);
@@ -417,7 +521,6 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => response.json())
         .then(data => {
-            // Parse HTML dari respons JSON
             const parser = new DOMParser();
             const newDoc = parser.parseFromString(data.table, 'text/html');
             const newTableBody = newDoc.querySelector('#historyTableBody');
@@ -427,7 +530,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelector('#historyTableBody').innerHTML = newTableBody.innerHTML;
             }
 
-            // Perbarui paginasi hanya jika ada
             if (data.pagination && paginationContainer) {
                 const newPagination = parser.parseFromString(data.pagination, 'text/html').body.firstChild;
                 paginationContainer.innerHTML = newPagination ? newPagination.outerHTML : '';
@@ -435,7 +537,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 paginationContainer.innerHTML = '';
             }
 
-            // Re-bind event listeners untuk tombol edit dan delete yang baru
             bindHistoryTableEvents();
         })
         .catch(error => {
@@ -446,19 +547,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fungsi untuk mengikat ulang event listener
     function bindHistoryTableEvents() {
-        // Re-bind preview image events
         document.querySelectorAll('a.preview-image').forEach(link => {
             link.removeEventListener('click', handlePreviewClick);
             link.addEventListener('click', handlePreviewClick);
         });
 
-        // Re-bind edit button events
         document.querySelectorAll('.edit-button').forEach(button => {
             button.removeEventListener('click', handleEditClick);
             button.addEventListener('click', handleEditClick);
         });
 
-        // Re-bind delete form events
         document.querySelectorAll('.delete-form').forEach(form => {
             form.removeEventListener('submit', handleDeleteSubmit);
             form.addEventListener('submit', handleDeleteSubmit);
@@ -548,13 +646,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Event listeners untuk filter
     document.getElementById('pengajarFilter')?.addEventListener('change', loadHistoryTable);
     document.getElementById('tahunFilter')?.addEventListener('change', loadHistoryTable);
     document.getElementById('bulanFilter')?.addEventListener('change', loadHistoryTable);
     document.getElementById('entriesSelect')?.addEventListener('change', loadHistoryTable);
 
-    // Initial binding
     bindHistoryTableEvents();
 });
 </script>

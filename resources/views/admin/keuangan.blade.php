@@ -30,7 +30,7 @@
     </div>
 
     <!-- Tab Content Infaq Santri -->
-    <div id="content-infaq" class="tab-content">
+    <div id="content-infaq" class="tab-content overflow-x-auto">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Data Infaq Tahunan</h2>
             <button id="tambahInfaqTahunanButton" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200">
@@ -96,7 +96,7 @@
     </div>
 
     <!-- Tab Content Administrasi Bulanan -->
-    <div id="content-administrasi-bulanan" class="tab-content hidden">
+    <div id="content-administrasi-bulanan" class="tab-content hidden overflow-x-auto">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Data Administrasi Bulanan</h2>
             <button id="tambahAdministrasiBulananButton" class="inline-flex items-center min-w-48 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200">
@@ -153,7 +153,7 @@
     </div>
 
     <!-- Tab Content Buku Kas -->
-    <div id="content-buku-kas" class="tab-content hidden">
+    <div id="content-buku-kas" class="tab-content hidden overflow-x-auto">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Data Buku Kas</h2>
             <button id="tambahBukuKasButton" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200">
@@ -204,7 +204,7 @@
     </div>
 
     <!-- Tab Content Rekening -->
-    <div id="content-bank-accounts" class="tab-content hidden">
+    <div id="content-bank-accounts" class="tab-content hidden overflow-x-auto">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Data Rekening</h2>
             <button id="tambahBankAccountButton" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200">

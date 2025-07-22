@@ -3,7 +3,7 @@
 @section('title', 'Detail Administrasi')
 
 @section('content')
-<div class="container px-6 mx-auto grid h-screen">
+<div class="container px-6 mx-auto grid">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-y-4 mb-6 mt-6">
         <h1 class="text-2xl font-bold text-center md:text-left">
@@ -21,7 +21,7 @@
         </div>
     @endif
 
-    <div class="rounded-lg shadow-md">
+    <div class="rounded-lg shadow-md overflow-x-auto">
     <!-- Informasi Rekening -->
     <div class="bg-white p-6 mt-6 rounded-lg shadow-sm">
         <h2 class="text-xl font-semibold text-gray-800 text-center md:text-left mb-4">Informasi Rekening</h2>
@@ -178,7 +178,7 @@
     </div>
 
     <!-- Scrollable Container for Pengajar Cards -->
-    <div class="overflow-y-auto mt-8 min-h-fit">
+    <div class="overflow-y-auto mt-8 min-h-fit overflow-x-auto">
         <!-- Card Pengajar -->
         @if($recap)
             <div class="space-y-6 mb-10">

@@ -8,11 +8,13 @@ import $ from 'jquery';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.min.css';
+import convert from 'heic-convert/browser';
+import heic2any from 'heic2any';
 
-// Membuat Swal tersedia secara global
+// Membuat tersedia secara global
 window.Swal = Swal;
 window.Cropper = Cropper;
-// Membuat jQuery tersedia secara global
 window.$ = window.jQuery = $;
-// Membuat html2pdf tersedia secara global
 window.html2pdf = html2pdf;
+window.heicConvert = convert;
+window.heic2any = heic2any;

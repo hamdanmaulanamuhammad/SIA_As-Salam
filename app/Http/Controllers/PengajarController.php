@@ -148,4 +148,20 @@ class PengajarController extends Controller
             ]);
         }
     }
+
+    public function deleteTeacher($id)
+    {
+        try {
+            $teacher = User::findOrFail($id);
+            if ($teacher->role !== 'pengajar') {
+                return response()->json(['success' => false, 'message' => 'Hanya pengajar yang dapat dihapus.'], 403);
+            }
+
+            $teacher->delete();
+
+            return response()->json(['success' => true, 'message' => 'Pengajar berhasil dihapus.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghapus pengajar: ' . $e->getMessage()], 500);
+        }
+    }
 }

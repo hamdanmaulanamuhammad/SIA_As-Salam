@@ -79,11 +79,11 @@ class ProfileController extends Controller
     {
         try {
             $request->validate([
-                'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'photo' => 'required|image|mimes:jpeg,png,jpg,gif,heic|max:2048',
             ], [
                 'photo.required' => 'File foto wajib diisi.',
                 'photo.image' => 'File harus berupa gambar.',
-                'photo.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif.',
+                'photo.mimes' => 'Format gambar harus jpeg, png, jpg, heic atau gif.',
                 'photo.max' => 'Ukuran gambar maksimal 2MB.'
             ]);
 
