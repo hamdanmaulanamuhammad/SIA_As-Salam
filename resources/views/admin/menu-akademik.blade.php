@@ -198,7 +198,7 @@
                 <input type="hidden" name="_method" id="kelas-method" value="POST">
                 <div class="mb-4">
                     <label for="nama_kelas" class="block text-sm font-medium text-gray-700 mb-1">Nama Kelas <span class="text-red-600">*</span></label>
-                    <input type="text" name="nama_kelas" id="nama_kelas" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" required>
+                    <input type="text" name="nama_kelas" id="nama_kelas" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
                 </div>
                 <div class="flex justify-end space-x-2">
                     <button type="button" id="cancel-kelas-form-button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
@@ -223,11 +223,11 @@
                 <input type="hidden" name="_method" id="mapel-method" value="POST">
                 <div class="mb-4">
                     <label for="nama_mapel" class="block text-sm font-medium text-gray-700 mb-1">Nama Mata Pelajaran <span class="text-red-600">*</span></label>
-                    <input type="text" name="nama_mapel" id="nama_mapel" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" required>
+                    <input type="text" name="nama_mapel" id="nama_mapel" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
                 </div>
                 <div class="mb-4">
                     <label for="kategori" class="block text-sm font-medium text-gray-700 mb-1">Kategori <span class="text-red-600">*</span></label>
-                    <select name="kategori" id="kategori" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" required>
+                    <select name="kategori" id="kategori" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
                         <option value="">Pilih Kategori</option>
                         <option value="Hafalan">Hafalan</option>
                         <option value="Teori">Teori</option>
@@ -257,19 +257,19 @@
                 <input type="hidden" name="_method" id="semester-method" value="POST">
                 <div class="mb-4">
                     <label for="nama_semester" class="block text-sm font-medium text-gray-700 mb-1">Nama Semester <span class="text-red-600">*</span></label>
-                    <input type="text" name="nama_semester" id="nama_semester" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" required>
+                    <input type="text" name="nama_semester" id="nama_semester" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
                 </div>
                 <div class="mb-4">
                     <label for="tahun_ajaran" class="block text-sm font-medium text-gray-700 mb-1">Tahun Ajaran <span class="text-red-600">*</span></label>
-                    <input type="text" name="tahun_ajaran" id="tahun_ajaran" placeholder="2024/2025" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" required>
+                    <input type="text" name="tahun_ajaran" id="tahun_ajaran" placeholder="2024/2025" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
                 </div>
                 <div class="mb-4">
                     <label for="tanggal_mulai" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai <span class="text-red-600">*</span></label>
-                    <input type="date" name="tanggal_mulai" id="tanggal_mulai" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" required>
+                    <input type="date" name="tanggal_mulai" id="tanggal_mulai" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
                 </div>
                 <div class="mb-4">
                     <label for="tanggal_selesai" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Selesai <span class="text-red-600">*</span></label>
-                    <input type="date" name="tanggal_selesai" id="tanggal_selesai" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" required>
+                    <input type="date" name="tanggal_selesai" id="tanggal_selesai" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
                 </div>
                 <div class="flex justify-end space-x-2">
                     <button type="button" id="cancel-semester-form-button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
