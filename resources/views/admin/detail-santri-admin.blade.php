@@ -90,7 +90,6 @@
                             <div class="flex items-center space-x-2 mt-1">
                                 @if($santri->akta_path)
                                     @php
-                                        // Format nama file untuk display
                                         $namaSantri = str_replace(' ', '_', $santri->nama_lengkap);
                                         $namaSantri = preg_replace('/[^A-Za-z0-9_]/', '', $namaSantri);
                                         $extension = pathinfo($santri->akta_path, PATHINFO_EXTENSION);
@@ -167,7 +166,7 @@
         <!-- Modal untuk Form Santri -->
         <div id="santri-form-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
             <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-4xl max-h-screen overflow-y-auto">
-                <span id="close-santri-form-modal" class="float-right cursor-pointer text-gray-500">×</span>
+                <span id="close-santri-form-modal" class="float-right cursor-pointer text-gray-500 text-2xl">×</span>
                 <h2 class="text-lg font-semibold mb-4">Form Data Santri</h2>
 
                 <form id="santri-form" action="{{ route('santri.store') }}" method="POST" enctype="multipart/form-data">
@@ -189,6 +188,7 @@
                             <div>
                                 <label for="nama_lengkap" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap <span class="text-red-600">*</span></label>
                                 <input type="text" name="nama_lengkap" id="nama_lengkap" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
+                                <span id="nama_lengkap_error" class="text-red-500 text-sm hidden"></span>
                             </div>
 
                             <div>
@@ -199,16 +199,19 @@
                             <div>
                                 <label for="tempat_lahir" class="block text-sm font-medium text-gray-700 mb-1">Tempat Lahir <span class="text-red-600">*</span></label>
                                 <input type="text" name="tempat_lahir" id="tempat_lahir" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
+                                <span id="tempat_lahir_error" class="text-red-500 text-sm hidden"></span>
                             </div>
 
                             <div>
                                 <label for="tanggal_lahir" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Lahir <span class="text-red-600">*</span></label>
                                 <input type="date" name="tanggal_lahir" id="tanggal_lahir" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
+                                <span id="tanggal_lahir_error" class="text-red-500 text-sm hidden"></span>
                             </div>
 
                             <div>
                                 <label for="tahun_bergabung" class="block text-sm font-medium text-gray-700 mb-1">Tahun Bergabung <span class="text-red-600">*</span></label>
                                 <input type="number" name="tahun_bergabung" id="tahun_bergabung" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required min="2000" max="{{ date('Y') }}" value="{{ date('Y') }}">
+                                <span id="tahun_bergabung_error" class="text-red-500 text-sm hidden"></span>
                             </div>
 
                             <div>
@@ -223,6 +226,7 @@
                                     <option value="Laki-laki">Laki-laki</option>
                                     <option value="Perempuan">Perempuan</option>
                                 </select>
+                                <span id="jenis_kelamin_error" class="text-red-500 text-sm hidden"></span>
                             </div>
 
                             <div>
@@ -238,6 +242,7 @@
                             <div class="md:col-span-2">
                                 <label for="alamat" class="block text-sm font-medium text-gray-700 mb-1">Alamat <span class="text-red-600">*</span></label>
                                 <textarea name="alamat" id="alamat" rows="2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required></textarea>
+                                <span id="alamat_error" class="text-red-500 text-sm hidden"></span>
                             </div>
 
                             <div>
@@ -256,6 +261,7 @@
                                     <option value="5">5</option>
                                     <option value="6">6</option>
                                 </select>
+                                <span id="kelas_error" class="text-red-500 text-sm hidden"></span>
                             </div>
 
                             <div>
@@ -266,6 +272,7 @@
                                         <option value="{{ $kelas->id }}">{{ $kelas->nama_kelas }}</option>
                                     @endforeach
                                 </select>
+                                <span id="kelas_id_error" class="text-red-500 text-sm hidden"></span>
                             </div>
 
                             <div>
@@ -279,6 +286,7 @@
                                     <option value="Aktif">Aktif</option>
                                     <option value="Tidak Aktif">Tidak Aktif</option>
                                 </select>
+                                <span id="status_error" class="text-red-500 text-sm hidden"></span>
                             </div>
                         </div>
                     </div>
@@ -309,19 +317,21 @@
                             <div>
                                 <label for="pas_foto" class="block text-sm font-medium text-gray-700 mb-1">Pas Foto <span class="text-red-600">*</span></label>
                                 <div class="flex items-center">
-                                    <input type="file" name="pas_foto" id="pas_foto" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" accept="image/*" required>
+                                    <input type="file" name="pas_foto" id="pas_foto" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" accept="image/jpeg,image/png,image/jpg,image/heic,image/heif">
                                     <input type="hidden" id="pas_foto_existing" name="pas_foto_existing">
                                     <div class="ml-2 w-24">
                                         <img id="pasFotoPreview" class="hidden w-full h-24 object-cover border rounded" alt="Pas Foto Preview">
                                     </div>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-1">Format: JPEG, PNG, JPG. Max: 2MB</p>
+                                <span id="pas_foto_error" class="text-red-500 text-sm hidden"></span>
+                                <p class="text-xs text-gray-500 mt-1">Format: JPEG, PNG, JPG, HEIC, HEIF. Max: 2MB</p>
                             </div>
 
                             <div>
                                 <label for="akta" class="block text-sm font-medium text-gray-700 mb-1">Akta Kelahiran <span class="text-red-600">*</span></label>
-                                <input type="file" name="akta" id="akta" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" accept="image/*,application/pdf" required>
+                                <input type="file" name="akta" id="akta" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" accept="image/jpeg,image/png,image/jpg,application/pdf">
                                 <input type="hidden" id="akta_existing" name="akta_existing">
+                                <span id="akta_error" class="text-red-500 text-sm hidden"></span>
                                 <p class="text-xs text-gray-500 mt-1">Format: PDF, JPEG, PNG, JPG. Max: 5MB</p>
                             </div>
                         </div>
@@ -329,10 +339,10 @@
 
                     <!-- Tombol Navigasi -->
                     <div class="flex justify-between p-5 border-t">
-                        <button type="button" id="prevBtn" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 hidden">Sebelumnya</button>
-                        <button type="button" id="nextBtn" class="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600">Selanjutnya</button>
-                        <button type="submit" id="submitBtn" class="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 hidden">Simpan</button>
-                        <button type="button" id="cancel-santri-form-button" class="px-4 py-2 rounded bg-gray-400 text-white hover:bg-gray-500 hidden">Batal</button>
+                        <button type="button" id="prevBtn" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 hidden"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button type="button" id="nextBtn" class="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"><i class="fa-solid fa-chevron-right"></i></button>
+                        <button type="submit" id="submitBtn" class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700">Simpan</button>
+                        <button type="button" id="cancel-santri-form-button" class="px-4 py-2 mr-2 text-sm text-white bg-gray-400 rounded-md hover:bg-gray-500 hidden">Batal</button>
                     </div>
                 </form>
             </div>
@@ -341,403 +351,560 @@
 @endsection
 
 @section('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    let currentStep = 1;
-    const totalSteps = 3;
-    let flatpickrInstance;
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentStep = 1;
+            const totalSteps = 3;
+            let flatpickrInstance;
+            const maxPhotoSizeMB = 2; // Batas ukuran pas foto dalam MB
+            const maxAktaSizeMB = 5; // Batas ukuran akta dalam MB
+            const photoMaxWidth = 300; // Lebar maksimum untuk pas foto
+            const photoMaxHeight = 300; // Tinggi maksimum untuk pas foto
+            const photoQuality = 0.5; // Kualitas kompresi gambar
 
-    flatpickrInstance = flatpickr("#tanggal_lahir", {
-        dateFormat: "Y-m-d",
-        maxDate: "today"
-    });
-
-    // Fungsi untuk membuka modal santri
-    document.querySelector('.edit-santri-button')?.addEventListener('click', function() {
-        const santriId = this.getAttribute('data-id');
-        document.getElementById('santri-form-modal').classList.remove('hidden');
-        showStep(1);
-
-        // Remove required attribute for file inputs in edit mode
-        document.getElementById('pas_foto').removeAttribute('required');
-        document.getElementById('akta').removeAttribute('required');
-
-        // Load data santri setelah modal terbuka
-        setTimeout(() => {
-            loadSantriData(santriId);
-        }, 200); // Delay untuk memastikan modal sudah terbuka sepenuhnya
-    });
-
-    // Menangani penutupan modal form santri
-    document.getElementById('close-santri-form-modal')?.addEventListener('click', () => {
-        document.getElementById('santri-form-modal')?.classList.add('hidden');
-    });
-
-    document.getElementById('cancel-santri-form-button')?.addEventListener('click', () => {
-        document.getElementById('santri-form-modal')?.classList.add('hidden');
-    });
-
-    // Fungsi untuk perhitungan umur otomatis
-    document.getElementById('tanggal_lahir')?.addEventListener('change', function() {
-        const birthDate = new Date(this.value);
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const m = today.getMonth() - birthDate.getMonth();
-
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-
-        document.getElementById('umur').value = age;
-    });
-
-    // Fungsi preview Pas Foto
-    document.getElementById('pas_foto')?.addEventListener('change', function() {
-        const file = this.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const preview = document.getElementById('pasFotoPreview');
-                preview.src = e.target.result;
-                preview.classList.remove('hidden');
-            }
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // Step navigation for multi-step form
-    function showStep(step) {
-        // Hide all steps
-        document.querySelectorAll('.step-content').forEach(el => {
-            el.classList.add('hidden');
-        });
-
-        // Remove active class from all buttons
-        document.querySelectorAll('.step-btn').forEach(btn => {
-            btn.classList.remove('active', 'bg-blue-600', 'text-white');
-            btn.classList.add('bg-gray-200', 'text-gray-700');
-        });
-
-        // Show active step
-        document.getElementById(`step-${step}`).classList.remove('hidden');
-
-        // Highlight active step button
-        document.getElementById(`btnStep${step}`).classList.add('active', 'bg-blue-600', 'text-white');
-        document.getElementById(`btnStep${step}`).classList.remove('bg-gray-200', 'text-gray-700');
-
-        // Update current step
-        currentStep = step;
-
-        // Update navigation buttons
-        if (step > 1) {
-            document.getElementById('prevBtn').classList.remove('hidden');
-        } else {
-            document.getElementById('prevBtn').classList.add('hidden');
-        }
-
-        if (step === totalSteps) {
-            document.getElementById('nextBtn').classList.add('hidden');
-            document.getElementById('submitBtn').classList.remove('hidden');
-            document.getElementById('cancel-santri-form-button').classList.remove('hidden');
-        } else {
-            document.getElementById('nextBtn').classList.remove('hidden');
-            document.getElementById('submitBtn').classList.add('hidden');
-            document.getElementById('cancel-santri-form-button').classList.add('hidden');
-        }
-    }
-
-    // Event listeners for step buttons
-    document.getElementById('btnStep1')?.addEventListener('click', () => showStep(1));
-    document.getElementById('btnStep2')?.addEventListener('click', () => showStep(2));
-    document.getElementById('btnStep3')?.addEventListener('click', () => showStep(3));
-
-    // Next button handler
-    document.getElementById('nextBtn')?.addEventListener('click', function() {
-        const currentStepElement = document.getElementById(`step-${currentStep}`);
-        const requiredFields = currentStepElement.querySelectorAll('[required]');
-        let isValid = true;
-
-        requiredFields.forEach(field => {
-            if (!field.value || (field.type === 'date' && !/^\d{4}-\d{2}-\d{2}$/.test(field.value))) {
-                isValid = false;
-                field.classList.add('border-red-500');
-
-                field.addEventListener('input', function() {
-                    if (field.value) {
-                        field.classList.remove('border-red-500');
-                    }
-                }, { once: true });
-            }
-        });
-
-        if (isValid) {
-            showStep(currentStep + 1);
-        } else {
-            Swal.fire({
-                title: 'Perhatian!',
-                text: 'Harap isi semua field yang wajib diisi dengan format yang benar.',
-                icon: 'warning',
-                confirmButtonText: 'OK'
+            // Inisialisasi Flatpickr
+            flatpickrInstance = flatpickr("#tanggal_lahir", {
+                dateFormat: "Y-m-d",
+                maxDate: "today"
             });
-        }
-    });
 
-    // Previous button handler
-    document.getElementById('prevBtn')?.addEventListener('click', function() {
-        showStep(currentStep - 1);
-    });
-
-    function loadSantriData(santriId) {
-        fetch(`/santri/${santriId}/edit`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const santri = data.data;
-
-                    // Format tanggal_lahir ke YYYY-MM-DD dengan penanganan yang lebih robust
-                    let tanggalLahir = '';
-                    if (santri.tanggal_lahir) {
-                        // Buat object Date dari string tanggal
-                        const dateObj = new Date(santri.tanggal_lahir);
-
-                        // Pastikan tanggal valid
-                        if (!isNaN(dateObj.getTime())) {
-                            // Format ke YYYY-MM-DD untuk input date
-                            tanggalLahir = dateObj.toISOString().split('T')[0];
-                        }
-                    }
-
-                    // Set form action dan method untuk update
-                    document.getElementById('santri-form').action = `/santri/${santri.id}`;
-                    document.getElementById('santri-method').value = 'PUT';
-                    document.getElementById('santri-id').value = santri.id;
-
-                    // Tunggu sedikit untuk memastikan DOM sudah ready, lalu set nilai
-                    setTimeout(() => {
-                        // Load data ke form
-                        const setFieldValue = (id, value) => {
-                            const element = document.getElementById(id);
-                            if (element) {
-                                element.value = value || '';
-                                // Trigger change event untuk field yang mungkin punya event listener
-                                element.dispatchEvent(new Event('change'));
-                            }
-                        };
-
-                        setFieldValue('nama_lengkap', santri.nama_lengkap);
-                        setFieldValue('nama_panggilan', santri.nama_panggilan);
-                        setFieldValue('tempat_lahir', santri.tempat_lahir);
-                        setFieldValue('tahun_bergabung', santri.tahun_bergabung);
-                        setFieldValue('umur', santri.umur);
-                        setFieldValue('jenis_kelamin', santri.jenis_kelamin);
-                        setFieldValue('hobi', santri.hobi);
-                        setFieldValue('riwayat_penyakit', santri.riwayat_penyakit);
-                        setFieldValue('alamat', santri.alamat);
-                        setFieldValue('sekolah', santri.sekolah);
-                        setFieldValue('kelas', santri.kelas);
-                        setFieldValue('kelas_id', santri.kelas_id);
-                        setFieldValue('jilid_juz', santri.jilid_juz);
-                        setFieldValue('status', santri.status);
-                        setFieldValue('nama_wali', santri.nama_wali);
-                        setFieldValue('pekerjaan_wali', santri.pekerjaan_wali);
-                        setFieldValue('no_hp_wali', santri.no_hp_wali);
-
-                        // Set tanggal lahir dengan penanganan khusus
-                        const tanggalLahirElement = document.getElementById('tanggal_lahir');
-                        if (tanggalLahirElement && tanggalLahir) {
-                            tanggalLahirElement.value = tanggalLahir;
-
-                            // Jika menggunakan flatpickr, set nilai melalui flatpickr instance
-                            if (tanggalLahirElement._flatpickr) {
-                                tanggalLahirElement._flatpickr.setDate(tanggalLahir);
-                            }
-
-                            // Trigger change event
-                            tanggalLahirElement.dispatchEvent(new Event('change'));
-
-                            console.log('Tanggal lahir element value after set:', tanggalLahirElement.value);
-                        }
-
-                        // Set existing files untuk hidden input
-                        if (santri.pas_foto_path) {
-                            const pasFotoExisting = document.getElementById('pas_foto_existing');
-                            if (pasFotoExisting) {
-                                pasFotoExisting.value = santri.pas_foto_path;
-                            }
-
-                            // Show existing photo preview
-                            const preview = document.getElementById('pasFotoPreview');
-                            if (preview) {
-                                preview.src = `/storage/${santri.pas_foto_path}`;
-                                preview.classList.remove('hidden');
-                            }
-                        }
-
-                        if (santri.akta_path) {
-                            const aktaExisting = document.getElementById('akta_existing');
-                            if (aktaExisting) {
-                                aktaExisting.value = santri.akta_path;
-                            }
-                        }
-
-                    }, 100); // Delay 100ms untuk memastikan DOM ready
-
-                    console.log('Data santri berhasil dimuat:', santri);
-                    console.log('Tanggal lahir yang di-set:', tanggalLahir);
-                }
-            })
-            .catch(error => {
-                console.error('Error loading santri data:', error);
-                Swal.fire('Error!', 'Gagal memuat data santri.', 'error');
-            });
-    }
-
-    // Menangani pengiriman form santri dengan AJAX
-    document.getElementById('santri-form')?.addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        // Validasi semua step
-        let isValid = true;
-        let invalidStep = null;
-
-        for (let step = 1; step <= totalSteps; step++) {
-            const stepElement = document.getElementById(`step-${step}`);
-            const requiredFields = stepElement.querySelectorAll('[required]');
-            requiredFields.forEach(field => {
-                if (!field.value || (field.type === 'date' && !/^\d{4}-\d{2}-\d{2}$/.test(field.value))) {
-                    isValid = false;
-                    invalidStep = step;
-                    field.classList.add('border-red-500');
-                }
-            });
-        }
-
-        if (!isValid) {
-            showStep(invalidStep);
-            Swal.fire({
-                title: 'Perhatian!',
-                text: 'Harap isi semua field yang wajib diisi dengan format yang benar.',
-                icon: 'warning',
-                confirmButtonText: 'OK'
-            });
-            return;
-        }
-
-        const formData = new FormData(this);
-        const url = this.action;
-
-        // Jika edit mode dan tidak ada file baru, kirim informasi file existing
-        const isEdit = document.getElementById('santri-method').value === 'PUT';
-
-        if (isEdit) {
-            // Jika tidak ada file pas_foto baru, kirim existing path
-            if (!document.getElementById('pas_foto').files.length) {
-                const existingPasFoto = document.getElementById('pas_foto_existing').value;
-                if (existingPasFoto) {
-                    formData.append('pas_foto_existing', existingPasFoto);
-                }
+            // Fungsi untuk memeriksa apakah file adalah HEIC/HEIF
+            function isHEIC(file) {
+                const ext = file.name.split('.').pop().toLowerCase();
+                return ext === 'heic' || ext === 'heif' || file.type === 'image/heic' || file.type === 'image/heif';
             }
 
-            // Jika tidak ada file akta baru, kirim existing path
-            if (!document.getElementById('akta').files.length) {
-                const existingAkta = document.getElementById('akta_existing').value;
-                if (existingAkta) {
-                    formData.append('akta_existing', existingAkta);
-                }
-            }
-        }
+            // Fungsi untuk mengompresi dan mengubah ukuran gambar
+            async function compressImage(file, maxWidth, maxHeight, quality) {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        img.src = e.target.result;
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
 
-        fetch(url, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                'accept': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    title: 'Berhasil!',
-                    text: data.message,
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    location.reload();
-                });
-            } else {
-                let errorMessage = data.message || 'Terjadi kesalahan.';
-                if (data.errors) {
-                    const errorList = Object.values(data.errors).flat();
-                    errorMessage = errorList.join('<br>');
-                }
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
 
-                Swal.fire({
-                    title: 'Gagal!',
-                    html: errorMessage,
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Swal.fire('Error!', 'Terjadi kesalahan pada server.', 'error');
-        });
-    });
+                        let width = img.width;
+                        let height = img.height;
 
-    flatpickr("#tanggal_lahir", {
-        dateFormat: "Y-m-d",
-        maxDate: "today"
-    });
-
-    // Menangani tombol delete
-    document.querySelectorAll('.delete-santri-form').forEach(form => {
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            Swal.fire({
-                title: 'Konfirmasi',
-                text: 'Apakah Anda yakin ingin menghapus data santri ini?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Ya, hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch(form.action, {
-                        method: 'POST',
-                        body: new FormData(form),
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire({
-                                title: 'Berhasil!',
-                                text: data.message,
-                                icon: 'success',
-                                confirmButtonText: 'OK'
-                            }).then(() => {
-                                window.location.href = '{{ route("santri.index") }}';
-                            });
+                        // Hitung dimensi baru dengan mempertahankan rasio aspek
+                        if (width > height) {
+                            if (width > maxWidth) {
+                                height = Math.round((height * maxWidth) / width);
+                                width = maxWidth;
+                            }
                         } else {
-                            Swal.fire('Gagal!', data.message || 'Terjadi kesalahan.', 'error');
+                            if (height > maxHeight) {
+                                width = Math.round((width * maxHeight) / height);
+                                height = maxHeight;
+                            }
                         }
-                    })
-                    .catch(() => {
-                        Swal.fire('Error!', 'Terjadi kesalahan saat menghapus data.', 'error');
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        canvas.toBlob(
+                            (blob) => {
+                                if (blob && blob.size / (1024 * 1024) > maxPhotoSizeMB) {
+                                    Swal.fire('Peringatan!', 'Ukuran gambar masih terlalu besar meskipun sudah dikompresi.', 'warning');
+                                    reject(new Error('Ukuran gambar melebihi batas'));
+                                } else {
+                                    resolve(blob);
+                                }
+                            },
+                            'image/jpeg',
+                            quality
+                        );
+                    };
+                    img.onerror = reject;
+                });
+            }
+
+            // Fungsi untuk membuka modal santri
+            document.querySelector('.edit-santri-button')?.addEventListener('click', function() {
+                const santriId = this.getAttribute('data-id');
+                document.getElementById('santri-form-modal').classList.remove('hidden');
+                showStep(1);
+
+                // Remove required attribute for file inputs in edit mode
+                document.getElementById('pas_foto').removeAttribute('required');
+                document.getElementById('akta').removeAttribute('required');
+
+                // Reset error messages
+                document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('input, select, textarea').forEach(el => el.classList.remove('border-red-500'));
+
+                // Load data santri setelah modal terbuka
+                setTimeout(() => {
+                    loadSantriData(santriId);
+                }, 200);
+            });
+
+            // Menangani penutupan modal form santri
+            document.getElementById('close-santri-form-modal')?.addEventListener('click', () => {
+                document.getElementById('santri-form-modal')?.classList.add('hidden');
+                resetForm();
+            });
+
+            document.getElementById('cancel-santri-form-button')?.addEventListener('click', () => {
+                document.getElementById('santri-form-modal')?.classList.add('hidden');
+                resetForm();
+            });
+
+            // Fungsi untuk reset form
+            function resetForm() {
+                document.getElementById('santri-form').reset();
+                document.getElementById('pasFotoPreview').classList.add('hidden');
+                document.getElementById('pas_foto').value = '';
+                document.getElementById('akta').value = '';
+                document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('input, select, textarea').forEach(el => el.classList.remove('border-red-500'));
+                if (flatpickrInstance) {
+                    flatpickrInstance.clear();
+                }
+            }
+
+            // Fungsi untuk perhitungan umur otomatis
+            document.getElementById('tanggal_lahir')?.addEventListener('change', function() {
+                const birthDate = new Date(this.value);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+
+                document.getElementById('umur').value = age;
+            });
+
+            // Validasi dan pratinjau Pas Foto
+            document.getElementById('pas_foto')?.addEventListener('change', async function() {
+                const file = this.files[0];
+                const errorElement = document.getElementById('pas_foto_error');
+                errorElement.classList.add('hidden');
+                this.classList.remove('border-red-500');
+
+                if (!file) return;
+
+                // Validasi ukuran file
+                if (file.size / (1024 * 1024) > maxPhotoSizeMB) {
+                    errorElement.textContent = `Ukuran file maksimal ${maxPhotoSizeMB}MB.`;
+                    errorElement.classList.remove('hidden');
+                    this.classList.add('border-red-500');
+                    Swal.fire('Peringatan!', `Ukuran pas foto maksimal ${maxPhotoSizeMB}MB.`, 'warning');
+                    this.value = '';
+                    document.getElementById('pasFotoPreview').classList.add('hidden');
+                    return;
+                }
+
+                // Validasi tipe file
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/heic', 'image/heif'];
+                if (!allowedTypes.includes(file.type) && !isHEIC(file)) {
+                    errorElement.textContent = 'Format file harus JPEG, PNG, JPG, HEIC, atau HEIF.';
+                    errorElement.classList.remove('hidden');
+                    this.classList.add('border-red-500');
+                    Swal.fire('Peringatan!', 'Format file harus JPEG, PNG, JPG, HEIC, atau HEIF.', 'warning');
+                    this.value = '';
+                    document.getElementById('pasFotoPreview').classList.add('hidden');
+                    return;
+                }
+
+                try {
+                    let blob = file;
+                    // Konversi HEIC/HEIF ke JPEG
+                    if (isHEIC(file)) {
+                        if (typeof window.heic2any === 'undefined') {
+                            throw new Error('Pustaka heic2any tidak dimuat.');
+                        }
+                        blob = await window.heic2any({
+                            blob: file,
+                            toType: 'image/jpeg',
+                            quality: photoQuality
+                        });
+                    }
+
+                    // Kompresi dan resize gambar
+                    const compressedBlob = await compressImage(blob, photoMaxWidth, photoMaxHeight, photoQuality);
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const preview = document.getElementById('pasFotoPreview');
+                        preview.src = e.target.result;
+                        preview.classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(compressedBlob);
+
+                    // Ganti file input dengan file yang sudah dikompresi
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(new File([compressedBlob], file.name.replace(/\.heic$/i, '.jpg').replace(/\.heif$/i, '.jpg'), { type: 'image/jpeg' }));
+                    this.files = dataTransfer.files;
+                } catch (error) {
+                    console.error('Error processing pas foto:', error);
+                    errorElement.textContent = 'Gagal memproses pas foto. Pastikan file valid dan coba lagi.';
+                    errorElement.classList.remove('hidden');
+                    this.classList.add('border-red-500');
+                    Swal.fire('Error!', 'Gagal memproses pas foto. Pastikan file valid dan coba lagi.', 'error');
+                    this.value = '';
+                    document.getElementById('pasFotoPreview').classList.add('hidden');
+                }
+            });
+
+            // Validasi Akta Kelahiran
+            document.getElementById('akta')?.addEventListener('change', function() {
+                const file = this.files[0];
+                const errorElement = document.getElementById('akta_error');
+                errorElement.classList.add('hidden');
+                this.classList.remove('border-red-500');
+
+                if (!file) return;
+
+                // Validasi ukuran file
+                if (file.size / (1024 * 1024) > maxAktaSizeMB) {
+                    errorElement.textContent = `Ukuran file maksimal ${maxAktaSizeMB}MB.`;
+                    errorElement.classList.remove('hidden');
+                    this.classList.add('border-red-500');
+                    Swal.fire('Peringatan!', `Ukuran akta kelahiran maksimal ${maxAktaSizeMB}MB.`, 'warning');
+                    this.value = '';
+                    return;
+                }
+
+                // Validasi tipe file
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+                if (!allowedTypes.includes(file.type)) {
+                    errorElement.textContent = 'Format file harus PDF, JPEG, PNG, atau JPG.';
+                    errorElement.classList.remove('hidden');
+                    this.classList.add('border-red-500');
+                    Swal.fire('Peringatan!', 'Format file harus PDF, JPEG, PNG, atau JPG.', 'warning');
+                    this.value = '';
+                    return;
+                }
+            });
+
+            // Step navigation for multi-step form
+            function showStep(step) {
+                document.querySelectorAll('.step-content').forEach(el => {
+                    el.classList.add('hidden');
+                });
+
+                document.querySelectorAll('.step-btn').forEach(btn => {
+                    btn.classList.remove('active', 'bg-blue-600', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                });
+
+                document.getElementById(`step-${step}`).classList.remove('hidden');
+                document.getElementById(`btnStep${step}`).classList.add('active', 'bg-blue-600', 'text-white');
+                document.getElementById(`btnStep${step}`).classList.remove('bg-gray-200', 'text-gray-700');
+
+                currentStep = step;
+
+                if (step > 1) {
+                    document.getElementById('prevBtn').classList.remove('hidden');
+                } else {
+                    document.getElementById('prevBtn').classList.add('hidden');
+                }
+
+                if (step === totalSteps) {
+                    document.getElementById('nextBtn').classList.add('hidden');
+                    document.getElementById('submitBtn').classList.remove('hidden');
+                    document.getElementById('cancel-santri-form-button').classList.remove('hidden');
+                } else {
+                    document.getElementById('nextBtn').classList.remove('hidden');
+                    document.getElementById('submitBtn').classList.add('hidden');
+                    document.getElementById('cancel-santri-form-button').classList.add('hidden');
+                }
+            }
+
+            // Event listeners for step buttons
+            document.getElementById('btnStep1')?.addEventListener('click', () => showStep(1));
+            document.getElementById('btnStep2')?.addEventListener('click', () => showStep(2));
+            document.getElementById('btnStep3')?.addEventListener('click', () => showStep(3));
+
+            // Next button handler
+            document.getElementById('nextBtn')?.addEventListener('click', function() {
+                const currentStepElement = document.getElementById(`step-${currentStep}`);
+                const requiredFields = currentStepElement.querySelectorAll('[required]');
+                let isValid = true;
+
+                requiredFields.forEach(field => {
+                    if (!field.value || (field.type === 'date' && !/^\d{4}-\d{2}-\d{2}$/.test(field.value))) {
+                        isValid = false;
+                        field.classList.add('border-red-500');
+                        document.getElementById(`${field.id}_error`).textContent = `${field.name.replace('_', ' ')} wajib diisi.`;
+                        document.getElementById(`${field.id}_error`).classList.remove('hidden');
+
+                        field.addEventListener('input', function() {
+                            if (field.value) {
+                                field.classList.remove('border-red-500');
+                                document.getElementById(`${field.id}_error`).classList.add('hidden');
+                            }
+                        }, { once: true });
+                    }
+                });
+
+                if (isValid) {
+                    showStep(currentStep + 1);
+                } else {
+                    Swal.fire({
+                        title: 'Perhatian!',
+                        text: 'Harap isi semua field yang wajib diisi dengan format yang benar.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
                     });
                 }
             });
+
+            // Previous button handler
+            document.getElementById('prevBtn')?.addEventListener('click', function() {
+                showStep(currentStep - 1);
+            });
+
+            // Fungsi untuk memuat data santri
+            function loadSantriData(santriId) {
+                fetch(`/santri/${santriId}/edit`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const santri = data.data;
+
+                            let tanggalLahir = '';
+                            if (santri.tanggal_lahir) {
+                                const dateObj = new Date(santri.tanggal_lahir);
+                                if (!isNaN(dateObj.getTime())) {
+                                    tanggalLahir = dateObj.toISOString().split('T')[0];
+                                }
+                            }
+
+                            document.getElementById('santri-form').action = `/santri/${santri.id}`;
+                            document.getElementById('santri-method').value = 'PUT';
+                            document.getElementById('santri-id').value = santri.id;
+
+                            setTimeout(() => {
+                                const setFieldValue = (id, value) => {
+                                    const element = document.getElementById(id);
+                                    if (element) {
+                                        element.value = value || '';
+                                        element.dispatchEvent(new Event('change'));
+                                    }
+                                };
+
+                                setFieldValue('nama_lengkap', santri.nama_lengkap);
+                                setFieldValue('nama_panggilan', santri.nama_panggilan);
+                                setFieldValue('tempat_lahir', santri.tempat_lahir);
+                                setFieldValue('tahun_bergabung', santri.tahun_bergabung);
+                                setFieldValue('umur', santri.umur);
+                                setFieldValue('jenis_kelamin', santri.jenis_kelamin);
+                                setFieldValue('hobi', santri.hobi);
+                                setFieldValue('riwayat_penyakit', santri.riwayat_penyakit);
+                                setFieldValue('alamat', santri.alamat);
+                                setFieldValue('sekolah', santri.sekolah);
+                                setFieldValue('kelas', santri.kelas);
+                                setFieldValue('kelas_id', santri.kelas_id);
+                                setFieldValue('jilid_juz', santri.jilid_juz);
+                                setFieldValue('status', santri.status);
+                                setFieldValue('nama_wali', santri.nama_wali);
+                                setFieldValue('pekerjaan_wali', santri.pekerjaan_wali);
+                                setFieldValue('no_hp_wali', santri.no_hp_wali);
+
+                                const tanggalLahirElement = document.getElementById('tanggal_lahir');
+                                if (tanggalLahirElement && tanggalLahir) {
+                                    tanggalLahirElement.value = tanggalLahir;
+                                    if (tanggalLahirElement._flatpickr) {
+                                        tanggalLahirElement._flatpickr.setDate(tanggalLahir);
+                                    }
+                                    tanggalLahirElement.dispatchEvent(new Event('change'));
+                                }
+
+                                if (santri.pas_foto_path) {
+                                    const pasFotoExisting = document.getElementById('pas_foto_existing');
+                                    if (pasFotoExisting) {
+                                        pasFotoExisting.value = santri.pas_foto_path;
+                                    }
+                                    const preview = document.getElementById('pasFotoPreview');
+                                    if (preview) {
+                                        preview.src = `/storage/${santri.pas_foto_path}`;
+                                        preview.classList.remove('hidden');
+                                    }
+                                }
+
+                                if (santri.akta_path) {
+                                    const aktaExisting = document.getElementById('akta_existing');
+                                    if (aktaExisting) {
+                                        aktaExisting.value = santri.akta_path;
+                                    }
+                                }
+                            }, 100);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading santri data:', error);
+                        Swal.fire('Error!', 'Gagal memuat data santri.', 'error');
+                    });
+            }
+
+            // Menangani pengiriman form santri dengan AJAX
+            document.getElementById('santri-form')?.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                // Validasi semua step
+                let isValid = true;
+                let invalidStep = null;
+
+                for (let step = 1; step <= totalSteps; step++) {
+                    const stepElement = document.getElementById(`step-${step}`);
+                    const requiredFields = stepElement.querySelectorAll('[required]');
+                    requiredFields.forEach(field => {
+                        if (!field.value || (field.type === 'date' && !/^\d{4}-\d{2}-\d{2}$/.test(field.value))) {
+                            isValid = false;
+                            invalidStep = step;
+                            field.classList.add('border-red-500');
+                            document.getElementById(`${field.id}_error`).textContent = `${field.name.replace('_', ' ')} wajib diisi.`;
+                            document.getElementById(`${field.id}_error`).classList.remove('hidden');
+                        }
+                    });
+                }
+
+                const isEdit = document.getElementById('santri-method').value === 'PUT';
+                if (!isEdit) {
+                    const pasFoto = document.getElementById('pas_foto').files[0];
+                    const akta = document.getElementById('akta').files[0];
+                    if (!pasFoto) {
+                        isValid = false;
+                        invalidStep = 3;
+                        document.getElementById('pas_foto').classList.add('border-red-500');
+                        document.getElementById('pas_foto_error').textContent = 'Pas foto wajib diisi.';
+                        document.getElementById('pas_foto_error').classList.remove('hidden');
+                    }
+                    if (!akta) {
+                        isValid = false;
+                        invalidStep = 3;
+                        document.getElementById('akta').classList.add('border-red-500');
+                        document.getElementById('akta_error').textContent = 'Akta kelahiran wajib diisi.';
+                        document.getElementById('akta_error').classList.remove('hidden');
+                    }
+                }
+
+                if (!isValid) {
+                    showStep(invalidStep);
+                    Swal.fire({
+                        title: 'Perhatian!',
+                        text: 'Harap isi semua field yang wajib diisi dengan format yang benar.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+
+                const formData = new FormData(this);
+                const url = this.action;
+
+                if (isEdit) {
+                    if (!document.getElementById('pas_foto').files.length) {
+                        const existingPasFoto = document.getElementById('pas_foto_existing').value;
+                        if (existingPasFoto) {
+                            formData.append('pas_foto_existing', existingPasFoto);
+                        }
+                    }
+
+                    if (!document.getElementById('akta').files.length) {
+                        const existingAkta = document.getElementById('akta_existing').value;
+                        if (existingAkta) {
+                            formData.append('akta_existing', existingAkta);
+                        }
+                    }
+                }
+
+                fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                        'accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: data.message,
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        let errorMessage = data.message || 'Terjadi kesalahan.';
+                        if (data.errors) {
+                            const errorList = Object.values(data.errors).flat();
+                            errorMessage = errorList.join('<br>');
+                        }
+
+                        Swal.fire({
+                            title: 'Gagal!',
+                            html: errorMessage,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire('Error!', 'Terjadi kesalahan pada server.', 'error');
+                });
+            });
+
+            // Menangani tombol delete
+            document.querySelectorAll('.delete-santri-form').forEach(form => {
+                form.addEventListener('submit', function(event) {
+                    event.preventDefault();
+
+                    Swal.fire({
+                        title: 'Konfirmasi',
+                        text: 'Apakah Anda yakin ingin menghapus data santri ini?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Ya, hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(form.action, {
+                                method: 'POST',
+                                body: new FormData(form),
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire({
+                                        title: 'Berhasil!',
+                                        text: data.message,
+                                        icon: 'success',
+                                        confirmButtonText: 'OK'
+                                    }).then(() => {
+                                        window.location.href = '{{ route("santri.index") }}';
+                                    });
+                                } else {
+                                    Swal.fire('Gagal!', data.message || 'Terjadi kesalahan.', 'error');
+                                }
+                            })
+                            .catch(() => {
+                                Swal.fire('Error!', 'Terjadi kesalahan saat menghapus data.', 'error');
+                            });
+                        }
+                    });
+                });
+            });
         });
-    });
-});
-</script>
+    </script>
 @endsection

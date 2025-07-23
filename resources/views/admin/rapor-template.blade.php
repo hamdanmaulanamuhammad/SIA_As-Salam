@@ -158,7 +158,7 @@
             <div class="flex items-center justify-center gap-x-5">
                 <div class="flex-shrink-0">
                     <div class="logo-container">
-                        <img src="{{ asset('storage/rapor/logo_kop.png') }}" alt="Logo TPA">
+                        <img src="{{ asset('assets/cap-logo-rapor/logo-kop.png') }}" alt="Logo TPA">
                     </div>
                 </div>
                 <div class="text-center">
@@ -311,7 +311,7 @@
                             @endif
                         </div>
                         <div class="cap-container">
-                            <img src="{{ asset('storage/rapor/Cap As-Salam.png') }}" alt="Cap/Stempel">
+                            <img src="{{ asset('assets/cap-logo-rapor/cap-as-salam.png') }}" alt="Cap/Stempel">
                         </div>
                         <p class="font-bold">{{ $kelasSemester->mudir->full_name ?? 'Hamdan Maulana Muhammad' }}</p>
                     </div>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register - SIA As-Salam</title>
+    <title>Register Admin - SIA As-Salam</title>
     <link rel="icon" type="image/png" href="{{ asset('assets/images/icons/favicon.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -16,8 +16,8 @@
                 </div>
                 <div class="flex items-center justify-center p-6 sm:p-12 md:w-1/2">
                     <div class="w-full">
-                        <h1 class="mb-6 text-2xl font-semibold text-gray-700">Register - SIA As-Salam</h1>
-                        <form id="registerForm" method="POST">
+                        <h1 class="mb-6 text-2xl font-semibold text-gray-700">Register Admin - SIA As-Salam</h1>
+                        <form id="registerForm" method="POST" action="{{ route('admin.register.store') }}">
                             @csrf
                             <label class="block text-base" for="username">
                                 <span class="text-gray-700">Username</span>
@@ -46,7 +46,7 @@
                             <label class="block text-base mt-4" for="password">
                                 <span class="text-gray-700">Password</span>
                                 <div class="relative">
-                                    <input id="password" class="block w personally-identifiable-data w-full p-2 mt-1 text-sm lg:text-lg border-gray-300 rounded-md focus:border-blue-600 focus:outline-none focus:shadow-outline-blue form-input dark:bg-gray-100 dark:border-gray-600 pr-10" name="password" placeholder="***************" type="password" required />
+                                    <input id="password" class="block w-full p-2 mt-1 text-sm lg:text-lg border-gray-300 rounded-md focus:border-blue-600 focus:outline-none focus:shadow-outline-blue form-input dark:bg-gray-100 dark:border-gray-600 pr-10" name="password" placeholder="***************" type="password" required />
                                     <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('password')">
                                         <i id="password-eye" class="fas fa-eye text-gray-500 hover:text-gray-700"></i>
                                     </button>
@@ -61,7 +61,7 @@
                                     </button>
                                 </div>
                             </label>
-                            <button type="submit" class="block w-full px-4 py-3 mt-4 text-sm lg:text-lg font-medium leading-5 text-center text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">Register</button>
+                            <button type="submit" class="block w-full px-4 py-3 mt-4 text-sm lg:text-lg font-medium leading-5 text-center text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">Register Admin</button>
                         </form>
                         <hr class="my-8" />
                         <p class="mt-1">
@@ -99,7 +99,7 @@
 
                 const formData = new FormData(registerForm);
                 try {
-                    const response = await fetch('{{ route('register.store') }}', {
+                    const response = await fetch('{{ route('admin.register.store') }}', {
                         method: 'POST',
                         body: formData,
                         headers: {
@@ -131,17 +131,12 @@
                 } catch (error) {
                     Swal.fire({
                         title: 'Error!',
-                        text: 'Terjadi kesalahan saat mendaftar. Silakan coba lagi.',
+                        text: 'Terjadi kesalahan saat mendaftar admin. Silakan coba lagi.',
                         icon: 'error',
                         confirmButtonText: 'OK'
                     });
                 }
             });
-        });
-    </script>
-</body>
-</html>
-;
         });
     </script>
 </body>

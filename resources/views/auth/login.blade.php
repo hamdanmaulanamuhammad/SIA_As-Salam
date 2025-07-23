@@ -4,9 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - SIA As-Salam</title>
-    @vite('resources/css/app.css')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/icons/favicon.png') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
     <div class="flex items-center min-h-screen p-6 bg-gray-50">
@@ -18,7 +17,7 @@
                 <div class="flex items-center justify-center p-6 sm:p-12 md:w-1/2">
                     <div class="w-full">
                         <h1 class="mb-6 text-2xl font-semibold text-gray-700">Login - SIA As-Salam</h1>
-                        <form action="{{ route('login.authenticate') }}" method="POST">
+                        <form id="loginForm" method="POST">
                             @csrf
                             <label class="block text-base" for="email">
                                 <span class="text-gray-700">Email</span>
@@ -28,7 +27,7 @@
                                 <span class="text-gray-700">Password</span>
                                 <div class="relative">
                                     <input id="password" class="block w-full p-2 mt-1 text-sm lg:text-lg border-gray-300 rounded-md focus:border-blue-600 focus:outline-none focus:shadow-outline-blue form-input dark:bg-gray-100 dark:border-gray-600 pr-10" name="password" placeholder="***************" type="password" required />
-                                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('password')">
+                                    <button type="button" class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center">
                                         <i id="password-eye" class="fas fa-eye text-gray-500 hover:text-gray-700"></i>
                                     </button>
                                 </div>
@@ -46,49 +45,78 @@
     </div>
 
     <script>
-        function togglePassword(fieldId) {
-            const passwordField = document.getElementById(fieldId);
-            const eyeIcon = document.getElementById(fieldId + '-eye');
-
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                eyeIcon.classList.remove('fa-eye');
-                eyeIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordField.type = 'password';
-                eyeIcon.classList.remove('fa-eye-slash');
-                eyeIcon.classList.add('fa-eye');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle password visibility
+            function togglePassword(fieldId) {
+                const passwordField = document.getElementById(fieldId);
+                const eyeIcon = document.getElementById(fieldId + '-eye');
+                if (passwordField && eyeIcon) {
+                    if (passwordField.type === 'password') {
+                        passwordField.type = 'text';
+                        eyeIcon.classList.remove('fa-eye');
+                        eyeIcon.classList.add('fa-eye-slash');
+                    } else {
+                        passwordField.type = 'password';
+                        eyeIcon.classList.remove('fa-eye-slash');
+                        eyeIcon.classList.add('fa-eye');
+                    }
+                }
             }
-        }
 
-        // Show success message
-        @if(session('success'))
-            Swal.fire({
-                title: 'Berhasil!',
-                text: '{{ session('success') }}',
-                icon: 'success',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
+            // Attach toggle event listener to the button
+            const toggleButton = document.querySelector('.toggle-password');
+            if (toggleButton) {
+                toggleButton.addEventListener('click', function() {
+                    togglePassword('password');
+                });
+            }
+
+            // Handle form submission with AJAX
+            const loginForm = document.getElementById('loginForm');
+            loginForm.addEventListener('submit', async function(event) {
+                event.preventDefault(); // Prevent default form submission
+
+                const formData = new FormData(loginForm);
+                try {
+                    const response = await fetch('{{ route('login.authenticate') }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: result.message,
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true
+                        }).then(() => {
+                            window.location.href = result.redirect; // Redirect to dashboard
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: result.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat login. Silakan coba lagi.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
             });
-        @endif
-
-        // Show error messages
-        @if($errors->any())
-            let errorMessage = '';
-            @foreach($errors->all() as $error)
-                errorMessage += '{{ $error }}\n';
-            @endforeach
-
-            Swal.fire({
-                title: 'Error!',
-                text: errorMessage,
-                icon: 'error',
-                showConfirmButton: false,
-                timer: 4000,
-                timerProgressBar: true
-            });
-        @endif
+        });
     </script>
 </body>
 </html>

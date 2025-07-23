@@ -134,7 +134,7 @@
                         <input type="file" id="presence-proof" name="proof" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1 text-sm" accept="image/*,.heic,.heif" required />
                         <span id="presence-proof-error" class="text-red-500 text-sm hidden"></span>
                         <input type="hidden" id="presence-proof-existing" name="proof_existing">
-                        <img id="presence-proof-preview" class="mt-2 w-full rounded-md shadow-md hidden" alt="Pratinjau Bukti Mengajar">
+                        <img id="presence-proof-preview" class="mt-2 w-[150px] h-[150px] mx-auto object-cover rounded-md shadow-md hidden" alt="Pratinjau Bukti Mengajar">
                     </div>
                     <div class="mb-4">
                         <label for="issues" class="block text-sm font-medium text-gray-700">Kendala (Opsional)</label>

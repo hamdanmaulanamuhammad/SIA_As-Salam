@@ -66,7 +66,6 @@
             </div>
         </aside>
 
-
         <div class="flex flex-col flex-1 w-full md:ml-64">
             <header class="z-10 py-2 bg-white shadow-md">
                 <div class="container flex items-center justify-between h-full px-6 mx-auto">
@@ -78,15 +77,15 @@
                     <h2 class="my-2 text-xl font-semibold text-gray-700">@yield('title')</h2>
                     <div class="flex items-center">
                         <div class="relative">
-                        <button id="profile-button" class="align-middle rounded-full focus:outline-none" aria-label="Account" aria-haspopup="true">
-                            <img class="object-cover w-8 h-8 rounded-full" src="{{ Auth::user()->photo ? Storage::url(Auth::user()->photo) : 'https://placehold.co/100x100' }}" alt="Profile Picture" aria-hidden="true" />
-                        </button>
+                            <button id="profile-button" class="align-middle rounded-full focus:outline-none" aria-label="Account" aria-haspopup="true">
+                                <img class="object-cover w-8 h-8 rounded-full" src="{{ Auth::user()->photo ? Storage::url(Auth::user()->photo) : 'https://placehold.co/100x100' }}" alt="Profile Picture" aria-hidden="true" />
+                            </button>
                             <span class="ml-2 text-sm font-medium text-gray-700">
-                            @auth
-                                {{ Auth::user()->username }}
-                            @else
-                                Guest
-                            @endauth
+                                @auth
+                                    {{ Auth::user()->username }}
+                                @else
+                                    Guest
+                                @endauth
                             </span>
                             <div id="dropdown" class="absolute right-0 z-20 hidden mt-2 w-48 bg-white rounded-md shadow-lg">
                                 <div class="py-1">
@@ -94,15 +93,15 @@
                                         <img src="{{ asset('assets/images/icons/profile.svg') }}" alt="Profile" class="w-3 h-3 mr-3">
                                         <span class="block text-sm text-gray-800">Profile</span>
                                     </a>
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                        @csrf
-                                    </form>
-                                    <a class="flex px-4 py-2 hover:bg-gray-100" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <a id="logout-link" class="flex px-4 py-2 hover:bg-gray-100" href="#">
                                         <img src="{{ asset('assets/images/icons/logout.svg') }}" alt="Logout" class="w-4 h-4 mr-2">
                                         <span class="block text-sm text-gray-800">Logout</span>
                                     </a>
                                 </div>
                             </div>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                @csrf
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -123,6 +122,10 @@
                     event.stopPropagation(); // Prevent the click from bubbling up
                     this.toggleDropdown();
                 });
+                document.getElementById('logout-link').addEventListener('click', (event) => {
+                    event.preventDefault();
+                    this.handleLogout();
+                });
                 document.addEventListener('click', this.closeDropdown.bind(this));
                 window.addEventListener('resize', () => this.handleResize());
             },
@@ -133,8 +136,8 @@
             },
             closeSideMenu() {
                 this.isSideMenuOpen = false;
-                document.getElementById('sidebar').classList.add('hidden'); // Hide the sidebar
-                document.body.classList.remove('overflow-hidden'); // Remove overflow hidden class
+                document.getElementById('sidebar').classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
             },
             toggleDropdown() {
                 const dropdown = document.getElementById('dropdown');
@@ -151,6 +154,48 @@
                 } else {
                     this.isSideMenuOpen = false;
                     document.getElementById('sidebar').classList.add('hidden');
+                }
+            },
+            async handleLogout() {
+                const form = document.getElementById('logout-form');
+                const formData = new FormData(form);
+                try {
+                    const response = await fetch('{{ route('logout') }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: result.message,
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true
+                        }).then(() => {
+                            window.location.href = result.redirect;
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: result.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat logout. Silakan coba lagi.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
                 }
             }
         };

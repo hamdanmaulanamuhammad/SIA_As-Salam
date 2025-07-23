@@ -18,7 +18,6 @@
         </div>
     </div>
 
-
     <!-- Summary Section -->
     <div class="mb-6 bg-white p-4 rounded-lg shadow">
         <h2 class="text-lg font-semibold mb-4">Rekap Keuangan</h2>
@@ -93,10 +92,10 @@
     </div>
 
     <!-- Modal for Transaksi Kas Form -->
-    <div id="transaksi-kas-form-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
-        <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md">
+    <div id="transaksi-kas-form-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50 p-4">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md max-h-screen overflow-y-auto p-6">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold">Form Transaksi Kas</h3>
+                <h3 class="text-lg font-semibold text-gray-800">Form Transaksi Kas</h3>
                 <button id="close-transaksi-kas-form-modal" class="text-gray-500 hover:text-gray-700">
                     <i class="fa fa-times"></i>
                 </button>
@@ -106,58 +105,65 @@
                 <input type="hidden" id="transaksi-kas-id" name="id">
                 <input type="hidden" name="_method" id="transaksi-kas-method" value="POST">
 
+                <!-- Field: Tanggal -->
                 <div class="mb-4">
                     <label for="tanggal" class="block text-sm font-medium text-gray-700 mb-1">Tanggal <span class="text-red-600">*</span></label>
-                    <input type="date" name="tanggal" id="tanggal" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
+                    <input type="date" name="tanggal" id="tanggal" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
                 </div>
 
+                <!-- Field: Jenis Transaksi -->
                 <div class="mb-4">
                     <label for="jenis" class="block text-sm font-medium text-gray-700 mb-1">Jenis Transaksi <span class="text-red-600">*</span></label>
-                    <select name="jenis" id="jenis" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
+                    <select name="jenis" id="jenis" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
                         <option value="">Pilih Jenis Transaksi</option>
                         <option value="debet">Debet (Uang Masuk)</option>
                         <option value="kredit">Kredit (Uang Keluar)</option>
                     </select>
-                    <p class="text-xs text-gray-500 mt-1" id="jenis-hint">Pilih jenis transaksi untuk melanjutkan</p>
+                    <p class="text-xs text-gray-500 mt-1">Pilih jenis transaksi untuk melanjutkan</p>
                 </div>
 
+                <!-- Field: Keterangan -->
                 <div class="mb-4">
                     <label for="keterangan" class="block text-sm font-medium text-gray-700 mb-1">Keterangan <span class="text-red-600">*</span></label>
-                    <input type="text" name="keterangan" id="keterangan" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required placeholder="Masukkan keterangan transaksi">
+                    <input type="text" name="keterangan" id="keterangan" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required placeholder="Masukkan keterangan transaksi">
                 </div>
 
-                <!-- Field Sumber (untuk Debet) -->
+                <!-- Field: Sumber -->
                 <div class="mb-4 hidden" id="sumber-field">
                     <label for="sumber" class="block text-sm font-medium text-gray-700 mb-1">Sumber Dana <span class="text-red-600">*</span></label>
-                    <input type="text" name="sumber" id="sumber" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" placeholder="Contoh: Donasi, Iuran, dll">
+                    <input type="text" name="sumber" id="sumber" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" placeholder="Contoh: Donasi, Iuran, dll">
                     <p class="text-xs text-gray-500 mt-1">Dari mana uang ini berasal</p>
                 </div>
 
-                <!-- Field Tujuan (untuk Kredit) -->
+                <!-- Field: Tujuan -->
                 <div class="mb-4 hidden" id="tujuan-field">
                     <label for="tujuan" class="block text-sm font-medium text-gray-700 mb-1">Tujuan Pengeluaran <span class="text-red-600">*</span></label>
-                    <input type="text" name="tujuan" id="tujuan" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" placeholder="Contoh: Pembelian alat, Operasional, dll">
+                    <input type="text" name="tujuan" id="tujuan" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" placeholder="Contoh: Pembelian alat, Operasional, dll">
                     <p class="text-xs text-gray-500 mt-1">Untuk apa uang ini digunakan</p>
                 </div>
 
+                <!-- Field: Jumlah -->
                 <div class="mb-4">
                     <label for="jumlah" class="block text-sm font-medium text-gray-700 mb-1">Jumlah <span class="text-red-600">*</span></label>
                     <div class="relative">
                         <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">Rp</span>
-                        <input type="number" name="jumlah" id="jumlah" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-8 py-1" required min="0" placeholder="0">
+                        <input type="number" name="jumlah" id="jumlah" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-8 py-1" required min="0" placeholder="0">
                     </div>
                 </div>
 
+                <!-- Field: Bukti -->
                 <div class="mb-4">
                     <label for="bukti" class="block text-sm font-medium text-gray-700 mb-1">Bukti Transaksi (Nota/Kuitansi)</label>
-                    <input type="file" name="bukti" id="bukti" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" accept="image/*,application/pdf">
-                    <p class="text-xs text-gray-500 mt-1">Upload gambar atau PDF (opsional)</p>
+                    <input type="file" name="bukti" id="bukti" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" accept="image/jpeg,image/png,application/pdf">
+                    <p class="text-xs text-gray-500 mt-1">Upload gambar (JPEG/PNG) atau PDF, maksimal 2MB (opsional)</p>
                     <p id="bukti-preview" class="text-sm text-blue-600 mt-1"></p>
+                    <p id="bukti-error" class="text-sm text-red-600 mt-1 hidden">File terlalu besar! Maksimal 2MB.</p>
                 </div>
 
+                <!-- Tombol -->
                 <div class="flex justify-end space-x-2">
-                    <button type="button" id="cancel-transaksi-kas-form-button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
-                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">Simpan</button>
+                    <button type="button" id="cancel-transaksi-kas-form-button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 w-full sm:w-auto">Batal</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 w-full sm:w-auto">Simpan</button>
                 </div>
             </form>
         </div>
@@ -165,7 +171,7 @@
 </div>
 @endsection
 
-@section('scripts')
+@section('scripts')@section('scripts')
 <script>
     const routes = {
         transaksiKasStore: "{{ route('keuangan.buku-kas.transaksi.store', $bukuKas->id) }}",
@@ -183,7 +189,6 @@
             const tujuanField = document.getElementById('tujuan-field');
             const sumberInput = document.getElementById('sumber');
             const tujuanInput = document.getElementById('tujuan');
-            const jenisHint = document.getElementById('jenis-hint');
 
             // Reset visibility and required attributes
             sumberField.classList.add('hidden');
@@ -196,13 +201,9 @@
             if (jenis === 'debet') {
                 sumberField.classList.remove('hidden');
                 sumberInput.setAttribute('required', 'required');
-                jenisHint.textContent = 'Uang masuk - Anda perlu menentukan sumber dana';
             } else if (jenis === 'kredit') {
                 tujuanField.classList.remove('hidden');
                 tujuanInput.setAttribute('required', 'required');
-                jenisHint.textContent = 'Uang keluar - Anda perlu menentukan tujuan pengeluaran';
-            } else {
-                jenisHint.textContent = 'Pilih jenis transaksi untuk melanjutkan';
             }
         }
 
@@ -217,6 +218,8 @@
             document.getElementById('transaksi-kas-form').action = routes.transaksiKasStore + '?tab=buku-kas';
             document.querySelector('#transaksi-kas-form-modal h3').textContent = 'Form Transaksi Kas';
             document.getElementById('bukti-preview').textContent = '';
+            document.getElementById('bukti-error').classList.add('hidden');
+            document.getElementById('bukti').value = '';
             toggleSumberTujuanFields(); // Reset field visibility
         }
 
@@ -234,13 +237,30 @@
             document.getElementById('transaksi-kas-form-modal').classList.add('hidden');
         });
 
-        // File Preview
+        // File Preview and Size Validation
         document.getElementById('bukti').addEventListener('change', (e) => {
             const file = e.target.files[0];
             const preview = document.getElementById('bukti-preview');
+            const error = document.getElementById('bukti-error');
+            const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+
             if (file) {
-                preview.textContent = `File terpilih: ${file.name}`;
+                if (file.size > maxSize) {
+                    error.classList.remove('hidden');
+                    preview.textContent = '';
+                    e.target.value = ''; // Clear the file input
+                    Swal.fire({
+                        title: 'File Terlalu Besar!',
+                        text: 'Ukuran file maksimal adalah 2MB.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    error.classList.add('hidden');
+                    preview.textContent = `File terpilih: ${file.name}`;
+                }
             } else {
+                error.classList.add('hidden');
                 preview.textContent = '';
             }
         });
@@ -254,6 +274,8 @@
             const jenis = document.getElementById('jenis').value;
             const sumber = document.getElementById('sumber').value;
             const tujuan = document.getElementById('tujuan').value;
+            const file = document.getElementById('bukti').files[0];
+            const maxSize = 2 * 1024 * 1024; // 2MB in bytes
 
             if (jenis === 'debet' && !sumber.trim()) {
                 Swal.fire({
@@ -274,6 +296,18 @@
                     confirmButtonText: "OK"
                 });
                 document.getElementById('tujuan').focus();
+                return;
+            }
+
+            if (file && file.size > maxSize) {
+                Swal.fire({
+                    title: "Validasi Gagal!",
+                    text: "Ukuran file maksimal adalah 2MB.",
+                    icon: "warning",
+                    confirmButtonText: "OK"
+                });
+                document.getElementById('bukti').value = '';
+                document.getElementById('bukti-error').classList.remove('hidden');
                 return;
             }
 
@@ -365,6 +399,7 @@
                         }
 
                         document.getElementById('bukti-preview').textContent = data.data.bukti ? `File saat ini: ${data.data.bukti}` : '';
+                        document.getElementById('bukti-error').classList.add('hidden');
                         form.querySelector('input[name="_method"]').value = 'PUT';
                         form.action = routes.transaksiKasUpdate.replace(':id', data.data.id) + `?tab=buku-kas`;
                         document.querySelector('#transaksi-kas-form-modal h3').textContent = 'Edit Transaksi Kas';

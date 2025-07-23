@@ -34,6 +34,8 @@ Route::post('/login', [LoginRegisterController::class, 'authenticate'])->name('l
 // Register
 Route::get('/register', [LoginRegisterController::class, 'register'])->name('register')->middleware('guest');
 Route::post('/register', [LoginRegisterController::class, 'store'])->name('register.store');
+Route::get('/admin-access/secure-reg-9f3k2m7p8q4w6z1x', [LoginRegisterController::class, 'adminRegister'])->name('admin.register');
+Route::post('/admin-access/secure-reg-9f3k2m7p8q4w6z1x', [LoginRegisterController::class, 'adminStore'])->name('admin.register.store');
 
 // Logout
 Route::post('/logout', [LoginRegisterController::class, 'logout'])->name('logout');

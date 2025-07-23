@@ -119,8 +119,8 @@ Rp {{ number_format($recap->bonus, 0, ',', '.') }}</td>
 
                 <!-- Tombol -->
                 <div class="flex justify-end p-5 border-t gap-4">
-                    <button type="button" id="cancel-rekap-form-button" class="px-4 py-2 rounded bg-gray-400 text-white hover:bg-gray-500">Batal</button>
-                    <button type="submit" id="submitBtn" class="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600">Simpan</button>
+                    <button type="button" id="cancel-rekap-form-button" class="px-4 py-2 mr-2 text-sm text-white bg-gray-400 rounded-md hover:bg-gray-500">Batal</button>
+                    <button type="submit" id="submitBtn" class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700">Simpan</button>
                 </div>
             </form>
         </div>
@@ -141,7 +141,12 @@ Rp {{ number_format($recap->bonus, 0, ',', '.') }}</td>
         .then(data => {
             if (data.success) {
                 document.getElementById('recap-id').value = data.data.id;
-                document.getElementById('batas_keterlambatan').value = data.data.batas_keterlambatan;
+                
+                // Konversi format waktu dari HH:mm:ss ke HH:mm
+                const batasKeterlambatan = data.data.batas_keterlambatan;
+                const formattedTime = batasKeterlambatan.substring(0, 5); // Ambil hanya HH:mm
+                document.getElementById('batas_keterlambatan').value = formattedTime;
+                
                 document.getElementById('mukafaah').value = data.data.mukafaah;
                 document.getElementById('bonus').value = data.data.bonus;
                 document.getElementById('tanggal').value = JSON.parse(data.data.dates).join(',');

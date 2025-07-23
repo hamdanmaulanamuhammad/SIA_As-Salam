@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
-use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
@@ -53,20 +52,16 @@ class ProfileController extends Controller
             $user->email = $request->email;
             $user->save();
 
-            Log::info('Profile updated successfully', ['user_id' => $user->id]);
-
             return response()->json([
                 'success' => true,
                 'message' => 'Profil berhasil diperbarui.'
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Validation failed in updateProfile', ['errors' => $e->errors()]);
             return response()->json([
                 'success' => false,
                 'message' => $e->errors()[array_key_first($e->errors())][0]
             ], 422);
         } catch (\Exception $e) {
-            Log::error('Error updating profile', ['error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat memperbarui profil.'
@@ -97,20 +92,16 @@ class ProfileController extends Controller
             $user->photo = $path;
             $user->save();
 
-            Log::info('Photo uploaded successfully', ['user_id' => $user->id, 'path' => $path]);
-
             return response()->json([
                 'success' => true,
                 'message' => 'Foto profil berhasil diunggah.'
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Validation failed in uploadPhoto', ['errors' => $e->errors()]);
             return response()->json([
                 'success' => false,
                 'message' => $e->errors()[array_key_first($e->errors())][0]
             ], 422);
         } catch (\Exception $e) {
-            Log::error('Error uploading photo', ['error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat mengunggah foto.'
@@ -128,8 +119,6 @@ class ProfileController extends Controller
                 Storage::delete($user->photo);
                 $user->photo = null;
                 $user->save();
-
-                Log::info('Photo deleted successfully', ['user_id' => $user->id]);
             }
 
             return response()->json([
@@ -137,7 +126,6 @@ class ProfileController extends Controller
                 'message' => 'Foto profil berhasil dihapus.'
             ]);
         } catch (\Exception $e) {
-            Log::error('Error deleting photo', ['error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat menghapus foto.'
@@ -151,10 +139,10 @@ class ProfileController extends Controller
         try {
             $request->validate([
                 'signature' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-                'x' => 'required|numeric',
-                'y' => 'required|numeric',
-                'width' => 'required|numeric',
-                'height' => 'required|numeric',
+                'x' => 'required|numeric|min:0',
+                'y' => 'required|numeric|min:0',
+                'width' => 'required|numeric|min:1',
+                'height' => 'required|numeric|min:1',
             ], [
                 'signature.required' => 'File tanda tangan wajib diisi.',
                 'signature.image' => 'File harus berupa gambar.',
@@ -163,8 +151,19 @@ class ProfileController extends Controller
                 'x.required' => 'Koordinat X wajib diisi.',
                 'y.required' => 'Koordinat Y wajib diisi.',
                 'width.required' => 'Lebar wajib diisi.',
-                'height.required' => 'Tinggi wajib diisi.'
+                'height.required' => 'Tinggi wajib diisi.',
+                'x.min' => 'Koordinat X harus non-negatif.',
+                'y.min' => 'Koordinat Y harus non-negatif.',
+                'width.min' => 'Lebar harus lebih besar dari 0.',
+                'height.min' => 'Tinggi harus lebih besar dari 0.'
             ]);
+
+            if (!extension_loaded('gd')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ekstensi GD tidak tersedia.'
+                ], 500);
+            }
 
             $user = Auth::user();
 
@@ -174,13 +173,25 @@ class ProfileController extends Controller
 
             $file = $request->file('signature');
             $tempPath = $file->store('temp', 'public');
+
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read(Storage::disk('public')->path($tempPath));
+            $imageWidth = $image->width();
+            $imageHeight = $image->height();
+
+            if ($request->x + $request->width > $imageWidth || $request->y + $request->height > $imageHeight) {
+                Storage::disk('public')->delete($tempPath);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Parameter crop tidak valid.'
+                ], 422);
+            }
+
             $signatureDir = 'rapor/ttd';
             if (!Storage::disk('public')->exists($signatureDir)) {
                 Storage::disk('public')->makeDirectory($signatureDir);
             }
 
-            $manager = new ImageManager(new Driver());
-            $image = $manager->read(Storage::disk('public')->path($tempPath));
             $image->crop(
                 (int)$request->width,
                 (int)$request->height,
@@ -191,25 +202,22 @@ class ProfileController extends Controller
             $filename = 'signature_' . $user->id . '_' . time() . '.png';
             $signaturePath = $signatureDir . '/' . $filename;
             $image->save(Storage::disk('public')->path($signaturePath));
+
             Storage::disk('public')->delete($tempPath);
 
             $user->signature = $signaturePath;
             $user->save();
-
-            Log::info('Signature uploaded successfully', ['user_id' => $user->id, 'path' => $signaturePath]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Tanda tangan berhasil diunggah.'
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Validation failed in uploadSignature', ['errors' => $e->errors()]);
             return response()->json([
                 'success' => false,
                 'message' => $e->errors()[array_key_first($e->errors())][0]
             ], 422);
         } catch (\Exception $e) {
-            Log::error('Error uploading signature', ['error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat mengunggah tanda tangan.'
@@ -227,8 +235,6 @@ class ProfileController extends Controller
                 Storage::disk('public')->delete($user->signature);
                 $user->signature = null;
                 $user->save();
-
-                Log::info('Signature deleted successfully', ['user_id' => $user->id]);
             }
 
             return response()->json([
@@ -236,7 +242,6 @@ class ProfileController extends Controller
                 'message' => 'Tanda tangan berhasil dihapus.'
             ]);
         } catch (\Exception $e) {
-            Log::error('Error deleting signature', ['error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat menghapus tanda tangan.'
