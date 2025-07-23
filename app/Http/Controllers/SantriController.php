@@ -134,8 +134,8 @@ class SantriController extends Controller
             $lastSantri = Santri::where('nis', 'like', "$prefix$tahun%")
                 ->orderBy('nis', 'desc')
                 ->first();
-            $lastNumber = $lastSantri ? (int) substr($lastSantri->nis, -5) : 0;
-            $newNumber = str_pad($lastNumber + 1, 5, '0', STR_PAD_LEFT);
+            $lastNumber = $lastSantri ? (int) substr($lastSantri->nis, -3) : 0;
+            $newNumber = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
             $nis = $prefix . $tahun . $newNumber;
 
             // Upload pas foto
