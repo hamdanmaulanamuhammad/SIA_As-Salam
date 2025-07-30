@@ -10,26 +10,13 @@ use App\Models\SantriKelasSemester;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
 
 class KelasSemesterController extends Controller
 {
-    public function __construct()
-    {
-        Log::info('=== KelasSemesterController instantiated ===');
-    }
     public function store(Request $request, $semesterId)
     {
-        Log::info('=== KelasSemesterController::store called ===', [
-            'url' => $request->url(),
-            'method' => $request->method(),
-            'semester_id' => $semesterId,
-            'data' => $request->all()
-        ]);
-
         // Prevent misrouting
         if ($request->url() === url('akademik/kelas-semester/mapel')) {
-            Log::error('Request to mapel route incorrectly handled by KelasSemesterController');
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid route: This should be handled by KelasMapelSemesterController.'
@@ -50,7 +37,6 @@ class KelasSemesterController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validation failed in KelasSemesterController::store', $validator->errors()->toArray());
             return response()->json([
                 'success' => false,
                 'message' => 'Validasi gagal.',
@@ -102,7 +88,6 @@ class KelasSemesterController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error in KelasSemesterController::store: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat menyimpan data.'
@@ -112,9 +97,6 @@ class KelasSemesterController extends Controller
 
     public function index($semesterId)
     {
-        Log::info('=== KelasSemesterController::index dipanggil ===');
-        Log::info('Semester ID: ' . $semesterId);
-
         $semester = Semester::findOrFail($semesterId);
         $kelasSemesters = KelasSemester::where('semester_id', $semesterId)
             ->with(['kelas', 'waliKelas', 'mudir', 'mapels.mataPelajaran'])
@@ -125,9 +107,6 @@ class KelasSemesterController extends Controller
 
     public function edit($id)
     {
-        Log::info('=== KelasSemesterController::edit dipanggil ===');
-        Log::info('KelasSemester ID: ' . $id);
-
         $kelasSemester = KelasSemester::findOrFail($id);
 
         return response()->json([
@@ -143,10 +122,6 @@ class KelasSemesterController extends Controller
 
     public function update(Request $request, $id)
     {
-        Log::info('=== KelasSemesterController::update dipanggil ===');
-        Log::info('KelasSemester ID: ' . $id);
-        Log::info('Request Data: ', $request->all());
-
         $kelasSemester = KelasSemester::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
@@ -163,7 +138,6 @@ class KelasSemesterController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validasi gagal pada KelasSemesterController::update: ', $validator->errors()->toArray());
             return response()->json([
                 'success' => false,
                 'message' => 'Validasi gagal.',
@@ -211,9 +185,6 @@ class KelasSemesterController extends Controller
 
     public function destroy($id)
     {
-        Log::info('=== KelasSemesterController::destroy dipanggil ===');
-        Log::info('KelasSemester ID: ' . $id);
-
         $kelasSemester = KelasSemester::findOrFail($id);
         $kelasSemester->delete();
 

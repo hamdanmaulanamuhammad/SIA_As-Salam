@@ -21,7 +21,6 @@ class RecapController extends Controller
 
     public function store(Request $request)
     {
-        \Log::info('Tanggal input: ' . print_r($request->input('tanggal'), true));
 
         $tanggalInput = $request->input('tanggal');
         if (is_string($tanggalInput)) {

@@ -318,7 +318,6 @@ class PresenceController extends Controller
             return redirect()->back()->with('error', 'Data presensi tidak ditemukan.');
 
         } catch (\Exception $e) {
-            \Log::error('Error deleting presence (admin): ' . $e->getMessage());
 
             if (request()->ajax()) {
                 return response()->json([
@@ -335,7 +334,6 @@ class PresenceController extends Controller
     {
         try {
             // Debug log
-            \Log::info('Attempting to delete presence ID: ' . $id . ' for user: ' . Auth::id());
 
             // Cari presensi berdasarkan ID dan pastikan milik user yang sedang login
             $presence = Presence::where('id', $id)
@@ -343,7 +341,7 @@ class PresenceController extends Controller
                 ->first();
 
             if (!$presence) {
-                \Log::warning('Presence not found or access denied');
+
 
                 if (request()->ajax()) {
                     return response()->json([
@@ -360,12 +358,11 @@ class PresenceController extends Controller
                 $filePath = storage_path('app/public/' . $presence->proof);
                 if (file_exists($filePath)) {
                     unlink($filePath);
-                    \Log::info('Proof file deleted: ' . $filePath);
+
                 }
             }
 
             $presence->delete();
-            \Log::info('Presence deleted successfully');
 
             if (request()->ajax()) {
                 return response()->json([
@@ -377,8 +374,6 @@ class PresenceController extends Controller
             return redirect()->back()->with('success', 'Data presensi berhasil dihapus.');
 
         } catch (\Exception $e) {
-            \Log::error('Error deleting own presence: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
 
             if (request()->ajax()) {
                 return response()->json([

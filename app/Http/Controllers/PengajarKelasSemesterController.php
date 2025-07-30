@@ -8,21 +8,13 @@ use App\Models\KelasSemester;
 use App\Models\Santri;
 use App\Models\SantriKelasSemester;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use DB;
 
 class PengajarKelasSemesterController extends Controller
 {
-    public function __construct()
-    {
-        Log::info('=== PengajarKelasSemesterController instantiated ===');
-    }
-
     public function index($semesterId)
     {
-        Log::info('=== PengajarKelasSemesterController::index dipanggil ===', ['semester_id' => $semesterId]);
-
         $semester = Semester::findOrFail($semesterId);
         $kelasSemesters = KelasSemester::where('semester_id', $semesterId)
             ->with(['kelas', 'waliKelas', 'mudir', 'mapels.mataPelajaran'])
@@ -33,19 +25,11 @@ class PengajarKelasSemesterController extends Controller
 
     public function store(Request $request, $semesterId)
     {
-        Log::info('=== PengajarKelasSemesterController::store dipanggil ===', [
-            'url' => $request->url(),
-            'method' => $request->method(),
-            'semester_id' => $semesterId,
-            'data' => $request->all()
-        ]);
-
         // Prevent misrouting
         if ($request->url() === url('pengajar/akademik/kelas-semester/mapel')) {
-            Log::error('Request to mapel route incorrectly handled by PengajarKelasSemesterController');
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid route: This should be handled by PengajarKelasMapelSemesterController.'
+                'message' => 'Rute tidak valid: Silakan gunakan rute yang benar untuk menambah mata pelajaran.'
             ], 400);
         }
 
@@ -55,18 +39,17 @@ class PengajarKelasSemesterController extends Controller
             'mudir_id' => 'required|exists:users,id',
         ], [
             'kelas_id.required' => 'Nama kelas wajib diisi.',
-            'kelas_id.exists' => 'Kelas tidak ditemukan.',
+            'kelas_id.exists' => 'Kelas yang dipilih tidak ditemukan.',
             'wali_kelas_id.required' => 'Wali kelas wajib diisi.',
-            'wali_kelas_id.exists' => 'Wali kelas tidak ditemukan.',
+            'wali_kelas_id.exists' => 'Wali kelas yang dipilih tidak ditemukan.',
             'mudir_id.required' => 'Mudir wajib diisi.',
-            'mudir_id.exists' => 'Mudir tidak ditemukan.',
+            'mudir_id.exists' => 'Mudir yang dipilih tidak ditemukan.',
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validation failed in PengajarKelasSemesterController::store', $validator->errors()->toArray());
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal.',
+                'message' => 'Gagal menambahkan kelas. Periksa kembali data yang diisi.',
                 'errors' => $validator->errors()
             ], 422);
         }
@@ -78,7 +61,7 @@ class PengajarKelasSemesterController extends Controller
         if ($existing) {
             return response()->json([
                 'success' => false,
-                'message' => 'Kelas ini sudah ditambahkan ke semester ini.'
+                'message' => 'Kelas ini sudah terdaftar di semester ini. Silakan pilih kelas lain.'
             ], 422);
         }
 
@@ -110,22 +93,19 @@ class PengajarKelasSemesterController extends Controller
             DB::commit();
             return response()->json([
                 'success' => true,
-                'message' => 'Kelas semester berhasil dibuat dan santri ditambahkan.'
+                'message' => 'Kelas berhasil ditambahkan ke semester ini.'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error in PengajarKelasSemesterController::store: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat menyimpan data.'
+                'message' => 'Gagal menambahkan kelas. Silakan coba lagi nanti.'
             ], 500);
         }
     }
 
     public function edit($id)
     {
-        Log::info('=== PengajarKelasSemesterController::edit dipanggil ===', ['id' => $id]);
-
         $kelasSemester = KelasSemester::findOrFail($id);
 
         return response()->json([
@@ -141,11 +121,6 @@ class PengajarKelasSemesterController extends Controller
 
     public function update(Request $request, $id)
     {
-        Log::info('=== PengajarKelasSemesterController::update dipanggil ===', [
-            'id' => $id,
-            'data' => $request->all()
-        ]);
-
         $kelasSemester = KelasSemester::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
@@ -154,18 +129,17 @@ class PengajarKelasSemesterController extends Controller
             'mudir_id' => 'required|exists:users,id',
         ], [
             'kelas_id.required' => 'Nama kelas wajib diisi.',
-            'kelas_id.exists' => 'Kelas tidak ditemukan.',
+            'kelas_id.exists' => 'Kelas yang dipilih tidak ditemukan.',
             'wali_kelas_id.required' => 'Wali kelas wajib diisi.',
-            'wali_kelas_id.exists' => 'Wali kelas tidak ditemukan.',
+            'wali_kelas_id.exists' => 'Wali kelas yang dipilih tidak ditemukan.',
             'mudir_id.required' => 'Mudir wajib diisi.',
-            'mudir_id.exists' => 'Mudir tidak ditemukan.',
+            'mudir_id.exists' => 'Mudir yang dipilih tidak ditemukan.',
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validasi gagal pada PengajarKelasSemesterController::update: ', $validator->errors()->toArray());
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal.',
+                'message' => 'Gagal memperbarui kelas. Periksa kembali data yang diisi.',
                 'errors' => $validator->errors()
             ], 422);
         }
@@ -178,7 +152,7 @@ class PengajarKelasSemesterController extends Controller
         if ($existing) {
             return response()->json([
                 'success' => false,
-                'message' => 'Kelas ini sudah ditambahkan ke semester ini.'
+                'message' => 'Kelas ini sudah terdaftar di semester ini. Silakan pilih kelas lain.'
             ], 422);
         }
 
@@ -204,20 +178,18 @@ class PengajarKelasSemesterController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Kelas semester berhasil diperbarui.'
+            'message' => 'Kelas berhasil diperbarui.'
         ]);
     }
 
     public function destroy($id)
     {
-        Log::info('=== PengajarKelasSemesterController::destroy dipanggil ===', ['id' => $id]);
-
         $kelasSemester = KelasSemester::findOrFail($id);
         $kelasSemester->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Kelas semester berhasil dihapus.'
+            'message' => 'Kelas berhasil dihapus dari semester ini.'
         ]);
     }
 }

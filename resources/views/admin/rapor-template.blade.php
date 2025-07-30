@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    @vite('resources/css/app.css')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/icons/favicon.png') }}">
     <title>E-Rapor Santri - {{ $santri->nama_lengkap }}</title>
     <style>
         body {
@@ -321,33 +321,12 @@
     </div>
 
     <script>
-        async function generatePDF() {
-            try {
-                const element = document.getElementById('rapor-content');
-                const opt = {
-                    filename: `E-Rapor_{{ $santri->nama_lengkap }}.pdf`,
-                    image: { type: 'png', quality: 1 },
-                    html2canvas: {
-                        scale: 1.2,
-                        useCORS: true,
-                        logging: false
-                    },
-                    jsPDF: {
-                        unit: 'mm',
-                        format: 'a4',
-                        orientation: 'portrait',
-                        putOnlyUsedFonts: true
-                    }
-                };
-                await html2pdf().from(element).set(opt).save();
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-                alert('Gagal menghasilkan PDF. Silakan coba lagi.');
-            }
+        function triggerPrint() {
+            window.print(); // Membuka dialog cetak browser
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('downloadPdf').addEventListener('click', generatePDF);
+            document.getElementById('downloadPdf').addEventListener('click', triggerPrint);
         });
     </script>
 </body>

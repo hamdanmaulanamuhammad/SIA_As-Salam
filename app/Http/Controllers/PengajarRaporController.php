@@ -9,27 +9,13 @@ use App\Models\KelasMapelSemester;
 use App\Models\NilaiRapor;
 use App\Models\Catatan;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
 
 class PengajarRaporController extends Controller
 {
     public function index($kelasSemesterId)
     {
-        Log::info('=== PengajarRaporController::index dipanggil ===', ['kelas_semester_id' => $kelasSemesterId]);
-
         $kelasSemester = KelasSemester::with(['kelas', 'semester', 'waliKelas', 'mudir'])
             ->findOrFail($kelasSemesterId);
-
-        // Validasi bahwa pengajar adalah wali kelas
-        if ($kelasSemester->wali_kelas_id !== Auth::id()) {
-            Log::warning('Akses ditolak: Pengajar bukan wali kelas', [
-                'user_id' => Auth::id(),
-                'wali_kelas_id' => $kelasSemester->wali_kelas_id
-            ]);
-            return redirect()->route('pengajar.kelas-semester', $kelasSemester->semester_id)
-                ->with('error', 'Anda hanya dapat mengakses rapor untuk kelas yang Anda wali.');
-        }
 
         $santriList = SantriKelasSemester::with('santri')
             ->where('kelas_semester_id', $kelasSemesterId)
@@ -40,23 +26,8 @@ class PengajarRaporController extends Controller
 
     public function show($kelasSemesterId, $santriId)
     {
-        Log::info('=== PengajarRaporController::show dipanggil ===', [
-            'kelas_semester_id' => $kelasSemesterId,
-            'santri_id' => $santriId
-        ]);
-
         $kelasSemester = KelasSemester::with(['kelas', 'semester'])
             ->findOrFail($kelasSemesterId);
-
-        // Validasi bahwa pengajar adalah wali kelas
-        if ($kelasSemester->wali_kelas_id !== Auth::id()) {
-            Log::warning('Akses ditolak: Pengajar bukan wali kelas', [
-                'user_id' => Auth::id(),
-                'wali_kelas_id' => $kelasSemester->wali_kelas_id
-            ]);
-            return redirect()->route('pengajar.kelas-semester', $kelasSemester->semester_id)
-                ->with('error', 'Anda hanya dapat mengakses rapor untuk kelas yang Anda wali.');
-        }
 
         $santri = Santri::findOrFail($santriId);
         $mapels = KelasMapelSemester::with('mataPelajaran')
@@ -92,30 +63,18 @@ class PengajarRaporController extends Controller
 
     public function update(Request $request, $kelasSemesterId, $santriId)
     {
-        Log::info('=== PengajarRaporController::update dipanggil ===', [
-            'kelas_semester_id' => $kelasSemesterId,
-            'santri_id' => $santriId,
-            'data' => $request->all()
-        ]);
-
         $kelasSemester = KelasSemester::findOrFail($kelasSemesterId);
-
-        // Validasi bahwa pengajar adalah wali kelas
-        if ($kelasSemester->wali_kelas_id !== Auth::id()) {
-            Log::warning('Akses ditolak: Pengajar bukan wali kelas', [
-                'user_id' => Auth::id(),
-                'wali_kelas_id' => $kelasSemester->wali_kelas_id
-            ]);
-            return response()->json([
-                'success' => false,
-                'message' => 'Anda hanya dapat mengedit rapor untuk kelas yang Anda wali.'
-            ], 403);
-        }
 
         $request->validate([
             'nilai.*' => 'required|numeric|min:0|max:100',
             'catatan' => 'nullable|string',
             'keputusan_kelas_id' => 'nullable|exists:kelas,id',
+        ], [
+            'nilai.*.required' => 'Nilai wajib diisi.',
+            'nilai.*.numeric' => 'Nilai harus berupa angka.',
+            'nilai.*.min' => 'Nilai tidak boleh kurang dari 0.',
+            'nilai.*.max' => 'Nilai tidak boleh lebih dari 100.',
+            'keputusan_kelas_id.exists' => 'Kelas tujuan tidak valid.'
         ]);
 
         // Simpan nilai rapor
@@ -159,7 +118,7 @@ class PengajarRaporController extends Controller
             $message = 'Rapor berhasil disimpan dan santri naik ke kelas baru.';
         } else {
             $santri->update(['kelas_id' => $kelasSemester->kelas_id]);
-            $message = 'Rapor berhasil disimpan. Santri tidak naik kelas.';
+            $message = 'Rapor berhasil disimpan. Santri tetap di kelas saat ini.';
         }
 
         return response()->json([
@@ -170,23 +129,8 @@ class PengajarRaporController extends Controller
 
     public function previewRapor($kelasSemesterId, $santriId)
     {
-        Log::info('=== PengajarRaporController::previewRapor dipanggil ===', [
-            'kelas_semester_id' => $kelasSemesterId,
-            'santri_id' => $santriId
-        ]);
-
         $kelasSemester = KelasSemester::with(['kelas', 'semester', 'waliKelas', 'mudir'])
             ->findOrFail($kelasSemesterId);
-
-        // Validasi bahwa pengajar adalah wali kelas
-        if ($kelasSemester->wali_kelas_id !== Auth::id()) {
-            Log::warning('Akses ditolak: Pengajar bukan wali kelas', [
-                'user_id' => Auth::id(),
-                'wali_kelas_id' => $kelasSemester->wali_kelas_id
-            ]);
-            return redirect()->route('pengajar.kelas-semester', $kelasSemester->semester_id)
-                ->with('error', 'Anda hanya dapat mengakses rapor untuk kelas yang Anda wali.');
-        }
 
         $santri = Santri::findOrFail($santriId);
         $mapels = KelasMapelSemester::with('mataPelajaran')
@@ -281,7 +225,7 @@ class PengajarRaporController extends Controller
         $units = ['', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan'];
         $teens = ['Sepuluh', 'Sebelas', 'Dua Belas', 'Tiga Belas', 'Empat Belas', 'Lima Belas', 'Enam Belas', 'Tujuh Belas', 'Delapan Belas', 'Sembilan Belas'];
         $tens = ['', '', 'Dua Puluh', 'Tiga Puluh', 'Empat Puluh', 'Lima Puluh', 'Enam Puluh', 'Tujuh Puluh', 'Delapan Puluh', 'Sembilan Puluh'];
-        $thousands = ['', 'Ribu', 'Juta', 'M encourage', 'Triliun'];
+        $thousands = ['', 'Ribu', 'Juta', 'Milyar', 'Triliun'];
 
         if ($number == 0) return 'Nol';
         if ($number < 0) return 'Minus ' . self::numberToWords(abs($number));
@@ -305,6 +249,6 @@ class PengajarRaporController extends Controller
             return self::numberToWords($thousands_count) . ' Ribu' . ($remainder ? ' ' . self::numberToWords($remainder) : '');
         }
 
-        return 'Angka terlalu besar'; // Tambahkan batasan untuk angka yang sangat besar
+        return 'Angka terlalu besar';
     }
 }

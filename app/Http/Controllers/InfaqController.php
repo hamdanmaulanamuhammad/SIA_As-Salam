@@ -72,7 +72,6 @@ class InfaqController extends Controller
 
     public function updateInfaqTahunan(Request $request, $id)
     {
-        \Log::info('Request data: ', $request->all());
         $infaqTahunan = InfaqTahunan::findOrFail($id);
         $request->validate([
             'tahun' => 'required|integer|unique:infaq_tahunans,tahun,' . $id

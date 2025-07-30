@@ -22,7 +22,7 @@
                     </li>
                     <li class="relative px-6 py-3">
                         <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->is('attendance-pengajar') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ url('/attendance-pengajar') }}">
-                            <img src="{{ asset(request()->is('attendance-pengajar') ? 'assets/images/icons/attendance-active.svg' : 'assets/images/icons/attendance.svg') }}" alt="Attendance Icon" class="w-5 h-5" />
+                            <img src="{{ asset(request()->is('attendance-pengajar') ? 'assets/images/icons/presence-active.svg' : 'assets/images/icons/presence.svg') }}" alt="Attendance Icon" class="w-5 h-5" />
                             <span class="ml-4">Kehadiran</span>
                         </a>
                     </li>
@@ -30,6 +30,12 @@
                         <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->is('pengajar/akademik*') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('pengajar.akademik.index') }}">
                             <img src="{{ asset(request()->is('pengajar/akademik*') ? 'assets/images/icons/akademik-active.svg' : 'assets/images/icons/akademik.svg') }}" alt="Akademik Icon" class="w-5 h-5" />
                             <span class="ml-4">Akademik</span>
+                        </a>
+                    </li>
+                    <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold {{ request()->routeIs('pengajar.santri*') ? 'border-l-4 p-3 border-blue-600 bg-blue-100' : 'text-gray-800' }} transition-colors duration-150 hover:text-gray-800" href="{{ route('pengajar.santri.index') }}">
+                            <img src="{{ asset(request()->routeIs('pengajar.santri*') ? 'assets/images/icons/attendance-active.svg' : 'assets/images/icons/attendance.svg') }}" alt="Santri Icon" class="w-5 h-5" />
+                            <span class="ml-4">Santri</span>
                         </a>
                     </li>
                 </ul>

@@ -3,9 +3,9 @@
 @section('title', 'Kelas Semester')
 
 @section('content')
-<div class="container px-5 mx-auto py-6">
+<div class="container px-4 sm:px-6 mx-auto py-6">
     <!-- Header -->
-    <div class="flex justify-between mb-6 mt-6">
+    <div class="flex flex-col sm:flex-row justify-between mb-6 mt-6 gap-4">
         <h3 class="text-lg font-semibold text-gray-800">Daftar Kelas - {{ $semester->nama_semester }} ({{ $semester->tahun_ajaran }})</h3>
         <div class="flex gap-2">
             <a href="{{ route('pengajar.akademik.index') }}?tab=semester" class="text-sm px-4 py-2 text-white bg-gray-600 rounded-md hover:bg-gray-700">
@@ -21,10 +21,10 @@
     @if ($kelasSemesters->isEmpty())
         <p class="text-gray-600">Belum ada kelas yang ditambahkan untuk semester ini.</p>
     @else
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             @foreach ($kelasSemesters as $kelasSemester)
                 <a href="{{ route('pengajar.rapor.index', $kelasSemester->id) }}" class="block">
-                    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-shadow min-w-[300px]">
                         <h4 class="text-lg font-semibold text-gray-800 mb-2">{{ $kelasSemester->kelas->nama_kelas }}</h4>
                         <p class="text-sm text-gray-600 mb-1"><strong>Wali Kelas:</strong> {{ $kelasSemester->waliKelas ? $kelasSemester->waliKelas->full_name : '-' }}</p>
                         <p class="text-sm text-gray-600 mb-3"><strong>Mudir:</strong> {{ $kelasSemester->mudir ? $kelasSemester->mudir->full_name : '-' }}</p>
@@ -47,7 +47,7 @@
                                 @endforeach
                             </ul>
                         @endif
-                        <div class="flex gap-2 mt-3">
+                        <div class="flex flex-wrap gap-2 mt-3">
                             <button class="edit-button text-sm px-3 py-1 text-white bg-yellow-500 rounded-md hover:bg-yellow-600" data-id="{{ $kelasSemester->id }}">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
@@ -145,7 +145,6 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // Buka modal tambah kelas
@@ -188,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => {
             if (!response.ok) {
-                return response.json().then(err => { throw new Error(JSON.stringify(err) || 'Terjadi kesalahan pada server.') });
+                return response.json().then(err => { throw err });
             }
             return response.json();
         })
@@ -205,7 +204,19 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         })
         .catch(error => {
-            Swal.fire('Error!', error.message || 'Terjadi kesalahan pada server.', 'error');
+            // Prioritaskan pesan dari server jika ada
+            let message = error.message || 'Terjadi kesalahan saat menyimpan kelas.';
+            if (error.errors) {
+                // Tangani error validasi
+                if (error.errors.kelas_id) {
+                    message = error.errors.kelas_id[0];
+                } else if (error.errors.wali_kelas_id) {
+                    message = error.errors.wali_kelas_id[0];
+                } else if (error.errors.mudir_id) {
+                    message = error.errors.mudir_id[0];
+                }
+            }
+            Swal.fire('Gagal!', message, 'error');
         });
     });
 
@@ -239,11 +250,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('kelas-method').value = 'PUT';
                     document.getElementById('tambah-kelas-modal').classList.remove('hidden');
                 } else {
-                    Swal.fire('Error!', data.message || 'Gagal mengambil data kelas.', 'error');
+                    Swal.fire('Gagal!', data.message || 'Gagal mengambil data kelas.', 'error');
                 }
             })
             .catch(error => {
-                Swal.fire('Error!', 'Gagal mengambil data kelas: ' + error.message, 'error');
+                Swal.fire('Gagal!', 'Gagal mengambil data kelas: ' + error.message, 'error');
             });
         });
     });
@@ -275,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                     .then(response => {
                         if (!response.ok) {
-                            return response.json().then(err => { throw new Error(JSON.stringify(err) || 'Terjadi kesalahan saat menghapus data.') });
+                            return response.json().then(err => { throw err });
                         }
                         return response.json();
                     })
@@ -285,11 +296,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 location.reload();
                             });
                         } else {
-                            Swal.fire('Error!', data.message || 'Terjadi kesalahan.', 'error');
+                            Swal.fire('Gagal!', data.message || 'Gagal menghapus kelas.', 'error');
                         }
                     })
                     .catch(error => {
-                        Swal.fire('Error!', error.message || 'Terjadi kesalahan saat menghapus data.', 'error');
+                        Swal.fire('Gagal!', error.message || 'Terjadi kesalahan saat menghapus kelas.', 'error');
                     });
                 }
             });
@@ -335,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => {
             if (!response.ok) {
-                return response.json().then(err => { throw new Error(JSON.stringify(err) || 'Terjadi kesalahan pada server.') });
+                return response.json().then(err => { throw err });
             }
             return response.json();
         })
@@ -352,7 +363,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         })
         .catch(error => {
-            Swal.fire('Error!', error.message || 'Terjadi kesalahan pada server.', 'error');
+            let message = 'Terjadi kesalahan saat menambahkan mata pelajaran.';
+            if (error.errors && error.errors.mata_pelajaran_id) {
+                message = error.errors.mata_pelajaran_id[0] || 'Mata pelajaran tidak valid.';
+            } else if (error.message) {
+                message = error.message;
+            }
+            Swal.fire('Gagal!', message, 'error');
         });
     });
 
@@ -383,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                     .then(response => {
                         if (!response.ok) {
-                            return response.json().then(err => { throw new Error(JSON.stringify(err) || 'Terjadi kesalahan saat menghapus data.') });
+                            return response.json().then(err => { throw err });
                         }
                         return response.json();
                     })
@@ -393,11 +410,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 location.reload();
                             });
                         } else {
-                            Swal.fire('Error!', data.message || 'Terjadi kesalahan.', 'error');
+                            Swal.fire('Gagal!', data.message || 'Gagal menghapus mata pelajaran.', 'error');
                         }
                     })
                     .catch(error => {
-                        Swal.fire('Error!', error.message || 'Terjadi kesalahan saat menghapus data.', 'error');
+                        Swal.fire('Gagal!', error.message || 'Terjadi kesalahan saat menghapus mata pelajaran.', 'error');
                     });
                 }
             });

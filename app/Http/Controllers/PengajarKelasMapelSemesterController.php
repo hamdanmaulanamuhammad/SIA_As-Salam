@@ -5,19 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\KelasMapelSemester;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
 
 class PengajarKelasMapelSemesterController extends Controller
 {
-    public function __construct()
-    {
-        Log::info('=== PengajarKelasMapelSemesterController instantiated ===');
-    }
-
     public function store(Request $request)
     {
-        Log::info('=== PengajarKelasMapelSemesterController::store dipanggil ===', ['data' => $request->all()]);
-
         $validator = Validator::make($request->all(), [
             'kelas_semester_id' => 'required|exists:kelas_semester,id',
             'mata_pelajaran_id' => 'required|exists:mapels,id|unique:kelas_mapel_semester,mata_pelajaran_id,NULL,id,kelas_semester_id,' . $request->kelas_semester_id,
@@ -30,7 +22,6 @@ class PengajarKelasMapelSemesterController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validation failed in PengajarKelasMapelSemesterController::store', $validator->errors()->toArray());
             return response()->json([
                 'success' => false,
                 'message' => 'Validasi gagal.',
@@ -49,8 +40,6 @@ class PengajarKelasMapelSemesterController extends Controller
 
     public function destroy($id)
     {
-        Log::info('=== PengajarKelasMapelSemesterController::destroy dipanggil ===', ['id' => $id]);
-
         try {
             $kelasMapelSemester = KelasMapelSemester::findOrFail($id);
             $kelasMapelSemester->delete();
@@ -60,7 +49,6 @@ class PengajarKelasMapelSemesterController extends Controller
                 'message' => 'Mata pelajaran berhasil dihapus dari kelas.'
             ]);
         } catch (\Exception $e) {
-            Log::error('Error in PengajarKelasMapelSemesterController::destroy: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Data mata pelajaran tidak ditemukan.'

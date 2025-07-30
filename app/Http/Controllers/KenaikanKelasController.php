@@ -135,7 +135,6 @@ class KenaikanKelasController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Kenaikan Kelas Error:', ['error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat memproses kenaikan kelas.'

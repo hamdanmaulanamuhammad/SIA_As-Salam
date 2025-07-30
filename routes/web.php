@@ -242,6 +242,12 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/delete-signature', [ProfileController::class, 'deleteSignature'])->name('profile.pengajar.deleteSignature');
         });
 
+        Route::prefix('pengajar/santri')->group(function () {
+            Route::get('/data-santri', [SantriController::class, 'index'])->name('pengajar.santri.index');
+            Route::get('/{id}', [SantriController::class, 'show'])->name('pengajar.santri.show');
+            Route::get('/{id}/download-akta', [SantriController::class, 'downloadAkta'])->name('pengajar.download.akta');
+        });
+
        Route::prefix('pengajar/akademik')->group(function () {
             // Route yang sudah ada (dari implementasi sebelumnya)
             Route::get('/', [PengajarAkademikController::class, 'index'])->name('pengajar.akademik.index');
@@ -263,7 +269,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('rapor/{kelasSemesterId}/{santriId}', [PengajarRaporController::class, 'show'])->name('pengajar.rapor.show');
             Route::put('rapor/{kelasSemesterId}/{santriId}', [PengajarRaporController::class, 'update'])->name('pengajar.rapor.update');
             Route::get('rapor/{kelasSemesterId}/{santriId}/preview', [PengajarRaporController::class, 'previewRapor'])->name('pengajar.rapor.preview');
-            Route::get('rapor/{kelasSemesterId}/{santriId}/pdf', [PengajarRaporController::class, 'generatePdf'])->name('pengajar.rapor.pdf');
         });
     });
 });

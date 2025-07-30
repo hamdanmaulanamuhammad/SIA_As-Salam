@@ -24,7 +24,6 @@ class Recap extends Model
                 ->locale('id')
                 ->translatedFormat('F Y');
         } catch (\Exception $e) {
-            \Log::error('Failed to parse periode: ' . $e->getMessage(), ['periode' => $value]);
             return $value;
         }
     }

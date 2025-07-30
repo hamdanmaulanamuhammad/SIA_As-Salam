@@ -14,7 +14,6 @@ class LoginRegisterController extends Controller
     // Menampilkan form registrasi pengguna biasa
     public function register()
     {
-        \Log::info('Displaying register page');
         return view('auth.register');
     }
 
@@ -22,7 +21,6 @@ class LoginRegisterController extends Controller
     public function store(Request $request)
     {
         try {
-            \Log::info('Attempting registration', ['email' => $request->email]);
             $request->validate([
                 'username' => 'required|string|max:50|unique:users',
                 'full_name' => 'required|string|max:100',
@@ -44,22 +42,18 @@ class LoginRegisterController extends Controller
                 'role' => 'pengajar',
                 'accepted' => false,
             ]);
-
-            \Log::info('Registration successful', ['email' => $request->email]);
             return response()->json([
                 'status' => 'success',
                 'message' => 'Registrasi berhasil! Silakan tunggu persetujuan admin untuk dapat login.',
                 'redirect' => route('login')
             ]);
         } catch (ValidationException $e) {
-            \Log::error('Registration validation error: ' . json_encode($e->errors()));
             return response()->json([
                 'status' => 'error',
                 'message' => implode('\n', array_merge(...array_values($e->errors()))),
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
-            \Log::error('Registration general error: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Terjadi kesalahan saat mendaftar. Silakan coba lagi.'
@@ -70,7 +64,6 @@ class LoginRegisterController extends Controller
     // Menampilkan form registrasi admin
     public function adminRegister()
     {
-        \Log::info('Displaying admin register page');
         return view('auth.register-admin');
     }
 
@@ -78,7 +71,6 @@ class LoginRegisterController extends Controller
     public function adminStore(Request $request)
     {
         try {
-            \Log::info('Attempting admin registration', ['email' => $request->email]);
             $request->validate([
                 'username' => 'required|string|max:50|unique:users',
                 'full_name' => 'required|string|max:100',
@@ -101,21 +93,21 @@ class LoginRegisterController extends Controller
                 'accepted' => true,
             ]);
 
-            \Log::info('Admin registration successful', ['email' => $request->email]);
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Registrasi admin berhasil! Silakan login.',
                 'redirect' => route('login')
             ]);
         } catch (ValidationException $e) {
-            \Log::error('Admin registration validation error: ' . json_encode($e->errors()));
+
             return response()->json([
                 'status' => 'error',
                 'message' => implode('\n', array_merge(...array_values($e->errors()))),
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
-            \Log::error('Admin registration general error: ' . $e->getMessage());
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Terjadi kesalahan saat mendaftar admin. Silakan coba lagi.'
@@ -126,7 +118,7 @@ class LoginRegisterController extends Controller
     // Menampilkan form login
     public function login()
     {
-        \Log::info('Displaying login page', ['session' => session()->all()]);
+
         return view('auth.login');
     }
 
@@ -178,7 +170,7 @@ class LoginRegisterController extends Controller
     // Menampilkan layar dashboard kepada pengguna yang telah terautentikasi
     public function dashboard()
     {
-        \Log::info('Displaying dashboard for user', ['user' => Auth::user()->full_name]);
+
         return view('dashboard');
     }
 
@@ -187,18 +179,18 @@ class LoginRegisterController extends Controller
     {
         try {
             $userName = Auth::user()->full_name;
-            \Log::info('User logging out', ['user' => $userName]);
+
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-            \Log::info('Logout successful', ['user' => $userName]);
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Anda berhasil logout. Sampai jumpa, ' . $userName . '!',
                 'redirect' => route('login')
             ]);
         } catch (\Exception $e) {
-            \Log::error('Logout error: ' . $e->getMessage());
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Terjadi kesalahan saat logout. Silakan coba lagi.'

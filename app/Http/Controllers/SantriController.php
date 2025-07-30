@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
 
 class SantriController extends Controller
 {
@@ -62,12 +61,17 @@ class SantriController extends Controller
         // Ambil data kelas untuk dropdown
         $kelasList = Kelas::select('id', 'nama_kelas')->get();
 
+        // Tentukan view berdasarkan route
+        $view = $request->route()->getName() === 'pengajar.santri.index'
+                ? 'pengajar.data-santri-pengajar'
+                : 'admin.data-santri-admin';
+
         // Jika request adalah AJAX, return partial view atau JSON
         if ($request->ajax()) {
-            return view('admin.data-santri-admin', compact('santri', 'kelasList'));
+            return view($view, compact('santri', 'kelasList'));
         }
 
-        return view('admin.data-santri-admin', compact('santri', 'kelasList'));
+        return view($view, compact('santri', 'kelasList'));
     }
 
     /**
@@ -107,7 +111,6 @@ class SantriController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validation failed:', $validator->errors()->toArray());
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors()
@@ -115,14 +118,6 @@ class SantriController extends Controller
         }
 
         try {
-            // Log untuk debugging
-            Log::info('File upload attempt', [
-                'pas_foto' => $request->hasFile('pas_foto') ? 'Present' : 'Not present',
-                'akta' => $request->hasFile('akta') ? 'Present' : 'Not present',
-                'akta_mime' => $request->hasFile('akta') ? $request->file('akta')->getMimeType() : 'N/A',
-                'akta_extension' => $request->hasFile('akta') ? $request->file('akta')->getClientOriginalExtension() : 'N/A'
-            ]);
-
             // Hitung umur
             $tanggalLahir = new \DateTime($request->tanggal_lahir);
             $today = new \DateTime();
@@ -183,8 +178,6 @@ class SantriController extends Controller
                 'akta_path' => $aktaPath,
             ]);
 
-            Log::info('Santri created successfully', ['santri_id' => $santri->id]);
-
             return response()->json([
                 'success' => true,
                 'message' => 'Data santri berhasil disimpan',
@@ -192,11 +185,6 @@ class SantriController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error creating santri:', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
@@ -211,9 +199,14 @@ class SantriController extends Controller
     {
         $santri = Santri::with('kelasRelation')->findOrFail($id);
         $kelasList = Kelas::select('id', 'nama_kelas')->get();
-        return view('admin.detail-santri-admin', compact('santri', 'kelasList'));
-    }
 
+        // Tentukan view berdasarkan route
+        $view = request()->route()->getName() === 'pengajar.santri.show'
+                ? 'pengajar.detail-santri-pengajar'
+                : 'admin.detail-santri-admin';
+
+        return view($view, compact('santri', 'kelasList'));
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -281,7 +274,6 @@ class SantriController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::error('Update validation failed:', $validator->errors()->toArray());
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors()
@@ -301,8 +293,6 @@ class SantriController extends Controller
             // Handle file uploads
             $pasFotoPath = $santri->pas_foto_path;
             if ($request->hasFile('pas_foto')) {
-                Log::info('Updating pas foto for santri', ['santri_id' => $id]);
-
                 // Hapus file lama jika ada
                 if ($pasFotoPath && Storage::disk('public')->exists($pasFotoPath)) {
                     Storage::disk('public')->delete($pasFotoPath);
@@ -319,12 +309,6 @@ class SantriController extends Controller
 
             $aktaPath = $santri->akta_path;
             if ($request->hasFile('akta')) {
-                Log::info('Updating akta for santri', [
-                    'santri_id' => $id,
-                    'mime_type' => $request->file('akta')->getMimeType(),
-                    'extension' => $request->file('akta')->getClientOriginalExtension()
-                ]);
-
                 // Hapus file lama jika ada
                 if ($aktaPath && Storage::disk('public')->exists($aktaPath)) {
                     Storage::disk('public')->delete($aktaPath);
@@ -370,8 +354,6 @@ class SantriController extends Controller
                 'akta_path' => $aktaPath,
             ]);
 
-            Log::info('Santri updated successfully', ['santri_id' => $santri->id]);
-
             return response()->json([
                 'success' => true,
                 'message' => 'Data santri berhasil diperbarui',
@@ -379,11 +361,6 @@ class SantriController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error updating santri:', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
@@ -415,11 +392,6 @@ class SantriController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error deleting santri:', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
@@ -434,18 +406,12 @@ class SantriController extends Controller
     {
         try {
             if (!$file || !$file->isValid()) {
-                Log::error('Invalid file for upload', ['directory' => $directory]);
                 return null;
             }
 
             // Validasi file
             $maxSize = $directory === 'pas_foto' ? 2048 : 5120; // KB
             if ($file->getSize() > $maxSize * 1024) {
-                Log::error('File too large', [
-                    'directory' => $directory,
-                    'size' => $file->getSize(),
-                    'max_size' => $maxSize * 1024
-                ]);
                 return null;
             }
 
@@ -454,34 +420,16 @@ class SantriController extends Controller
             $extension = $file->getClientOriginalExtension();
             $filename = time() . '_' . Str::random(10) . '.' . $extension;
 
-            Log::info('Uploading file', [
-                'directory' => $directory,
-                'original_name' => $originalName,
-                'filename' => $filename,
-                'mime_type' => $file->getMimeType(),
-                'size' => $file->getSize()
-            ]);
-
             // Upload file
             $path = $file->storeAs($directory, $filename, 'public');
 
             if ($path) {
-                Log::info('File uploaded successfully', [
-                    'path' => $path,
-                    'full_path' => storage_path('app/public/' . $path)
-                ]);
                 return $path;
             } else {
-                Log::error('Failed to store file', ['directory' => $directory]);
                 return null;
             }
 
         } catch (\Exception $e) {
-            Log::error('Exception during file upload:', [
-                'message' => $e->getMessage(),
-                'directory' => $directory,
-                'trace' => $e->getTraceAsString()
-            ]);
             return null;
         }
     }
@@ -507,11 +455,6 @@ class SantriController extends Controller
             return response()->download($fullPath, $downloadName);
 
         } catch (\Exception $e) {
-            Log::error('Error downloading akta:', [
-                'santri_id' => $id,
-                'message' => $e->getMessage()
-            ]);
-
             return redirect()->back()->with('error', 'Terjadi kesalahan saat mengunduh file.');
         }
     }

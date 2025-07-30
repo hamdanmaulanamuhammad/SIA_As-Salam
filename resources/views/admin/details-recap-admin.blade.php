@@ -193,7 +193,7 @@
                         if ($presence && $presence->arrival_time) {
                             if (!\Carbon\Carbon::hasFormat($recap->batas_keterlambatan, 'H:i:s')) {
                                 $batas = \Carbon\Carbon::createFromTime(16, 15, 0, 'Asia/Jakarta');
-                                \Log::warning('Invalid batas_keterlambatan, using default 16:15:00', ['recap_id' => $recap->id, 'value' => $recap->batas_keterlambatan]);
+
                             } else {
                                 $batas = \Carbon\Carbon::parse($recap->batas_keterlambatan, 'Asia/Jakarta');
                             }
@@ -201,14 +201,14 @@
                                 $arrival = \Carbon\Carbon::parse($presence->arrival_time, 'Asia/Jakarta');
                             } else {
                                 $arrival = null;
-                                \Log::warning('Invalid arrival_time', ['presence' => $presence]);
+
                             }
 
                             if ($arrival && $arrival->greaterThan($batas)) {
                                 $terlambat++;
                                 $minutesLate = $arrival->diffInMinutes($batas);
                                 if ($minutesLate < 0) {
-                                    \Log::error('Negative minutes late detected', ['date' => $date, 'arrival' => $arrival->toTimeString(), 'batas' => $batas->toTimeString()]);
+
                                     $minutesLate = abs($minutesLate);
                                 }
                                 $totalLateness += $minutesLate;
@@ -239,9 +239,6 @@
                         <div>
                             <h3 class="text-lg font-bold text-gray-800">{{ $pengajar->full_name }}</h3>
                         </div>
-                        <button class="no-pdf px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600" onclick="downloadCard('pengajar-card-{{ $pengajar->id }}', '{{ $pengajar->full_name }}-Rekap-Presensi.pdf')">
-                            Download PDF
-                        </button>
                     </div>
 
                     <!-- Tabel Rekap Performa -->
@@ -298,7 +295,7 @@
                                             $timeOut = $presence->end_time ? \Carbon\Carbon::parse($presence->end_time)->format('H:i') : '-';
                                             if (!\Carbon\Carbon::hasFormat($recap->batas_keterlambatan, 'H:i:s')) {
                                                 $batas = \Carbon\Carbon::createFromTime(16, 15, 0, 'Asia/Jakarta');
-                                                \Log::warning('Invalid batas_keterlambatan, using default 16:15:00', ['recap_id' => $recap->id, 'value' => $recap->batas_keterlambatan]);
+
                                             } else {
                                                 $batas = \Carbon\Carbon::parse($recap->batas_keterlambatan, 'Asia/Jakarta');
                                             }
@@ -306,13 +303,13 @@
                                                 $arrival = \Carbon\Carbon::parse($presence->arrival_time, 'Asia/Jakarta');
                                             } else {
                                                 $arrival = null;
-                                                \Log::warning('Invalid arrival_time', ['presence' => $presence]);
+
                                             }
 
                                             if ($arrival && $arrival->greaterThan($batas)) {
                                                 $minutesLate = $arrival->diffInMinutes($batas);
                                                 if ($minutesLate < 0) {
-                                                    \Log::error('Negative minutes late detected', ['date' => $date, 'arrival' => $arrival->toTimeString(), 'batas' => $batas->toTimeString()]);
+
                                                     $minutesLate = abs($minutesLate);
                                                 }
                                                 $rangesOf5Minutes = ceil($minutesLate / 5);
@@ -421,8 +418,6 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         // Menangani tombol untuk membuka form mukafaah
@@ -586,19 +581,6 @@
                 });
             });
         });
-
-        // Download PDF
-        function downloadCard(elementId, filename) {
-            const element = document.getElementById(elementId);
-            const opt = {
-                margin: 0.3,
-                filename: filename,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(element).save();
-        }
     });
 </script>
 @endsection

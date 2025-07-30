@@ -27,9 +27,6 @@
     <div id="content-kelas" class="tab-content">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Data Kelas</h2>
-            <div class="bg-gray-100 px-4 py-2 rounded-md text-sm text-gray-600">
-                <i class="fa fa-info-circle mr-2"></i>Mode View Only
-            </div>
         </div>
 
         <div class="overflow-x-auto">
@@ -116,9 +113,6 @@
     <div id="content-semester" class="tab-content hidden overflow-x-auto">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Data Semester</h2>
-            <div class="bg-gray-100 px-4 py-2 rounded-md text-sm text-gray-600">
-                <i class="fa fa-info-circle mr-2"></i>Mode View Only
-            </div>
         </div>
 
         <div class="overflow-x-auto">
@@ -173,11 +167,11 @@
                 <input type="hidden" name="_method" id="mapel-method" value="POST">
                 <div class="mb-4">
                     <label for="nama_mapel" class="block text-sm font-medium text-gray-700 mb-1">Nama Mata Pelajaran <span class="text-red-600">*</span></label>
-                    <input type="text" name="nama_mapel" id="nama_mapel" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" required>
+                    <input type="text" name="nama_mapel" id="nama_mapel" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1 text-sm" required>
                 </div>
                 <div class="mb-4">
                     <label for="kategori" class="block text-sm font-medium text-gray-700 mb-1">Kategori <span class="text-red-600">*</span></label>
-                    <select name="kategori" id="kategori" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" required>
+                    <select name="kategori" id="kategori" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1 text-sm" required>
                         <option value="">Pilih Kategori</option>
                         <option value="Hafalan">Hafalan</option>
                         <option value="Teori">Teori</option>

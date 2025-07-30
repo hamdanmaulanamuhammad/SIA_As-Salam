@@ -98,7 +98,6 @@
             <div class="mb-4">
                 <label for="keputusan_kelas_id" class="block text-sm font-medium text-gray-700">Keputusan Kelas</label>
                 <select id="keputusan_kelas_id" name="keputusan_kelas_id" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-3 py-2">
-                    <option value="">Tidak Naik Kelas</option>
                     @foreach (\App\Models\Kelas::all() as $kelas)
                         <option value="{{ $kelas->id }}" {{ old('keputusan_kelas_id', $catatanRapor ? $catatanRapor->keputusan_kelas_id : '') == $kelas->id ? 'selected' : '' }}>
                             {{ $kelas->nama_kelas }}

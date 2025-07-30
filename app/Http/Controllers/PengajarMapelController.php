@@ -18,33 +18,55 @@ class PengajarMapelController extends Controller
         $validator = Validator::make($request->all(), [
             'nama_mapel' => 'required|string|max:255|unique:mapels,nama_mapel',
             'kategori' => 'required|in:Hafalan,Teori,Praktik',
+        ], [
+            'nama_mapel.required' => 'Nama mata pelajaran wajib diisi.',
+            'nama_mapel.string' => 'Nama mata pelajaran harus berupa teks.',
+            'nama_mapel.max' => 'Nama mata pelajaran tidak boleh lebih dari 255 karakter.',
+            'nama_mapel.unique' => 'Nama mata pelajaran ini sudah terdaftar. Silakan gunakan nama lain.',
+            'kategori.required' => 'Kategori wajib dipilih.',
+            'kategori.in' => 'Kategori harus salah satu dari: Hafalan, Teori, atau Praktik.'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => $validator->errors()->first()
+                'message' => 'Gagal menambahkan mata pelajaran. Periksa kembali data yang diisi.',
+                'errors' => $validator->errors()
             ], 422);
         }
 
-        Mapel::create([
-            'nama_mapel' => $request->nama_mapel,
-            'kategori' => $request->kategori
-        ]);
+        try {
+            Mapel::create([
+                'nama_mapel' => $request->nama_mapel,
+                'kategori' => $request->kategori
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Mata Pelajaran berhasil ditambahkan'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Mata pelajaran berhasil ditambahkan.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menambahkan mata pelajaran. Silakan coba lagi nanti.'
+            ], 500);
+        }
     }
 
     public function edit($id)
     {
-        $mapel = Mapel::findOrFail($id);
-        return response()->json([
-            'success' => true,
-            'data' => $mapel
-        ]);
+        try {
+            $mapel = Mapel::findOrFail($id);
+            return response()->json([
+                'success' => true,
+                'data' => $mapel
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Mata pelajaran tidak ditemukan.'
+            ], 404);
+        }
     }
 
     public function update(Request $request, $id)
@@ -52,35 +74,57 @@ class PengajarMapelController extends Controller
         $validator = Validator::make($request->all(), [
             'nama_mapel' => 'required|string|max:255|unique:mapels,nama_mapel,'.$id,
             'kategori' => 'required|in:Hafalan,Teori,Praktik',
+        ], [
+            'nama_mapel.required' => 'Nama mata pelajaran wajib diisi.',
+            'nama_mapel.string' => 'Nama mata pelajaran harus berupa teks.',
+            'nama_mapel.max' => 'Nama mata pelajaran tidak boleh lebih dari 255 karakter.',
+            'nama_mapel.unique' => 'Nama mata pelajaran ini sudah terdaftar. Silakan gunakan nama lain.',
+            'kategori.required' => 'Kategori wajib dipilih.',
+            'kategori.in' => 'Kategori harus salah satu dari: Hafalan, Teori, atau Praktik.'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => $validator->errors()->first()
+                'message' => 'Gagal memperbarui mata pelajaran. Periksa kembali data yang diisi.',
+                'errors' => $validator->errors()
             ], 422);
         }
 
-        $mapel = Mapel::findOrFail($id);
-        $mapel->update([
-            'nama_mapel' => $request->nama_mapel,
-            'kategori' => $request->kategori
-        ]);
+        try {
+            $mapel = Mapel::findOrFail($id);
+            $mapel->update([
+                'nama_mapel' => $request->nama_mapel,
+                'kategori' => $request->kategori
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Mata Pelajaran berhasil diperbarui'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Mata pelajaran berhasil diperbarui.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui mata pelajaran. Silakan coba lagi nanti.'
+            ], 500);
+        }
     }
 
     public function destroy($id)
     {
-        $mapel = Mapel::findOrFail($id);
-        $mapel->delete();
+        try {
+            $mapel = Mapel::findOrFail($id);
+            $mapel->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Mata Pelajaran berhasil dihapus'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Mata pelajaran berhasil dihapus.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus mata pelajaran. Silakan coba lagi nanti.'
+            ], 500);
+        }
     }
 }
