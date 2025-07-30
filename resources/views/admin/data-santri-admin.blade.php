@@ -197,6 +197,8 @@
                         <label for="kelas" class="block text-sm font-medium text-gray-700 mb-1">Kelas Sekolah <span class="text-red-600">*</span></label>
                         <select name="kelas" id="kelas" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
                             <option value="">Pilih Kelas</option>
+                            <option value="TK A">TK A</option>  
+                            <option value="TK B">TK B</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -277,10 +279,10 @@
 
             <!-- Tombol Navigasi -->
             <div class="flex justify-between p-5 border-t">
-                <button type="button" id="prevBtn" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 hidden">Sebelumnya</button>
-                <button type="button" id="nextBtn" class="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600">Selanjutnya</button>
-                <button type="submit" id="submitBtn" class="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 hidden">Simpan</button>
-                <button type="button" id="cancel-santri-form-button" class="px-4 py-2 rounded bg-gray-400 text-white hover:bg-gray-500 hidden">Batal</button>
+                <button type="button" id="prevBtn" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 hidden"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button type="button" id="nextBtn" class="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"><i class="fa-solid fa-chevron-right"></i></button>
+                        <button type="submit" id="submitBtn" class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700">Simpan</button>
+                        <button type="button" id="cancel-santri-form-button" class="px-4 py-2 mr-2 text-sm text-white bg-gray-400 rounded-md hover:bg-gray-500 hidden">Batal</button>
             </div>
         </form>
     </div>

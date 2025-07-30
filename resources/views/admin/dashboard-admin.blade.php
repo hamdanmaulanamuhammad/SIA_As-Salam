@@ -79,7 +79,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-4 py-3 text-center text-gray-600">Tidak ada data presensi hari ini.</td>
+                            <td colspan="6" class="px-4 py-3 text-center text-gray-600">Tidak ada data presensi hari ini.</td>
                         </tr>
                     @endforelse
                 </tbody>

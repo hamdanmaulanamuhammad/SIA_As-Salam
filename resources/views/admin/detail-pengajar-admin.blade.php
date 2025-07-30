@@ -265,10 +265,6 @@
                         <option value="terminated">Terminated</option>
                     </select>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700">Dokumen</label>
-                    <input type="text" name="document" id="contract_document" class="w-full border rounded px-3 py-2">
-                </div>
                 <div class="flex justify-end gap-2">
                     <button type="button" onclick="closeContractModal()" class="bg-gray-500 text-white px-4 py-2 rounded">Batal</button>
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Simpan</button>
@@ -280,7 +276,6 @@
 @endsection
 
 @section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // Reset Password Modal
         function openResetPasswordModal() {

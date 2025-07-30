@@ -65,10 +65,6 @@
                     <input type="text" id="name" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1 text-sm" value="{{ $user->full_name }}" readonly />
                 </div>
                 <div class="mb-4">
-                    <label for="nip" class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
-                    <input type="text" id="nip" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1 text-sm" value="{{ $user->id }}" readonly />
-                </div>
-                <div class="mb-4">
                     <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
                     <input type="text" id="username" class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1 text-sm" value="{{ $user->username }}" readonly />
                 </div>

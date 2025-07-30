@@ -254,6 +254,8 @@
                                 <label for="kelas" class="block text-sm font-medium text-gray-700 mb-1">Kelas Sekolah <span class="text-red-600">*</span></label>
                                 <select name="kelas" id="kelas" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 px-2 py-1" required>
                                     <option value="">Pilih Kelas</option>
+                                    <option value="TK A">TK A</option>
+                                    <option value="TK B">TK B</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
                                     <option value="3">3</option>
