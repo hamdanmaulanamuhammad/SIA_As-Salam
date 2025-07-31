@@ -8,22 +8,19 @@ use Illuminate\Support\Facades\Auth;
 
 class CheckRole
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  string  $role
-     * @return mixed
-     */
     public function handle(Request $request, Closure $next, $role)
     {
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Anda harus login untuk mengakses halaman ini.');
         }
 
-        if (Auth::user()->role !== $role) {
-            $user = Auth::user();
+        $user = Auth::user();
+        if (!$user->accepted) {
+            Auth::logout();
+            return redirect()->route('login')->with('error', 'Akun Anda belum disetujui oleh admin. Silakan tunggu persetujuan.');
+        }
+
+        if ($user->role !== $role) {
             if ($user->role === 'admin') {
                 return redirect()->route('dashboard-admin')->with('error', 'Akses ditolak. Anda tidak memiliki izin untuk halaman ini.');
             } elseif ($user->role === 'pengajar') {
@@ -34,4 +31,3 @@ class CheckRole
         return $next($request);
     }
 }
-

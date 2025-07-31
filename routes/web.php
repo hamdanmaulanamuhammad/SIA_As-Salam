@@ -28,7 +28,25 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckRole;
 
 // Login
-Route::post('/login', [LoginRegisterController::class, 'authenticate'])->name('login.authenticate');
+Route::get('/login', [LoginRegisterController::class, 'login'])->name('login');
+
+// Redirect root ke login
+Route::get('/', function () {
+    return redirect()->route('login');
+});
+
+Route::fallback(function () {
+    if (Auth::check()) {
+        $user = Auth::user();
+        if ($user->accepted) {
+            return redirect()->route($user->role === 'admin' ? 'dashboard-admin' : 'dashboard-pengajar');
+        } else {
+            Auth::logout();
+            return redirect()->route('login')->with('error', 'Akun Anda belum disetujui oleh admin.');
+        }
+    }
+    return redirect()->route('login')->with('error', 'Halaman tidak ditemukan.');
+});
 
 // Register
 Route::get('/register', [LoginRegisterController::class, 'register'])->name('register')->middleware('guest');

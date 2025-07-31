@@ -120,10 +120,15 @@ class LoginRegisterController extends Controller
     {
         if (Auth::check()) {
             $user = Auth::user();
-            if ($user->role === 'admin') {
-                return redirect()->route('dashboard-admin');
-            } elseif ($user->role === 'pengajar') {
-                return redirect()->route('dashboard-pengajar');
+            if ($user->accepted) {
+                if ($user->role === 'admin') {
+                    return redirect()->route('dashboard-admin');
+                } elseif ($user->role === 'pengajar') {
+                    return redirect()->route('dashboard-pengajar');
+                }
+            } else {
+                Auth::logout();
+                return view('auth.login')->with('error', 'Akun Anda belum disetujui oleh admin. Silakan tunggu persetujuan.');
             }
         }
         return view('auth.login');
