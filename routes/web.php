@@ -25,28 +25,18 @@ use App\Http\Controllers\RecapController;
 use App\Http\Controllers\SemesterController;
 use App\Models\Santri;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Middleware\CheckRole;
 
-// Login
 Route::get('/login', [LoginRegisterController::class, 'login'])->name('login');
+Route::post('/login', [LoginRegisterController::class, 'authenticate'])->name('login.authenticate'); // BARIS INI YANG HILANG
 
 // Redirect root ke login
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::fallback(function () {
-    if (Auth::check()) {
-        $user = Auth::user();
-        if ($user->accepted) {
-            return redirect()->route($user->role === 'admin' ? 'dashboard-admin' : 'dashboard-pengajar');
-        } else {
-            Auth::logout();
-            return redirect()->route('login')->with('error', 'Akun Anda belum disetujui oleh admin.');
-        }
-    }
-    return redirect()->route('login')->with('error', 'Halaman tidak ditemukan.');
-});
+Route::fallback([LoginRegisterController::class, 'fallback']);
 
 // Register
 Route::get('/register', [LoginRegisterController::class, 'register'])->name('register')->middleware('guest');

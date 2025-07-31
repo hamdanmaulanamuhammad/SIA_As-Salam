@@ -17,6 +17,10 @@ class LoginRegisterController extends Controller
         return view('auth.register');
     }
 
+    public function fallback()
+    {
+        return redirect()->route('login')->with('error', 'Halaman yang Anda cari tidak ditemukan.');
+    }
     // Menyimpan data form registrasi pengguna biasa
     public function store(Request $request)
     {
