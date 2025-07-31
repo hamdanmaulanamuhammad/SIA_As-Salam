@@ -28,7 +28,20 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckRole;
 
 // Login
-Route::get('/', [LoginRegisterController::class, 'login'])->name('login')->middleware('guest');
+Route::get('/', function() {
+    if (Auth::check()) {
+        $user = Auth::user();
+        if ($user->role === 'admin') {
+            return redirect()->route('dashboard-admin');
+        } elseif ($user->role === 'pengajar') {
+            return redirect()->route('dashboard-pengajar');
+        }
+        // Fallback
+        return redirect()->route('dashboard-admin');
+    }
+    return app(LoginRegisterController::class)->login();
+})->name('login');
+
 Route::post('/login', [LoginRegisterController::class, 'authenticate'])->name('login.authenticate');
 
 // Register

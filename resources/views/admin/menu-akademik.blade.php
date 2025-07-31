@@ -28,7 +28,7 @@
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Data Kelas</h2>
             <button id="tambahKelasButton" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200">
-                <i class="fa fa-plus mr-2"></i>Tambah Kelas
+                <i class="fa fa-plus mr-2"></i>Kelas
             </button>
         </div>
 
@@ -77,7 +77,7 @@
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Data Mata Pelajaran</h2>
             <button id="tambahMapelButton" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200">
-                <i class="fa fa-plus mr-2"></i>Tambah Mata Pelajaran
+                <i class="fa fa-plus mr-2"></i>Mata Pelajaran
             </button>
         </div>
 
@@ -132,7 +132,7 @@
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Data Semester</h2>
             <button id="tambahSemesterButton" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200">
-                <i class="fa fa-plus mr-2"></i>Tambah Semester
+                <i class="fa fa-plus mr-2"></i>Semester
             </button>
         </div>
 
