@@ -118,7 +118,14 @@ class LoginRegisterController extends Controller
     // Menampilkan form login
     public function login()
     {
-
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user->role === 'admin') {
+                return redirect()->route('dashboard-admin');
+            } elseif ($user->role === 'pengajar') {
+                return redirect()->route('dashboard-pengajar');
+            }
+        }
         return view('auth.login');
     }
 
