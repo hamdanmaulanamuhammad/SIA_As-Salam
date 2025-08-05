@@ -20,8 +20,9 @@ class PengajarRaporController extends Controller
         $santriList = SantriKelasSemester::with('santri')
             ->where('kelas_semester_id', $kelasSemesterId)
             ->paginate(10);
+        $totalSantri = SantriKelasSemester::where('kelas_semester_id', $kelasSemesterId)->count();
 
-        return view('pengajar.list-santri-rapor', compact('kelasSemester', 'santriList'));
+        return view('pengajar.list-santri-rapor', compact('kelasSemester', 'santriList', 'totalSantri'));
     }
 
     public function show($kelasSemesterId, $santriId)

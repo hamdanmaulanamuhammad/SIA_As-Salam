@@ -34,7 +34,7 @@
             </div>
             <div>
                 <p class="text-sm text-gray-600"><strong>Jumlah Santri:</strong></p>
-                <p class="text-gray-800">{{ $santriList->count() }} santri</p>
+                <p class="text-gray-800">{{ $totalSantri }} santri</p>
             </div>
         </div>
     </div>
