@@ -107,15 +107,17 @@
                 background: white;
             }
             .container {
-                width: 210mm;
-                min-height: 297mm;
+                width: 210mm; /* A4 width */
+                min-height: auto !important; /* Hapus batas tinggi */
+                height: auto !important;
                 margin: 0;
                 box-shadow: none;
             }
             .pdf-content {
-                width: 190mm;
+                width: 190mm; /* Lebar konten minus margin */
+                padding: 5mm; /* Kecilkan padding */
                 margin: 0 auto;
-                padding: 10mm;
+                font-size: 10pt; /* Perkecil font biar muat */
             }
             table {
                 page-break-inside: avoid;
@@ -125,7 +127,7 @@
             }
             @page {
                 size: A4;
-                margin: 0;
+                margin: 5mm; /* Kasih sedikit margin biar rapi */
             }
             .logo-container, .signature-container, .cap-container {
                 border: none !important;

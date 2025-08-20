@@ -58,7 +58,6 @@
                         $totalSukarela = $item->infaqSantris->sum('infaq_sukarela');
                         $totalInfaqItem = $totalWajib + $totalSukarela;
                         $expectedWajib = $item->infaqSantris->count() * 12 * 10000;
-                        $kekurangan = $expectedWajib - $totalWajib;
                     @endphp
                     <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-50' }}">
                         <td class="px-4 py-3 text-sm">{{ ($infaqTahunan->currentPage() - 1) * $infaqTahunan->perPage() + $index + 1 }}</td>
@@ -66,7 +65,7 @@
                         <td class="px-4 py-3 text-sm">{{ $item->infaqSantris->count() }}</td>
                         <td class="px-4 py-3 text-sm text-blue-600 font-medium">{{ 'Rp ' . number_format($totalWajib, 0, ',', '.') }}</td>
                         <td class="px-4 py-3 text-sm text-green-600 font-medium">{{ 'Rp ' . number_format($totalSukarela, 0, ',', '.') }}</td>
-                        <td class="px-4 py-3 text-sm text-red-600 font-medium">{{ 'Rp ' . number_format($kekurangan, 0, ',', '.') }}</td>
+                        <td class="px-4 py-3 text-sm text-red-600 font-medium">Rp {{ number_format($totalKekurangan, 0, ',', '.') }}</td>
                         <td class="px-4 py-3 text-sm text-purple-600 font-bold">{{ 'Rp ' . number_format($totalInfaqItem, 0, ',', '.') }}</td>
                         <td class="px-4 py-3 text-sm">
                             <div class="flex space-x-2">
